@@ -76,17 +76,34 @@ function openModule(moduleId, submoduleId) {
     const module = courseData.modules.find(m => m.id === moduleId);
     const submodule = module.submodules.find(s => s.id === submoduleId);
     
-    if (!module || !submodule) return;
+    if (!module || !submodule) {
+        console.error("Модуль или подмодуль не найден:", moduleId, submoduleId);
+        return;
+    }
     
     // Обновление заголовка
-    document.getElementById('moduleTitle').textContent = module.title;
-    document.getElementById('moduleSubtitle').textContent = submodule.title;
+    const moduleTitle = document.getElementById('moduleTitle');
+    const moduleSubtitle = document.getElementById('moduleSubtitle');
+    
+    if (moduleTitle) moduleTitle.textContent = module.title;
+    if (moduleSubtitle) moduleSubtitle.textContent = submodule.title;
+    
+    // Скрываем тестовую область, если она открыта
+    const testArea = document.getElementById('testArea');
+    const contentDisplay = document.getElementById('contentDisplay');
+    const moduleTabs = document.getElementById('moduleTabs');
+    
+    if (testArea) testArea.style.display = 'none';
+    if (contentDisplay) contentDisplay.style.display = 'block';
+    if (moduleTabs) moduleTabs.style.display = 'flex';
     
     // Рендеринг вкладок
     renderTabs(submodule);
     
     // Перерисовка списка модулей для отображения подмодулей
     renderModulesList();
+    
+    console.log("Открыт модуль:", moduleId, "подмодуль:", submoduleId);
 }
 
 // Рендеринг вкладок подмодуля
