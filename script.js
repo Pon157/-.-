@@ -1,13 +1,13 @@
 // Инициализация при загрузке страницы
 document.addEventListener('DOMContentLoaded', function() {
-    console.log("Документ загружен, инициализируем...");
+    console.log("Курс эмпатии загружается...");
     
     initProgress();
     renderModulesList();
     updateProgressUI();
     setupEventListeners();
     
-    // Открываем сохраненный модуль
+    // Открываем последний сохраненный модуль
     if (userProgress.currentModule && userProgress.currentSubmodule) {
         setTimeout(() => {
             openModule(userProgress.currentModule, userProgress.currentSubmodule);
@@ -15,29 +15,26 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+// Состояние прогресса
+let userProgress = {
+    currentModule: 1,
+    currentSubmodule: "1.1",
+    completedModules: [],
+    completedSubmodules: [],
+    testResults: {},
+    assignmentResults: {}
+};
+
 // Инициализация прогресса
 function initProgress() {
-    const savedProgress = localStorage.getItem('empathyCourseProgress');
-    if (savedProgress) {
+    const saved = localStorage.getItem('empathyCourseProgress');
+    if (saved) {
         try {
-            userProgress = JSON.parse(savedProgress);
+            userProgress = JSON.parse(saved);
         } catch (e) {
-            userProgress = getDefaultProgress();
+            console.error("Ошибка загрузки прогресса:", e);
         }
-    } else {
-        userProgress = getDefaultProgress();
     }
-}
-
-function getDefaultProgress() {
-    return {
-        currentModule: 1,
-        currentSubmodule: "1.1",
-        completedModules: [],
-        completedSubmodules: [],
-        testResults: {},
-        assignmentResults: {}
-    };
 }
 
 // Сохранение прогресса
@@ -46,43 +43,49 @@ function saveProgress() {
     updateProgressUI();
 }
 
-// Обновление прогресса
+// Обновление UI прогресса
 function updateProgressUI() {
-    const totalSubmodules = courseData.modules.reduce((total, module) => {
-        return total + (module.submodules ? module.submodules.length : 0);
+    const totalSubmodules = courseData.modules.reduce((sum, module) => {
+        return sum + (module.submodules ? module.submodules.length : 0);
     }, 0);
     
-    const completedSubmodules = userProgress.completedSubmodules.length;
-    const progressPercent = totalSubmodules > 0 ? Math.round((completedSubmodules / totalSubmodules) * 100) : 0;
+    const completed = userProgress.completedSubmodules.length;
+    const percent = totalSubmodules > 0 ? Math.round((completed / totalSubmodules) * 100) : 0;
     
     const progressFill = document.getElementById('progressFill');
     const progressText = document.getElementById('progressText');
     
-    if (progressFill) progressFill.style.width = `${progressPercent}%`;
-    if (progressText) progressText.textContent = `Прогресс: ${progressPercent}%`;
+    if (progressFill) progressFill.style.width = percent + '%';
+    if (progressText) progressText.textContent = `Прогресс: ${percent}%`;
     
     // Сертификат
-    const certificateBtn = document.getElementById('certificateBtn');
-    if (certificateBtn) {
-        if (progressPercent === 100) {
-            certificateBtn.classList.remove('disabled');
+    const certBtn = document.getElementById('certificateBtn');
+    if (certBtn) {
+        if (percent === 100) {
+            certBtn.classList.remove('disabled');
+            certBtn.onclick = showCertificate;
         } else {
-            certificateBtn.classList.add('disabled');
+            certBtn.classList.add('disabled');
+            certBtn.onclick = function(e) {
+                e.preventDefault();
+                alert(`Завершите все модули! Прогресс: ${percent}%`);
+            };
         }
     }
 }
 
-// Рендеринг списка модулей (ИСПРАВЛЕННАЯ)
+// Рендеринг списка модулей
 function renderModulesList() {
     const modulesList = document.getElementById('modulesList');
     if (!modulesList) return;
     
-    // Создаем контейнер для модулей
+    // Находим или создаем контейнер модулей
     let container = modulesList.querySelector('.modules-container');
     if (!container) {
         container = document.createElement('div');
         container.className = 'modules-container';
-        // Вставляем перед прогресс-контейнером
+        
+        // Вставляем перед прогрессом
         const progressContainer = modulesList.querySelector('.progress-container');
         if (progressContainer) {
             modulesList.insertBefore(container, progressContainer);
@@ -102,17 +105,22 @@ function renderModulesList() {
         `;
         
         moduleItem.addEventListener('click', () => {
+            // Сброс активных классов
             document.querySelectorAll('.module-item').forEach(item => {
                 item.classList.remove('active');
             });
             moduleItem.classList.add('active');
-            openModule(module.id, module.submodules[0].id);
+            
+            // Открываем первый подмодуль
+            if (module.submodules && module.submodules.length > 0) {
+                openModule(module.id, module.submodules[0].id);
+            }
         });
         
         container.appendChild(moduleItem);
         
-        // Подмодули
-        if (userProgress.currentModule === module.id) {
+        // Подмодули для активного модуля
+        if (userProgress.currentModule === module.id && module.submodules) {
             module.submodules.forEach(submodule => {
                 const submoduleItem = document.createElement('div');
                 submoduleItem.className = `submodule-item ${userProgress.currentSubmodule === submodule.id ? 'active' : ''}`;
@@ -131,12 +139,12 @@ function renderModulesList() {
             });
         }
     });
-    
-    updateProgressUI();
 }
 
 // Открытие модуля
 function openModule(moduleId, submoduleId) {
+    console.log("Открываем модуль:", moduleId, submoduleId);
+    
     userProgress.currentModule = moduleId;
     userProgress.currentSubmodule = submoduleId;
     saveProgress();
@@ -144,15 +152,24 @@ function openModule(moduleId, submoduleId) {
     const module = courseData.modules.find(m => m.id === moduleId);
     const submodule = module.submodules.find(s => s.id === submoduleId);
     
+    if (!module || !submodule) {
+        console.error("Модуль или подмодуль не найдены");
+        return;
+    }
+    
+    // Обновляем заголовки
     document.getElementById('moduleTitle').textContent = module.title;
     document.getElementById('moduleSubtitle').textContent = submodule.title;
     
-    // Скрываем тест
+    // Скрываем тест, показываем контент
     document.getElementById('testArea').style.display = 'none';
     document.getElementById('contentDisplay').style.display = 'block';
     document.getElementById('moduleTabs').style.display = 'flex';
     
+    // Рендерим вкладки
     renderTabs(submodule);
+    
+    // Обновляем список модулей
     renderModulesList();
 }
 
@@ -164,7 +181,13 @@ function renderTabs(submodule) {
     moduleTabs.innerHTML = '';
     contentDisplay.innerHTML = '';
     
+    if (!submodule.tabs) {
+        contentDisplay.innerHTML = '<p>Нет контента для этого подмодуля</p>';
+        return;
+    }
+    
     const tabNames = Object.keys(submodule.tabs);
+    
     tabNames.forEach((tabName, index) => {
         const tab = document.createElement('div');
         tab.className = `tab ${index === 0 ? 'active' : ''}`;
@@ -172,17 +195,25 @@ function renderTabs(submodule) {
         tab.dataset.tab = tabName;
         
         tab.addEventListener('click', () => {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            // Активная вкладка
+            document.querySelectorAll('.tab').forEach(t => {
+                t.classList.remove('active');
+            });
             tab.classList.add('active');
+            
+            // Показываем контент
             showTabContent(tabName, submodule);
         });
         
         moduleTabs.appendChild(tab);
     });
     
-    // Кнопка контрольной
-    const module = courseData.modules.find(m => m.submodules.some(s => s.id === submodule.id));
-    if (module.test) {
+    // Кнопка контрольной работы
+    const module = courseData.modules.find(m => 
+        m.submodules && m.submodules.some(s => s.id === submodule.id)
+    );
+    
+    if (module && module.test) {
         const testTab = document.createElement('div');
         testTab.className = 'tab';
         testTab.innerHTML = '<i class="fas fa-clipboard-check"></i> Контрольная';
@@ -190,154 +221,249 @@ function renderTabs(submodule) {
         moduleTabs.appendChild(testTab);
     }
     
+    // Показываем первую вкладку
     if (tabNames.length > 0) {
         showTabContent(tabNames[0], submodule);
     }
 }
 
-// Показ контента вкладки (ИСПРАВЛЕННАЯ)
+// Показ контента вкладки
 function showTabContent(tabName, submodule) {
     const contentDisplay = document.getElementById('contentDisplay');
+    
+    if (!submodule.tabs[tabName]) {
+        contentDisplay.innerHTML = '<p>Контент не найден</p>';
+        return;
+    }
+    
     contentDisplay.innerHTML = `
         <div class="tab-content active">
             <h3>${submodule.tabs[tabName].title}</h3>
-            ${submodule.tabs[tabName].content}
+            ${submodule.tabs[tabName].content || '<p>Контент отсутствует</p>'}
         </div>
     `;
     
-    // Инициализируем кнопки СРАЗУ
-    setTimeout(initializeAssignmentButtons, 50);
+    // Инициализируем кнопки проверки заданий
+    initCheckButtons();
 }
 
-// Инициализация кнопок проверки (ИСПРАВЛЕННАЯ)
-function initializeAssignmentButtons() {
-    const buttons = document.querySelectorAll('button[onclick*="checkAssignment"]');
+// Инициализация кнопок проверки
+function initCheckButtons() {
+    console.log("Инициализация кнопок проверки...");
+    
+    // Удаляем старые обработчики
+    const oldButtons = document.querySelectorAll('.check-btn');
+    oldButtons.forEach(btn => {
+        btn.replaceWith(btn.cloneNode(true));
+    });
+    
+    // Добавляем новые обработчики
+    const buttons = document.querySelectorAll('.check-btn');
     buttons.forEach(button => {
-        const onclick = button.getAttribute('onclick');
-        const match = onclick.match(/checkAssignment\('(.+?)'\)/);
-        if (match) {
-            const submoduleId = match[1];
-            button.onclick = () => checkAssignment(submoduleId);
-            button.removeAttribute('onclick');
+        const submoduleId = button.getAttribute('data-submodule');
+        if (submoduleId) {
+            button.addEventListener('click', function() {
+                checkAssignment(submoduleId);
+            });
+            console.log("Кнопка настроена для подмодуля:", submoduleId);
         }
     });
+    
+    console.log("Настроено кнопок:", buttons.length);
 }
 
-// Проверка задания (ИСПРАВЛЕННАЯ)
+// ПРОВЕРКА ЗАДАНИЯ - ГЛАВНОЕ ИСПРАВЛЕНИЕ
 function checkAssignment(submoduleId) {
-    console.log("Проверка задания:", submoduleId);
+    console.log("=== НАЧАЛО ПРОВЕРКИ ===");
+    console.log("Подмодуль для проверки:", submoduleId);
     
+    // Находим текущий модуль
     const moduleId = userProgress.currentModule;
+    console.log("Текущий модуль:", moduleId);
+    
+    // Находим модуль
     const module = courseData.modules.find(m => m.id === moduleId);
+    if (!module) {
+        console.error("Модуль не найден:", moduleId);
+        return;
+    }
+    
+    console.log("Найден модуль:", module.title);
+    
+    // Находим подмодуль
     const submodule = module.submodules.find(s => s.id === submoduleId);
+    if (!submodule) {
+        console.error("Подмодуль не найден:", submoduleId);
+        return;
+    }
     
-    if (!submodule.tabs.assignment) return;
+    console.log("Найден подмодуль:", submodule.title);
     
-    const answerId = `answer${submoduleId.replace('.', '_')}`;
-    const feedbackId = `feedback${submoduleId.replace('.', '_')}`;
+    // Проверяем, есть ли задание
+    if (!submodule.tabs || !submodule.tabs.assignment) {
+        console.error("У подмодуля нет задания:", submoduleId);
+        return;
+    }
+    
+    console.log("Задание найдено");
+    
+    // ID элементов
+    const answerId = 'answer' + submoduleId.replace('.', '_');
+    const feedbackId = 'feedback' + submoduleId.replace('.', '_');
+    
+    console.log("Ищем элементы:", answerId, feedbackId);
     
     const answerElement = document.getElementById(answerId);
     const feedbackElement = document.getElementById(feedbackId);
     
-    if (!answerElement || !feedbackElement) {
-        console.error("Не найдены элементы:", answerId, feedbackId);
+    if (!answerElement) {
+        console.error("Не найден textarea с id:", answerId);
+        // Попробуем найти по другому ID
+        const allTextareas = document.querySelectorAll('textarea');
+        console.log("Все textareas на странице:", allTextareas.length);
         return;
     }
     
+    if (!feedbackElement) {
+        console.error("Не найден feedback с id:", feedbackId);
+        return;
+    }
+    
+    console.log("Элементы найдены!");
+    
     const answer = answerElement.value.trim();
+    
     if (!answer) {
-        feedbackElement.textContent = "Напишите ответ перед проверкой.";
+        feedbackElement.textContent = "Пожалуйста, напишите ответ перед проверкой.";
         feedbackElement.className = "feedback incorrect";
         feedbackElement.style.display = "block";
         return;
     }
     
+    console.log("Ответ пользователя:", answer.substring(0, 50) + "...");
+    
     try {
+        // Вызываем функцию проверки из данных
         const result = submodule.tabs.assignment.check(answer);
+        
+        console.log("Результат проверки:", result);
         
         feedbackElement.textContent = result.message;
         feedbackElement.className = `feedback ${result.correct ? 'correct' : 'incorrect'}`;
         feedbackElement.style.display = "block";
         
-        if (result.correct && !userProgress.completedSubmodules.includes(submoduleId)) {
-            userProgress.completedSubmodules.push(submoduleId);
-            saveProgress();
+        // Если задание выполнено правильно
+        if (result.correct) {
+            if (!userProgress.completedSubmodules.includes(submoduleId)) {
+                userProgress.completedSubmodules.push(submoduleId);
+                saveProgress();
+                
+                // Добавляем галочку к заголовку задания
+                const assignmentHeader = answerElement.closest('.assignment')?.querySelector('h4');
+                if (assignmentHeader && !assignmentHeader.querySelector('.fa-check-circle')) {
+                    const checkIcon = document.createElement('i');
+                    checkIcon.className = 'fas fa-check-circle';
+                    checkIcon.style.color = '#2ecc71';
+                    checkIcon.style.marginLeft = '10px';
+                    assignmentHeader.appendChild(checkIcon);
+                }
+            }
         }
+        
     } catch (error) {
-        console.error("Ошибка проверки:", error);
-        feedbackElement.textContent = "Ошибка проверки.";
+        console.error("Ошибка при проверке задания:", error);
+        feedbackElement.textContent = "Произошла ошибка при проверке. Попробуйте еще раз.";
         feedbackElement.className = "feedback incorrect";
         feedbackElement.style.display = "block";
     }
+    
+    console.log("=== КОНЕЦ ПРОВЕРКИ ===");
 }
 
 // Открытие теста
 function openTest(moduleId) {
     const module = courseData.modules.find(m => m.id === moduleId);
+    if (!module || !module.test) return;
     
+    // Показываем тест, скрываем контент
     document.getElementById('contentDisplay').style.display = 'none';
     document.getElementById('moduleTabs').style.display = 'none';
     
     const testArea = document.getElementById('testArea');
     testArea.style.display = 'block';
     
+    // Заполняем тест
     document.getElementById('testTitle').textContent = module.test.title;
     document.getElementById('testDescription').textContent = module.test.description;
     
     const testContent = document.getElementById('testContent');
     testContent.innerHTML = '';
     
-    module.test.questions.forEach((question, index) => {
-        const questionDiv = document.createElement('div');
-        questionDiv.className = 'test-question';
-        questionDiv.innerHTML = `
-            <h4>Вопрос ${index + 1}: ${question.question}</h4>
-            ${question.options.map((option, optIndex) => `
-                <label>
-                    <input type="radio" name="question${index}" value="${optIndex}">
-                    ${option}
-                </label>
-            `).join('')}
-        `;
-        testContent.appendChild(questionDiv);
-    });
+    // Вопросы
+    if (module.test.questions) {
+        module.test.questions.forEach((question, index) => {
+            const questionDiv = document.createElement('div');
+            questionDiv.className = 'test-question';
+            questionDiv.innerHTML = `
+                <h4>Вопрос ${index + 1}: ${question.question}</h4>
+                ${question.options.map((option, i) => `
+                    <label>
+                        <input type="radio" name="question${index}" value="${i}">
+                        ${option}
+                    </label>
+                `).join('')}
+            `;
+            testContent.appendChild(questionDiv);
+        });
+    }
     
+    // Практическое задание
     if (module.test.practical) {
         const practicalDiv = document.createElement('div');
         practicalDiv.className = 'test-question';
         practicalDiv.innerHTML = `
             <h4>Практическое задание</h4>
             <p>${module.test.practical.task}</p>
-            <textarea id="practicalAnswer" placeholder="Напишите ваш ответ здесь..." rows="5"></textarea>
+            <textarea id="practicalAnswer" placeholder="Напишите ваш ответ..." rows="5"></textarea>
         `;
         testContent.appendChild(practicalDiv);
     }
 }
 
-// Настройка обработчиков
+// Настройка обработчиков событий
 function setupEventListeners() {
-    document.getElementById('submitTestBtn')?.addEventListener('click', submitTest);
-    document.getElementById('closeTestBtn')?.addEventListener('click', () => {
-        document.getElementById('testArea').style.display = 'none';
-        document.getElementById('contentDisplay').style.display = 'block';
-        document.getElementById('moduleTabs').style.display = 'flex';
-    });
+    // Кнопка отправки теста
+    const submitBtn = document.getElementById('submitTestBtn');
+    if (submitBtn) {
+        submitBtn.addEventListener('click', submitTest);
+    }
     
-    document.getElementById('resetBtn')?.addEventListener('click', resetProgress);
-    document.getElementById('certificateBtn')?.addEventListener('click', showCertificate);
+    // Кнопка закрытия теста
+    const closeTestBtn = document.getElementById('closeTestBtn');
+    if (closeTestBtn) {
+        closeTestBtn.addEventListener('click', () => {
+            document.getElementById('testArea').style.display = 'none';
+            document.getElementById('contentDisplay').style.display = 'block';
+            document.getElementById('moduleTabs').style.display = 'flex';
+        });
+    }
+    
+    // Кнопка сброса прогресса
+    const resetBtn = document.getElementById('resetBtn');
+    if (resetBtn) {
+        resetBtn.addEventListener('click', resetProgress);
+    }
     
     // Модальное окно
-    document.getElementById('closeModalBtn')?.addEventListener('click', () => {
-        document.getElementById('modalOverlay').style.display = 'none';
-    });
-    document.getElementById('modalOkBtn')?.addEventListener('click', () => {
-        document.getElementById('modalOverlay').style.display = 'none';
-    });
-    document.getElementById('modalOverlay')?.addEventListener('click', (e) => {
-        if (e.target === document.getElementById('modalOverlay')) {
-            document.getElementById('modalOverlay').style.display = 'none';
-        }
-    });
+    const closeModal = document.getElementById('closeModalBtn');
+    const modalOverlay = document.getElementById('modalOverlay');
+    const modalOk = document.getElementById('modalOkBtn');
+    
+    if (closeModal) closeModal.onclick = () => modalOverlay.style.display = 'none';
+    if (modalOverlay) modalOverlay.onclick = (e) => {
+        if (e.target === modalOverlay) modalOverlay.style.display = 'none';
+    };
+    if (modalOk) modalOk.onclick = () => modalOverlay.style.display = 'none';
 }
 
 // Отправка теста
@@ -345,9 +471,12 @@ function submitTest() {
     const moduleId = userProgress.currentModule;
     const module = courseData.modules.find(m => m.id === moduleId);
     
+    if (!module || !module.test) return;
+    
     let score = 0;
     const totalQuestions = module.test.questions.length;
     
+    // Проверяем вопросы
     module.test.questions.forEach((question, index) => {
         const selected = document.querySelector(`input[name="question${index}"]:checked`);
         if (selected && parseInt(selected.value) === question.correct) {
@@ -355,30 +484,33 @@ function submitTest() {
         }
     });
     
+    // Практическое задание
     let practicalPassed = false;
     if (module.test.practical) {
         const answer = document.getElementById('practicalAnswer')?.value || '';
         practicalPassed = module.test.practical.check(answer);
     }
     
-    const theoryPercent = Math.round((score / totalQuestions) * 100);
-    const passed = theoryPercent >= 70 && (module.test.practical ? practicalPassed : true);
+    const percent = Math.round((score / totalQuestions) * 100);
+    const passed = percent >= 70 && (module.test.practical ? practicalPassed : true);
     
+    // Показываем результат
     const modalTitle = document.getElementById('modalTitle');
     const modalBody = document.getElementById('modalBody');
     
-    modalTitle.textContent = 'Результат';
+    modalTitle.textContent = 'Результат теста';
     modalBody.innerHTML = `
-        <div style="text-align: center;">
-            <h3>${passed ? 'Поздравляем!' : 'Попробуйте еще'}</h3>
-            <p>Теория: ${score}/${totalQuestions} (${theoryPercent}%)</p>
-            ${module.test.practical ? `<p>Практика: ${practicalPassed ? 'Зачтено' : 'Нет'}</p>` : ''}
-            ${passed ? '<div style="color: green; font-size: 3rem;"><i class="fas fa-trophy"></i></div>' : ''}
+        <div style="text-align: center; padding: 20px;">
+            <h3>${passed ? '✅ Поздравляем!' : '❌ Попробуйте еще'}</h3>
+            <p>Теоретическая часть: ${score} из ${totalQuestions} (${percent}%)</p>
+            ${module.test.practical ? `<p>Практика: ${practicalPassed ? '✅ Зачтено' : '❌ Не зачтено'}</p>` : ''}
+            <p><strong>${passed ? 'Тест пройден!' : 'Нужно набрать минимум 70%'}</strong></p>
         </div>
     `;
     
     document.getElementById('modalOverlay').style.display = 'flex';
     
+    // Сохраняем результат
     if (passed && !userProgress.completedModules.includes(moduleId)) {
         userProgress.completedModules.push(moduleId);
         module.completed = true;
@@ -386,10 +518,10 @@ function submitTest() {
     }
 }
 
-// Сертификат
+// Показать сертификат
 function showCertificate() {
-    const completed = userProgress.completedModules.length;
     const total = courseData.modules.length;
+    const completed = userProgress.completedModules.length;
     
     if (completed < total) {
         alert(`Завершите все модули! Вы прошли ${completed} из ${total}.`);
@@ -399,15 +531,18 @@ function showCertificate() {
     const modalTitle = document.getElementById('modalTitle');
     const modalBody = document.getElementById('modalBody');
     
-    modalTitle.textContent = 'Ваш сертификат';
+    modalTitle.textContent = '🎓 Ваш сертификат';
     modalBody.innerHTML = `
         <div class="certificate">
             <div class="certificate-content">
                 <h1>СЕРТИФИКАТ</h1>
-                <p>Курс «Эмпатия и поддержка в общении»</p>
-                <p>Выдан: ${new Date().toLocaleDateString('ru-RU')}</p>
-                <div style="margin: 30px 0; font-size: 1.5rem;">
-                    <i class="fas fa-award" style="color: gold; font-size: 3rem;"></i>
+                <p>о прохождении курса</p>
+                <h2>«Эмпатия и поддержка в общении»</h2>
+                <p>Настоящим удостоверяется, что слушатель успешно освоил</p>
+                <p>программу из 5 модулей и проявил компетенции в области</p>
+                <p>эмпатического общения и психологической поддержки.</p>
+                <div style="margin-top: 30px;">
+                    <p>Дата выдачи: ${new Date().toLocaleDateString('ru-RU')}</p>
                 </div>
             </div>
         </div>
@@ -418,19 +553,25 @@ function showCertificate() {
 
 // Сброс прогресса
 function resetProgress() {
-    if (confirm("Сбросить весь прогресс?")) {
-        userProgress = getDefaultProgress();
-        courseData.modules.forEach(m => m.completed = false);
-        saveProgress();
-        renderModulesList();
+    if (confirm("Вы уверены, что хотите сбросить весь прогресс? Все данные будут удалены.")) {
+        userProgress = {
+            currentModule: 1,
+            currentSubmodule: "1.1",
+            completedModules: [],
+            completedSubmodules: [],
+            testResults: {},
+            assignmentResults: {}
+        };
+        
+        localStorage.removeItem('empathyCourseProgress');
         location.reload();
     }
 }
 
-// Глобальные функции
+// Делаем функции глобальными
 window.checkAssignment = checkAssignment;
 window.openModule = openModule;
 window.resetProgress = resetProgress;
 window.showCertificate = showCertificate;
 
-console.log("Script loaded");
+console.log("✅ Курс эмпатии загружен и готов к работе!");
