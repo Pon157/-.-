@@ -417,254 +417,220 @@ const courseData = {
                 }
             }
         },
+{
+    id: 3,
+    title: "Модуль 3. Активное слушание",
+    description: "Техники слышания и понимания",
+    completed: false,
+    submodules: [
         {
-            id: 3,
-            title: "Модуль 3. Активное слушание",
-            description: "Техники слышания и понимания",
-            completed: false,
-            submodules: [
-                {
-                    id: "3.1",
-                    title: "Техника отражения",
-                    tabs: {
-                        theory: {
-                            title: "Теория",
-                            content: `<p>Техника отражения (рефлексивное слушание) — это повторение ключевых слов и смыслов говорящего, чтобы показать, что вы действительно слышите.</p>
-                            <ul>
-                                <li><strong>Повторение ключевых слов:</strong> «Ты говоришь, что чувствуешь [слово из речи собеседника]»</li>
-                                <li><strong>Перефразирование:</strong> «Если я правильно понял, ты ощущаешь...»</li>
-                                <li><strong>Отражение эмоций:</strong> «Похоже, это вызывает у тебя [эмоция]»</li>
-                                <li><strong>Важно:</strong> Не добавлять свои интерпретации, не давать советов, не перебивать.</li>
-                            </ul>`
-                        },
-                        quote: {
-                            title: "Цитата",
-                            content: `<div class="quote">«Самое главное в общении — слышать то, что не сказано»</div>
-                            <p class="author">— Питер Друкер</p>`
-                        },
-                        assignment: {
-                            title: "Задание",
-                            content: `<div class="assignment">
-                                <h4>Примените технику отражения</h4>
-                                <p>Жалоба: «Меня постоянно критикует начальник. Даже когда я делаю все правильно, он находит к чему придраться. Я уже не знаю, как работать в таком стрессе.»</p>
-                                <p>Напишите ответ, используя технику отражения.</p>
-                                <textarea id="answer3_1" placeholder="Напишите ваш ответ здесь..."></textarea>
-                                <button class="btn-primary" onclick="checkAssignment('3.1')">Проверить задание</button>
-                                <div id="feedback3_1" class="feedback"></div>
-                            </div>`,
-                            check: function(answer) {
-                                const reflectionWords = ["критикует", "придраться", "стрессе", "начальник", "правильно"];
-                                let reflectionCount = 0;
-                                
-                                reflectionWords.forEach(word => {
-                                    if (answer.toLowerCase().includes(word)) reflectionCount++;
-                                });
-                                
-                                if (reflectionCount >= 3 && !answer.toLowerCase().includes("советую") && !answer.toLowerCase().includes("надо бы")) {
-                                    return {correct: true, message: "Отлично! Вы точно отразили ключевые слова и чувства собеседника без советов."};
-                                } else if (reflectionCount >= 2) {
-                                    return {correct: true, message: "Хорошо, но попробуйте отразить больше ключевых слов из жалобы."};
-                                } else {
-                                    return {correct: false, message: "Ответ не отражает жалобу. Попробуйте повторить ключевые слова: 'критикует', 'придраться', 'стресс'."};
-                                }
-                            }
-                        }
-                    }
+            id: "3.1",
+            title: "Техника отражения",
+            tabs: {
+                theory: {
+                    title: "Теория",
+                    content: `<p>Техника отражения (рефлексивное слушание) — это повторение ключевых слов и смыслов говорящего, чтобы показать, что вы действительно слышите.</p>
+                    <ul>
+                        <li><strong>Повторение ключевых слов:</strong> «Ты говоришь, что чувствуешь [слово из речи собеседника]»</li>
+                        <li><strong>Перефразирование:</strong> «Если я правильно понял, ты ощущаешь...»</li>
+                        <li><strong>Отражение эмоций:</strong> «Похоже, это вызывает у тебя [эмоция]»</li>
+                        <li><strong>Важно:</strong> Не добавлять свои интерпретации, не давать советов, не перебивать.</li>
+                    </ul>`
                 },
-                {
-                    id: "3.2",
-                    title: "Уточняющие вопросы",
-                    tabs: {
-                        theory: {
-                            title: "Теория",
-                            content: `<p>Уточняющие вопросы помогают глубже понять чувства и потребности собеседника:</p>
-                            <ul>
-                                <li><strong>Открытые вопросы:</strong> «Что ты чувствуешь?», «Что для тебя самое сложное?», «Чего ты хочешь?»</li>
-                                <li><strong>Уточняющие вопросы:</strong> «Ты имеешь в виду, что...?», «Правильно ли я понимаю, что...?»</li>
-                                <li><strong>Вопросы о чувствах:</strong> «Какая эмоция сейчас самая сильная?», «Что вызывает самое болезненное чувство?»</li>
-                                <li><strong>Избегайте:</strong> Закрытых вопросов («Да/Нет»), вопросов «почему» (могут звучать как обвинение).</li>
-                            </ul>`
-                        },
-                        source: {
-                            title: "Источник",
-                            content: `<div class="source">
-                                <p><strong>MindTools: Active Listening</strong></p>
-                                <p>Активное слушание включает 5 ключевых элементов: 1) Полное внимание, 2) Отражение, 3) Уточнение, 4) Резюмирование, 5) Отсроченная реакция. Уточняющие вопросы помогают избежать недопонимания.</p>
-                            </div>`
-                        },
-                        assignment: {
-                            title: "Задание",
-                            content: `<div class="assignment">
-                                <h4>Составьте список открытых вопросов</h4>
-                                <p>Представьте, что друг говорит: «У меня проблемы в отношениях». Составьте 3 открытых вопроса, которые помогут ему лучше понять и выразить свои чувства.</p>
-                                <textarea id="answer3_2" placeholder="Напишите ваши вопросы здесь..."></textarea>
-                                <button class="btn-primary" onclick="checkAssignment('3.2')">Проверить задание</button>
-                                <div id="feedback3_2" class="feedback"></div>
-                            </div>`,
-                            check: function(answer) {
-                                const questionIndicators = ["что", "как", "расскажи", "опиши", "какой", "какая"];
-                                let questionCount = 0;
-                                
-                                // Считаем количество вопросительных знаков
-                                const questionMarkCount = (answer.match(/\?/g) || []).length;
-                                
-                                questionIndicators.forEach(word => {
-                                    if (answer.toLowerCase().includes(word)) questionCount++;
-                                });
-                                
-                                if (questionMarkCount >= 2 && questionCount >= 2) {
-                                    return {correct: true, message: "Отлично! Вы составили хорошие открытые вопросы, начинающиеся с 'что', 'как'."};
-                                } else if (questionMarkCount >= 1) {
-                                    return {correct: true, message: "Хорошо, но попробуйте добавить больше открытых вопросов, которые начинаются не с 'ты', а с 'что', 'как'."};
-                                } else {
-                                    return {correct: false, message: "Вопросы должны быть открытыми (не предполагать ответ 'да/нет'). Попробуйте начать с 'Что ты чувствуешь...', 'Как это проявляется...'."};
-                                }
-                            }
-                        }
-                    }
+                quote: {
+                    title: "Цитата",
+                    content: `<div class="quote">«Самое главное в общении — слышать то, что не сказано»</div>
+                    <p class="author">— Питер Друкер</p>`
                 },
-                {
-                    id: "3.3",
-                    title: "Невербальное слушание",
-                    tabs: {
-                        theory: {
-                            title: "Теория",
-                            content: `<p>Невербальные сигналы составляют до 70% коммуникации при активном слушании:</p>
-                            <ul>
-                                <li><strong>Контакт глазами:</strong> Умеренный, не пристальный (60-70% времени).</li>
-                                <li><strong>Кивки:</strong> Подтверждение, что вы следите за рассказом.</li>
-                                <li><strong>Открытая поза:</strong> Руки не скрещены, наклон к собеседнику.</li>
-                                <li><strong>Паузы:</strong> Дают время подумать и выразить чувства.</li>
-                                <li><strong>Соответствующее выражение лица:</strong> Эмпатическое отзеркаливание эмоций.</li>
-                            </ul>`
-                        },
-                        quote: {
-                            title: "Цитата",
-                            content: `<div class="quote">«Иногда молчание — лучший способ показать, что ты рядом»</div>
-                            <p class="author">— Неизвестный автор</p>`
-                        },
-                        assignment: {
-                            title: "Задание",
-                            content: `<div class="assignment">
-                                <h4>Опишите невербальные сигналы активного слушания</h4>
-                                <p>Представьте ситуацию: ваш друг расстроен и рассказывает о проблеме. Опишите 3-4 невербальных сигнала, которые покажут, что вы активно слушаете.</p>
-                                <textarea id="answer3_3" placeholder="Напишите ваше описание здесь..."></textarea>
-                                <button class="btn-primary" onclick="checkAssignment('3.3')">Проверить задание</button>
-                                <div id="feedback3_3" class="feedback"></div>
-                            </div>`,
-                            check: function(answer) {
-                                const nonverbalSignals = ["кив", "взгляд", "поза", "наклон", "выражение лица", "пауза", "молчание", "открытая поза"];
-                                let signalCount = 0;
-                                
-                                nonverbalSignals.forEach(signal => {
-                                    if (answer.toLowerCase().includes(signal)) signalCount++;
-                                });
-                                
-                                if (signalCount >= 3) {
-                                    return {correct: true, message: "Отлично! Вы хорошо описали ключевые невербальные сигналы активного слушания."};
-                                } else if (signalCount >= 2) {
-                                    return {correct: true, message: "Хорошо, но попробуйте добавить больше конкретных сигналов: кивки, открытая поза, соответствующий взгляд."};
-                                } else {
-                                    return {correct: false, message: "Попробуйте описать конкретные невербальные действия: кивки головой, наклон тела к собеседнику, соответствующий взгляд."};
-                                }
-                            }
+                assignment: {
+                    title: "Задание",
+                    content: `<div class="assignment">
+                        <h4>Примените технику отражения</h4>
+                        <p>Жалоба: «Меня постоянно критикует начальник. Даже когда я делаю все правильно, он находит к чему придраться. Я уже не знаю, как работать в таком стрессе.»</p>
+                        <p>Напишите ответ, используя технику отражения.</p>
+                        <textarea id="answer3_1" placeholder="Напишите ваш ответ здесь..."></textarea>
+                        <button class="btn-primary" onclick="checkAssignment('3.1')">Проверить задание</button>
+                        <div id="feedback3_1" class="feedback"></div>
+                    </div>`,
+                    check: function(answer) {
+                        const reflectionWords = ["критикует", "придраться", "стрессе", "начальник", "правильно"];
+                        let reflectionCount = 0;
+                        
+                        reflectionWords.forEach(word => {
+                            if (answer.toLowerCase().includes(word)) reflectionCount++;
+                        });
+                        
+                        if (reflectionCount >= 3 && !answer.toLowerCase().includes("советую") && !answer.toLowerCase().includes("надо бы")) {
+                            return {correct: true, message: "Отлично! Вы точно отразили ключевые слова и чувства собеседника без советов."};
+                        } else if (reflectionCount >= 2) {
+                            return {correct: true, message: "Хорошо, но попробуйте отразить больше ключевых слов из жалобы."};
+                        } else {
+                            return {correct: false, message: "Ответ не отражает жалобу. Попробуйте повторить ключевые слова: 'критикует', 'придраться', 'стресс'."};
                         }
                     }
                 }
-            ],
-    test: {
-    title: "Контрольная работа 3",
-    description: "Тест по технике активного слушания",
-    questions: [
-        {
-            type: "multiple-choice",
-            question: "Какой вопрос является открытым?",
-            options: [
-                "«Тебе плохо?»",
-                "«Что ты чувствуешь сейчас?»",
-                "«Ты злишься на начальника?»",
-                "«Это было вчера?»"
-            ],
-            correct: 1
+            }
         },
         {
-            type: "multiple-choice",
-            question: "Что такое техника отражения?",
-            options: [
-                "Критика слов собеседника",
-                "Повторение ключевых слов собеседника",
-                "Рассказ о своем похожем опыте",
-                "Смена темы разговора"
-            ],
-            correct: 1
+            id: "3.2",
+            title: "Уточняющие вопросы",
+            tabs: {
+                theory: {
+                    title: "Теория",
+                    content: `<p>Уточняющие вопросы помогают глубже понять чувства и потребности собеседника:</p>
+                    <ul>
+                        <li><strong>Открытые вопросы:</strong> «Что ты чувствуешь?», «Что для тебя самое сложное?», «Чего ты хочешь?»</li>
+                        <li><strong>Уточняющие вопросы:</strong> «Ты имеешь в виду, что...?», «Правильно ли я понимаю, что...?»</li>
+                        <li><strong>Вопросы о чувствах:</strong> «Какая эмоция сейчас самая сильная?», «Что вызывает самое болезненное чувство?»</li>
+                        <li><strong>Избегайте:</strong> Закрытых вопросов («Да/Нет»), вопросов «почему» (могут звучать как обвинение).</li>
+                    </ul>`
+                },
+                source: {
+                    title: "Источник",
+                    content: `<div class="source">
+                        <p><strong>MindTools: Active Listening</strong></p>
+                        <p>Активное слушание включает 5 ключевых элементов: 1) Полное внимание, 2) Отражение, 3) Уточнение, 4) Резюмирование, 5) Отсроченная реакция. Уточняющие вопросы помогают избежать недопонимания.</p>
+                    </div>`
+                },
+                assignment: {
+                    title: "Задание",
+                    content: `<div class="assignment">
+                        <h4>Составьте список открытых вопросов</h4>
+                        <p>Представьте, что друг говорит: «У меня проблемы в отношениях». Составьте 3 открытых вопроса, которые помогут ему лучше понять и выразить свои чувства.</p>
+                        <textarea id="answer3_2" placeholder="Напишите ваши вопросы здесь..."></textarea>
+                        <button class="btn-primary" onclick="checkAssignment('3.2')">Проверить задание</button>
+                        <div id="feedback3_2" class="feedback"></div>
+                    </div>`,
+                    check: function(answer) {
+                        const questionIndicators = ["что", "как", "расскажи", "опиши", "какой", "какая"];
+                        let questionCount = 0;
+                        
+                        const questionMarkCount = (answer.match(/\?/g) || []).length;
+                        
+                        questionIndicators.forEach(word => {
+                            if (answer.toLowerCase().includes(word)) questionCount++;
+                        });
+                        
+                        if (questionMarkCount >= 2 && questionCount >= 2) {
+                            return {correct: true, message: "Отлично! Вы составили хорошие открытые вопросы, начинающиеся с 'что', 'как'."};
+                        } else if (questionMarkCount >= 1) {
+                            return {correct: true, message: "Хорошо, но попробуйте добавить больше открытых вопросов, которые начинаются не с 'ты', а с 'что', 'как'."};
+                        } else {
+                            return {correct: false, message: "Вопросы должны быть открытыми (не предполагать ответ 'да/нет'). Попробуйте начать с 'Что ты чувствуешь...', 'Как это проявляется...'."};
+                        }
+                    }
+                }
+            }
+        },
+        {
+            id: "3.3",
+            title: "Невербальное слушание",
+            tabs: {
+                theory: {
+                    title: "Теория",
+                    content: `<p>Невербальные сигналы составляют до 70% коммуникации при активном слушании:</p>
+                    <ul>
+                        <li><strong>Контакт глазами:</strong> Умеренный, не пристальный (60-70% времени).</li>
+                        <li><strong>Кивки:</strong> Подтверждение, что вы следите за рассказом.</li>
+                        <li><strong>Открытая поза:</strong> Руки не скрещены, наклон к собеседнику.</li>
+                        <li><strong>Паузы:</strong> Дают время подумать и выразить чувства.</li>
+                        <li><strong>Соответствующее выражение лица:</strong> Эмпатическое отзеркаливание эмоций.</li>
+                    </ul>`
+                },
+                quote: {
+                    title: "Цитата",
+                    content: `<div class="quote">«Иногда молчание — лучший способ показать, что ты рядом»</div>
+                    <p class="author">— Неизвестный автор</p>`
+                },
+                assignment: {
+                    title: "Задание",
+                    content: `<div class="assignment">
+                        <h4>Опишите невербальные сигналы активного слушания</h4>
+                        <p>Представьте ситуацию: ваш друг расстроен и рассказывает о проблеме. Опишите 3-4 невербальных сигнала, которые покажут, что вы активно слушаете.</p>
+                        <textarea id="answer3_3" placeholder="Напишите ваше описание здесь..."></textarea>
+                        <button class="btn-primary" onclick="checkAssignment('3.3')">Проверить задание</button>
+                        <div id="feedback3_3" class="feedback"></div>
+                    </div>`,
+                    check: function(answer) {
+                        const nonverbalSignals = ["кив", "взгляд", "поза", "наклон", "выражение лица", "пауза", "молчание", "открытая поза"];
+                        let signalCount = 0;
+                        
+                        nonverbalSignals.forEach(signal => {
+                            if (answer.toLowerCase().includes(signal)) signalCount++;
+                        });
+                        
+                        if (signalCount >= 3) {
+                            return {correct: true, message: "Отлично! Вы хорошо описали ключевые невербальные сигналы активного слушания."};
+                        } else if (signalCount >= 2) {
+                            return {correct: true, message: "Хорошо, но попробуйте добавить больше конкретных сигналов: кивки, открытая поза, соответствующий взгляд."};
+                        } else {
+                            return {correct: false, message: "Попробуйте описать конкретные невербальные действия: кивки головой, наклон тела к собеседнику, соответствующий взгляд."};
+                        }
+                    }
+                }
+            }
         }
     ],
-    practical: {
-        task: "Жалоба: «Я постоянно ссорюсь с женой из-за мелочей. Кажется, мы разучились понимать друг друга.» Напишите ответ, используя: 1) технику отражения, 2) один уточняющий вопрос.",
-        check: function(answer) {
-            console.log("Проверка контрольной 3:", answer);
-            
-            // Приводим к нижнему регистру для удобства
-            const answerLower = answer.toLowerCase();
-            
-            // Проверяем технику отражения (должно отражать ключевые слова из жалобы)
-            const reflectionWords = ["ссор", "мелоч", "разучил", "понимать"];
-            let hasReflection = false;
-            
-            for (const word of reflectionWords) {
-                if (answerLower.includes(word)) {
-                    hasReflection = true;
-                    break;
-                }
+    test: {
+        title: "Контрольная работа 3",
+        description: "Тест по технике активного слушания",
+        questions: [
+            {
+                type: "multiple-choice",
+                question: "Какой вопрос является открытым?",
+                options: [
+                    "«Тебе плохо?»",
+                    "«Что ты чувствуешь сейчас?»",
+                    "«Ты злишься на начальника?»",
+                    "«Это было вчера?»"
+                ],
+                correct: 1
+            },
+            {
+                type: "multiple-choice",
+                question: "Что такое техника отражения?",
+                options: [
+                    "Критика слов собеседника",
+                    "Повторение ключевых слов собеседника",
+                    "Рассказ о своем похожем опыте",
+                    "Смена темы разговора"
+                ],
+                correct: 1
             }
-            
-            // Дополнительные проверки на отражение
-            if (!hasReflection) {
-                // Проверяем синонимы
-                const synonyms = ["конфликт", "спор", "разногласи", "непонимание"];
-                for (const word of synonyms) {
-                    if (answerLower.includes(word)) {
-                        hasReflection = true;
-                        break;
-                    }
-                }
-            }
-            
-            // Проверяем наличие вопроса
-            const hasQuestion = answer.includes("?");
-            
-            // Проверяем, что вопрос уточняющий (открытый)
-            let hasGoodQuestion = false;
-            if (hasQuestion) {
-                const questionWords = ["что", "как", "почему", "расскажи", "опиши", "объясни"];
-                for (const word of questionWords) {
-                    if (answerLower.includes(word + " ") || answerLower.includes(word + "?")) {
-                        hasGoodQuestion = true;
-                        break;
-                    }
-                }
+        ],
+        practical: {
+            task: "Жалоба: «Я постоянно ссорюсь с женой из-за мелочей. Кажется, мы разучились понимать друг друга.» Напишите ответ, используя: 1) технику отражения, 2) один уточняющий вопрос.",
+            check: function(answer) {
+                const answerLower = answer.toLowerCase();
                 
-                // Также проверяем вопросы типа "Что для тебя..."
-                if (answerLower.includes("что для") || answerLower.includes("как для")) {
-                    hasGoodQuestion = true;
-                }
+                // Проверяем отражение
+                const hasReflection = answerLower.includes("ссор") || 
+                                    answerLower.includes("мелоч") || 
+                                    answerLower.includes("разучил") || 
+                                    answerLower.includes("понимать") ||
+                                    answerLower.includes("конфликт") ||
+                                    answerLower.includes("непонимание");
+                
+                // Проверяем вопрос
+                const hasQuestion = answer.includes("?");
+                const hasGoodQuestion = hasQuestion && (
+                    answerLower.includes("что") || 
+                    answerLower.includes("как") || 
+                    answerLower.includes("почему") ||
+                    answerLower.includes("расскажи") ||
+                    answerLower.includes("опиши")
+                );
+                
+                // Проверяем длину
+                const hasLength = answer.length > 25;
+                
+                return (hasReflection && hasGoodQuestion && hasLength) ||
+                       (hasReflection && answer.length > 40) ||
+                       (hasGoodQuestion && answer.length > 50);
             }
-            
-            console.log("Результат проверки:", {
-                hasReflection,
-                hasQuestion,
-                hasGoodQuestion,
-                answerLength: answer.length
-            });
-            
-            // Условия прохождения:
-            // 1) Есть отражение ИЛИ хороший вопрос
-            // 2) Ответ не слишком короткий
-            return (hasReflection && hasGoodQuestion && answer.length > 20) || 
-                   (hasReflection && answer.length > 30) || 
-                   (hasGoodQuestion && answer.length > 40);
         }
     }
+},
         {
             id: 4,
             title: "Модуль 4. Поддержка без давления",
