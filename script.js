@@ -168,19 +168,6 @@ function renderModulesList() {
     
     modulesList.innerHTML = '';
     
-    // Создаем логотип
-    const logo = document.createElement('div');
-    logo.className = 'logo';
-    logo.innerHTML = `
-        <i class="fas fa-heart"></i>
-        <h1>Курс Эмпатии</h1>
-    `;
-    modulesList.appendChild(logo);
-    
-    // Создаем контейнер для модулей
-    const modulesContainer = document.createElement('div');
-    modulesContainer.className = 'modules-container';
-    
     courseData.modules.forEach(module => {
         if (!module) return;
         
@@ -208,7 +195,7 @@ function renderModulesList() {
             openModule(module.id, firstSubmodule);
         });
         
-        modulesContainer.appendChild(moduleItem);
+        modulesList.appendChild(moduleItem);
         
         // Рендеринг подмодулей, если модуль активен
         if (userProgress.currentModule === module.id && module.submodules && module.submodules.length > 0) {
@@ -233,14 +220,12 @@ function renderModulesList() {
                     openModule(module.id, submodule.id);
                 });
                 
-                modulesContainer.appendChild(submoduleItem);
+                modulesList.appendChild(submoduleItem);
             });
         }
     });
     
-    modulesList.appendChild(modulesContainer);
-    
-    // Добавляем прогресс и сертификат
+    // Добавляем прогресс
     const progressContainer = document.createElement('div');
     progressContainer.className = 'progress-container';
     progressContainer.innerHTML = `
@@ -248,17 +233,13 @@ function renderModulesList() {
             <div class="progress-fill" id="progressFill"></div>
         </div>
         <p id="progressText">Прогресс: 0%</p>
+        <div class="certificate-link">
+            <a href="#" id="certificateBtn" class="disabled">
+                <i class="fas fa-award"></i> Сертификат
+            </a>
+        </div>
     `;
     modulesList.appendChild(progressContainer);
-    
-    const certificateLink = document.createElement('div');
-    certificateLink.className = 'certificate-link';
-    certificateLink.innerHTML = `
-        <a href="#" id="certificateBtn" class="disabled">
-            <i class="fas fa-award"></i> Сертификат
-        </a>
-    `;
-    modulesList.appendChild(certificateLink);
     
     // Инициализируем прогресс после рендеринга
     updateProgressUI();
