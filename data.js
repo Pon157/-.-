@@ -665,7 +665,6 @@ const courseData = {
                    (hasGoodQuestion && answer.length > 40);
         }
     }
-}
         {
             id: 4,
             title: "Модуль 4. Поддержка без давления",
