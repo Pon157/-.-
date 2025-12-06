@@ -1069,11 +1069,11 @@ const courseData = {
 };
 
 // Состояние прогресса пользователя
-let userProgress = {
-    currentModule: 1,
-    currentSubmodule: "1.1",
-    completedModules: [],
-    completedSubmodules: [],
-    testResults: {},
-    assignmentResults: {}
-};
+// let userProgress = {
+//    currentModule: 1,
+//    currentSubmodule: "1.1",
+//    completedModules: [],
+//    completedSubmodules: [],
+//    testResults: {},
+//    assignmentResults: {}
+//};
