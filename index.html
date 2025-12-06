@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Курс: Эмпатия и поддержка в общении</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💭</text></svg>">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Боковая панель навигации -->
+        <nav class="sidebar">
+            <div class="logo">
+                <i class="fas fa-heart"></i>
+                <h1>Курс Эмпатии</h1>
+            </div>
+            <div class="modules-list" id="modulesList">
+                <!-- Список модулей будет сгенерирован скриптом -->
+            </div>
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <p id="progressText">Прогресс: 0%</p>
+            </div>
+            <div class="certificate-link">
+                <a href="#" id="certificateBtn" class="disabled">
+                    <i class="fas fa-award"></i> Сертификат
+                </a>
+            </div>
+        </nav>
+
+        <!-- Основная область контента -->
+        <main class="content-area">
+            <header class="content-header">
+                <div>
+                    <h2 id="moduleTitle">Добро пожаловать на курс</h2>
+                    <p id="moduleSubtitle">«Эмпатия и поддержка в общении»</p>
+                </div>
+                <div class="user-controls">
+                    <button id="resetBtn" class="btn-secondary"><i class="fas fa-redo"></i> Сбросить прогресс</button>
+                </div>
+            </header>
+
+            <div class="content-wrapper">
+                <!-- Область для вкладок модуля -->
+                <div class="tabs" id="moduleTabs">
+                    <!-- Вкладки (Теория, Цитата, Задание и т.д.) появятся здесь -->
+                </div>
+
+                <!-- Область для отображения контента -->
+                <div class="content-display" id="contentDisplay">
+                    <div class="welcome-screen">
+                        <div class="welcome-icon">
+                            <i class="fas fa-hands-helping"></i>
+                        </div>
+                        <h1>Полный курс: «Эмпатия и поддержка в общении»</h1>
+                        <p>Этот интерактивный курс проведет вас через 5 модулей, научит основам эмпатии, активному слушанию и поддержке людей, переживших травму.</p>
+                        <div class="features">
+                            <div class="feature">
+                                <i class="fas fa-book-open"></i>
+                                <h3>5 модулей</h3>
+                                <p>Теория, цитаты, практические задания</p>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-check-circle"></i>
+                                <h3>Контрольные работы</h3>
+                                <p>Тесты и практика после каждого модуля</p>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-graduation-cap"></i>
+                                <h3>Итоговый экзамен</h3>
+                                <p>Проверка знаний и получение сертификата</p>
+                            </div>
+                        </div>
+                        <p class="start-instruction">Выберите модуль в меню слева, чтобы начать обучение.</p>
+                    </div>
+                </div>
+
+                <!-- Область для контрольных/экзамена (скрыта по умолчанию) -->
+                <div class="test-area" id="testArea" style="display: none;">
+                    <div class="test-header">
+                        <h3 id="testTitle">Контрольная работа</h3>
+                        <p id="testDescription"></p>
+                    </div>
+                    <div class="test-content" id="testContent">
+                        <!-- Здесь будут вопросы и задания теста -->
+                    </div>
+                    <div class="test-controls">
+                        <button id="submitTestBtn" class="btn-primary">Отправить на проверку</button>
+                        <button id="closeTestBtn" class="btn-secondary">Вернуться к модулю</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Нижний колонтитул -->
+            <footer class="content-footer">
+                <p>© Курс «Эмпатия и поддержка в общении» | Для образовательных целей</p>
+                <p class="bot-notice"><i class="fas fa-robot"></i> Проверка заданий выполняется условным «ботом» — системой анализа ключевых слов.</p>
+            </footer>
+        </main>
+    </div>
+
+    <!-- Модальное окно для результатов теста/сертификата -->
+    <div class="modal-overlay" id="modalOverlay" style="display: none;">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modalTitle">Результат проверки</h3>
+                <button class="close-modal" id="closeModalBtn">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Результаты теста или сертификат -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn-primary" id="modalOkBtn">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Подключение скриптов -->
+    <script src="data.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
