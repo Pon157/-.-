@@ -1,3 +1,6 @@
+// Состояние прогресса - ОБЪЯВЛЯЕМ ТОЛЬКО ЗДЕСЬ!
+let userProgress;
+
 // Инициализация при загрузке страницы
 document.addEventListener('DOMContentLoaded', function() {
     console.log("Курс эмпатии загружается...");
@@ -15,16 +18,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Состояние прогресса
-let userProgress = {
-    currentModule: 1,
-    currentSubmodule: "1.1",
-    completedModules: [],
-    completedSubmodules: [],
-    testResults: {},
-    assignmentResults: {}
-};
-
 // Инициализация прогресса
 function initProgress() {
     const saved = localStorage.getItem('empathyCourseProgress');
@@ -33,8 +26,25 @@ function initProgress() {
             userProgress = JSON.parse(saved);
         } catch (e) {
             console.error("Ошибка загрузки прогресса:", e);
+            // Значения по умолчанию
+            userProgress = getDefaultProgress();
         }
+    } else {
+        // Значения по умолчанию
+        userProgress = getDefaultProgress();
     }
+    console.log("Прогресс загружен:", userProgress);
+}
+
+function getDefaultProgress() {
+    return {
+        currentModule: 1,
+        currentSubmodule: "1.1",
+        completedModules: [],
+        completedSubmodules: [],
+        testResults: {},
+        assignmentResults: {}
+    };
 }
 
 // Сохранение прогресса
@@ -272,7 +282,7 @@ function initCheckButtons() {
     console.log("Настроено кнопок:", buttons.length);
 }
 
-// ПРОВЕРКА ЗАДАНИЯ - ГЛАВНОЕ ИСПРАВЛЕНИЕ
+// ПРОВЕРКА ЗАДАНИЯ
 function checkAssignment(submoduleId) {
     console.log("=== НАЧАЛО ПРОВЕРКИ ===");
     console.log("Подмодуль для проверки:", submoduleId);
@@ -318,9 +328,6 @@ function checkAssignment(submoduleId) {
     
     if (!answerElement) {
         console.error("Не найден textarea с id:", answerId);
-        // Попробуем найти по другому ID
-        const allTextareas = document.querySelectorAll('textarea');
-        console.log("Все textareas на странице:", allTextareas.length);
         return;
     }
     
@@ -554,14 +561,12 @@ function showCertificate() {
 // Сброс прогресса
 function resetProgress() {
     if (confirm("Вы уверены, что хотите сбросить весь прогресс? Все данные будут удалены.")) {
-        userProgress = {
-            currentModule: 1,
-            currentSubmodule: "1.1",
-            completedModules: [],
-            completedSubmodules: [],
-            testResults: {},
-            assignmentResults: {}
-        };
+        userProgress = getDefaultProgress();
+        
+        // Сброс в данных курса
+        courseData.modules.forEach(module => {
+            module.completed = false;
+        });
         
         localStorage.removeItem('empathyCourseProgress');
         location.reload();
