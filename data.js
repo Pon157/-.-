@@ -205,36 +205,299 @@ const courseData = {
                 }
             }
         },
-        // Модули 2-5 будут иметь аналогичную структуру
         {
             id: 2,
             title: "Модуль 2. Общение с людьми, пережившими травму",
             description: "Как поддержать, не навредив",
             completed: false,
             submodules: [
-                // Подмодули 2.1, 2.2, 2.3
-            ]
+                {
+                    id: "2.1",
+                    title: "Что такое травма",
+                    tabs: {
+                        theory: {
+                            title: "Теория",
+                            content: `<p>Травма — это не просто событие, а его психологический след, который остается в человеке надолго.</p>`
+                        },
+                        quote: {
+                            title: "Цитата",
+                            content: `<div class="quote">«Травма — это не то, что произошло, а то, что осталось внутри»</div>
+                            <p class="author">— Джудит Герман</p>`
+                        },
+                        source: {
+                            title: "Источник",
+                            content: `<div class="source">
+                                <p><strong>National Center for PTSD</strong></p>
+                                <p>Посттравматическое стрессовое расстройство (ПТСР) может развиться после воздействия травмирующего события.</p>
+                            </div>`
+                        }
+                    }
+                },
+                {
+                    id: "2.2",
+                    title: "Ошибки в общении",
+                    tabs: {
+                        theory: {
+                            title: "Теория",
+                            content: `<p>Токсичная позитивность и обесценивание — частые ошибки...</p>`
+                        },
+                        assignment: {
+                            title: "Задание",
+                            content: `<div class="assignment">
+                                <h4>Составьте список фраз, которых стоит избегать</h4>
+                                <p>Перечислите 3-4 фразы, которые представляют токсичную позитивность или обесценивание чувств.</p>
+                                <textarea id="answer2_2" placeholder="Напишите фразы здесь..."></textarea>
+                                <button class="btn-primary" onclick="checkAssignment('2.2')">Проверить задание</button>
+                                <div id="feedback2_2" class="feedback"></div>
+                            </div>`,
+                            check: function(answer) {
+                                const bannedPhrases = ["все будет хорошо", "не переживай", "другим хуже", "возьми себя в руки"];
+                                let foundCount = 0;
+                                
+                                bannedPhrases.forEach(phrase => {
+                                    if (answer.toLowerCase().includes(phrase)) foundCount++;
+                                });
+                                
+                                if (foundCount >= 2) {
+                                    return {correct: true, message: "Верно! Вы правильно определили фразы, которые обесценивают чувства."};
+                                } else {
+                                    return {correct: false, message: "Попробуйте включить фразы типа 'Все будет хорошо' или 'Другим хуже'."};
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    id: "2.3",
+                    title: "Безопасное пространство",
+                    tabs: {
+                        theory: {
+                            title: "Теория",
+                            content: `<p>Создание безопасного пространства — основа помощи...</p>`
+                        },
+                        source: {
+                            title: "Источник",
+                            content: `<div class="source">
+                                <p><strong>WHO Mental Health Resources</strong></p>
+                                <p>Всемирная организация здравоохранения рекомендует при работе с пережившими травму: слушать без осуждения.</p>
+                            </div>`
+                        }
+                    }
+                }
+            ],
+            test: {
+                title: "Контрольная работа 2",
+                description: "Тест по общению с людьми, пережившими травму",
+                questions: [
+                    {
+                        type: "multiple-choice",
+                        question: "Что такое токсичная позитивность?",
+                        options: [
+                            "Позитивное мышление, которое всегда помогает",
+                            "Навязывание позитивных эмоций и отрицание негативных",
+                            "Способ быстро выйти из депрессии",
+                            "Метод психотерапии при травмах"
+                        ],
+                        correct: 1
+                    }
+                ],
+                practical: {
+                    task: "Перед вами человек, переживший потерю близкого полгода назад. Он говорит: «До сих пор не могу поверить, что его нет.» Напишите ответ, который создает безопасное пространство.",
+                    check: function(answer) {
+                        const safeKeywords = ["понимаю", "естественно", "нормально"];
+                        let safeCount = 0;
+                        
+                        safeKeywords.forEach(word => {
+                            if (answer.toLowerCase().includes(word)) safeCount++;
+                        });
+                        
+                        return safeCount >= 1;
+                    }
+                }
+            }
         },
         {
             id: 3,
-            title: "Модуль 3. Активное слушание", 
+            title: "Модуль 3. Активное слушание",
             description: "Техники слышания и понимания",
             completed: false,
-            submodules: []
+            submodules: [
+                {
+                    id: "3.1",
+                    title: "Техника отражения",
+                    tabs: {
+                        theory: {
+                            title: "Теория",
+                            content: `<p>Техника отражения (рефлексивное слушание) — это повторение ключевых слов и смыслов говорящего.</p>`
+                        }
+                    }
+                },
+                {
+                    id: "3.2",
+                    title: "Уточняющие вопросы",
+                    tabs: {
+                        theory: {
+                            title: "Теория",
+                            content: `<p>Уточняющие вопросы помогают глубже понять чувства и потребности собеседника.</p>`
+                        }
+                    }
+                },
+                {
+                    id: "3.3",
+                    title: "Невербальное слушание",
+                    tabs: {
+                        theory: {
+                            title: "Теория",
+                            content: `<p>Невербальные сигналы составляют до 70% коммуникации при активном слушании.</p>`
+                        }
+                    }
+                }
+            ],
+            test: {
+                title: "Контрольная работа 3",
+                description: "Тест по технике активного слушания",
+                questions: [
+                    {
+                        type: "multiple-choice",
+                        question: "Какой вопрос является открытым?",
+                        options: [
+                            "«Тебе плохо?»",
+                            "«Что ты чувствуешь сейчас?»",
+                            "«Ты злишься на начальника?»",
+                            "«Это было вчера?»"
+                        ],
+                        correct: 1
+                    }
+                ],
+                practical: {
+                    task: "Жалоба: «Я постоянно ссорюсь с женой из-за мелочей.» Напишите ответ, используя технику отражения.",
+                    check: function(answer) {
+                        return answer.includes("ссор") || answer.includes("мелоч");
+                    }
+                }
+            }
         },
         {
             id: 4,
             title: "Модуль 4. Поддержка без давления",
             description: "Помощь без спасения",
             completed: false,
-            submodules: []
+            submodules: [
+                {
+                    id: "4.1",
+                    title: "Разница между помощью и спасением",
+                    tabs: {
+                        theory: {
+                            title: "Теория",
+                            content: `<p>Помощь и спасение — принципиально разные подходы.</p>`
+                        }
+                    }
+                },
+                {
+                    id: "4.2",
+                    title: "Формулировка предложений",
+                    tabs: {
+                        theory: {
+                            title: "Теория",
+                            content: `<p>Как правильно предлагать помощь.</p>`
+                        }
+                    }
+                },
+                {
+                    id: "4.3",
+                    title: "Баланс между заботой и границами",
+                    tabs: {
+                        theory: {
+                            title: "Теория",
+                            content: `<p>Здоровые границы в поддержке.</p>`
+                        }
+                    }
+                }
+            ],
+            test: {
+                title: "Контрольная работа 4",
+                description: "Тест по поддержке без давления",
+                questions: [
+                    {
+                        type: "multiple-choice",
+                        question: "Какая фраза предлагает помощь, а не спасение?",
+                        options: [
+                            "«Я все сделаю за тебя»",
+                            "«Хочешь, помогу составить план?»",
+                            "«Ты должен сделать это немедленно»",
+                            "«Я знаю, что для тебя лучше»"
+                        ],
+                        correct: 1
+                    }
+                ],
+                practical: {
+                    task: "Ваш друг в депрессии уже месяц не может убраться в квартире. Напишите предложение помощи без давления.",
+                    check: function(answer) {
+                        return answer.includes("хочешь") || answer.includes("предлагаю") || answer.includes("помочь");
+                    }
+                }
+            }
         },
         {
-            id: 5, 
+            id: 5,
             title: "Модуль 5. Самоподдержка и границы",
             description: "Забота о себе и установление границ",
             completed: false,
-            submodules: []
+            submodules: [
+                {
+                    id: "5.1",
+                    title: "Эмоциональное выгорание",
+                    tabs: {
+                        theory: {
+                            title: "Теория",
+                            content: `<p>Эмоциональное выгорание у помогающих специалистов и эмпатов.</p>`
+                        }
+                    }
+                },
+                {
+                    id: "5.2",
+                    title: "Методы восстановления",
+                    tabs: {
+                        theory: {
+                            title: "Теория",
+                            content: `<p>Эффективные методы восстановления для помогающих.</p>`
+                        }
+                    }
+                },
+                {
+                    id: "5.3",
+                    title: "Личные границы",
+                    tabs: {
+                        theory: {
+                            title: "Теория",
+                            content: `<p>Установление и защита личных границ.</p>`
+                        }
+                    }
+                }
+            ],
+            test: {
+                title: "Контрольная работа 5",
+                description: "Тест по самоподдержке и границам",
+                questions: [
+                    {
+                        type: "multiple-choice",
+                        question: "Какой из перечисленных признаков НЕ относится к эмоциональному выгоранию?",
+                        options: [
+                            "Энтузиазм и повышенная работоспособность",
+                            "Хроническая усталость",
+                            "Циничное отношение к тем, кому помогаешь",
+                            "Частые простудные заболевания"
+                        ],
+                        correct: 0
+                    }
+                ],
+                practical: {
+                    task: "Составьте список из 3 методов самоподдержки.",
+                    check: function(answer) {
+                        return answer.length > 20;
+                    }
+                }
+            }
         }
     ],
     finalExam: {
@@ -259,713 +522,3 @@ let userProgress = {
     testResults: {},
     assignmentResults: {}
 };
-
-// Инициализация прогресса из localStorage
-function initProgress() {
-    const savedProgress = localStorage.getItem('empathyCourseProgress');
-    if (savedProgress) {
-        userProgress = JSON.parse(savedProgress);
-    }
-}
-
-// Сохранение прогресса в localStorage
-function saveProgress() {
-    localStorage.setItem('empathyCourseProgress', JSON.stringify(userProgress));
-    
-    // Обновление прогресса на UI
-    updateProgressUI();
-}
-
-// Обновление отображения прогресса
-function updateProgressUI() {
-    const totalSubmodules = courseData.modules.reduce((total, module) => {
-        return total + module.submodules.length;
-    }, 0);
-    
-    const completedSubmodules = userProgress.completedSubmodules.length;
-    const progressPercent = totalSubmodules > 0 ? Math.round((completedSubmodules / totalSubmodules) * 100) : 0;
-    
-    // Обновление прогресс-бара
-    const progressFill = document.getElementById('progressFill');
-    const progressText = document.getElementById('progressText');
-    
-    if (progressFill && progressText) {
-        progressFill.style.width = `${progressPercent}%`;
-        progressText.textContent = `Прогресс: ${progressPercent}%`;
-    }
-    
-    // Активация кнопки сертификата при 100% выполнении
-    const certificateBtn = document.getElementById('certificateBtn');
-    if (certificateBtn) {
-        if (progressPercent === 100) {
-            certificateBtn.classList.remove('disabled');
-        } else {
-            certificateBtn.classList.add('disabled');
-        }
-    }
-}
-
-
-{
-    id: 2,
-    title: "Модуль 2. Общение с людьми, пережившими травму",
-    description: "Как поддержать, не навредив",
-    completed: false,
-    submodules: [
-        {
-            id: "2.1",
-            title: "Что такое травма",
-            tabs: {
-                theory: {
-                    title: "Теория",
-                    content: `<p>Травма — это не просто событие, а его психологический след, который остается в человеке надолго.</p>
-                    <ul>
-                        <li><strong>Травма ≠ событие:</strong> Два человека могут пережить одно и то же событие, но только у одного разовьется травма.</li>
-                        <li><strong>Субъективное переживание:</strong> Важна не объективная тяжесть события, а то, как человек его воспринял.</li>
-                        <li><strong>Долгосрочные последствия:</strong> Травма влияет на восприятие мира, отношения с другими и самооценку.</li>
-                    </ul>`
-                },
-                quote: {
-                    title: "Цитата",
-                    content: `<div class="quote">«Травма — это не то, что произошло, а то, что осталось внутри»</div>
-                    <p class="author">— Джудит Герман</p>`
-                },
-                source: {
-                    title: "Источник",
-                    content: `<div class="source">
-                        <p><strong>National Center for PTSD</strong></p>
-                        <p>Посттравматическое стрессовое расстройство (ПТСР) может развиться после воздействия травмирующего события и включает симптомы повторного переживания, избегания и гипервозбуждения.</p>
-                    </div>`
-                }
-            }
-        },
-        {
-            id: "2.2",
-            title: "Ошибки в общении",
-            tabs: {
-                theory: {
-                    title: "Теория",
-                    content: `<p>Наиболее частые и вредные ошибки при общении с пережившими травму:</p>
-                    <ul>
-                        <li><strong>Токсичная позитивность:</strong> «Все будет хорошо», «Смотри на позитив» — обесценивает реальные страдания.</li>
-                        <li><strong>Обесценивание:</strong> «Другим еще хуже», «Это не так страшно» — отрицает право человека на свои чувства.</li>
-                        <li><strong>Советы без запроса:</strong> «Тебе нужно...», «Просто сделай...» — лишает человека контроля.</li>
-                        <li><strong>Давление на откровенность:</strong> «Расскажи подробнее» — может ретравматизировать.</li>
-                    </ul>`
-                },
-                assignment: {
-                    title: "Задание",
-                    content: `<div class="assignment">
-                        <h4>Составьте список фраз, которых стоит избегать</h4>
-                        <p>Перечислите 4 фразы, которые представляют токсичную позитивность или обесценивание чувств человека, пережившего травму.</p>
-                        <textarea id="answer2_2" placeholder="Напишите фразы здесь..."></textarea>
-                        <button class="btn-primary" onclick="checkAssignment('2.2')">Проверить задание</button>
-                        <div id="feedback2_2" class="feedback"></div>
-                    </div>`,
-                    check: function(answer) {
-                        const bannedPhrases = [
-                            "все будет хорошо",
-                            "не переживай",
-                            "другим хуже",
-                            "возьми себя в руки",
-                            "пора двигаться",
-                            "забудь",
-                            "не думай об этом",
-                            "смотри на позитив",
-                            "просто успокойся",
-                            "ты сильнее этого"
-                        ];
-                        
-                        let foundCount = 0;
-                        bannedPhrases.forEach(phrase => {
-                            if (answer.toLowerCase().includes(phrase)) foundCount++;
-                        });
-                        
-                        if (foundCount >= 3) {
-                            return {correct: true, message: "Отлично! Вы правильно определили токсичные фразы, которые обесценивают переживания."};
-                        } else if (foundCount >= 1) {
-                            return {correct: true, message: "Хорошо, но попробуйте найти больше фраз. Ищите выражения, которые призывают 'быть сильным' или 'не думать о плохом'."};
-                        } else {
-                            return {correct: false, message: "Попробуйте включить фразы типа 'Все будет хорошо', 'Другим хуже', 'Пора двигаться дальше' — они представляют токсичную позитивность."};
-                        }
-                    }
-                }
-            }
-        },
-        {
-            id: "2.3",
-            title: "Безопасное пространство",
-            tabs: {
-                theory: {
-                    title: "Теория",
-                    content: `<p>Создание безопасного пространства — основа помощи пережившему травму:</p>
-                    <ul>
-                        <li><strong>Безопасность:</strong> Физическая и эмоциональная защищенность.</li>
-                        <li><strong>Доверие:</strong> Последовательность, надежность, конфиденциальность.</li>
-                        <li><strong>Отсутствие давления:</strong> Не заставлять говорить или действовать.</li>
-                        <li><strong>Валидация чувств:</strong> Признание права человека на любые эмоции.</li>
-                        <li><strong>Контроль у человека:</strong> Он решает, что, когда и как делать.</li>
-                    </ul>`
-                },
-                source: {
-                    title: "Источник",
-                    content: `<div class="source">
-                        <p><strong>WHO Mental Health Resources</strong></p>
-                        <p>Всемирная организация здравоохранения рекомендует при работе с пережившими травму: слушать без осуждения, уважать автономию человека, предлагать практическую поддержку, не давать обещаний, которые не можете выполнить.</p>
-                    </div>`
-                },
-                assignment: {
-                    title: "Задание",
-                    content: `<div class="assignment">
-                        <h4>Придумайте диалог с поддержкой без давления</h4>
-                        <p>Ситуация: ваш друг пережил серьезную аварию месяц назад, до сих пор боится садиться в машину.</p>
-                        <p>Напишите диалог, где вы поддерживаете друга, но не навязываете помощь и не давите.</p>
-                        <textarea id="answer2_3" placeholder="Напишите диалог здесь..."></textarea>
-                        <button class="btn-primary" onclick="checkAssignment('2.3')">Проверить задание</button>
-                        <div id="feedback2_3" class="feedback"></div>
-                    </div>`,
-                    check: function(answer) {
-                        const openPhrases = [
-                            "хочешь поговорить",
-                            "как ты себя чувствуешь",
-                            "что тебе нужно",
-                            "чем я могу помочь",
-                            "хочешь ли ты",
-                            "если захочешь",
-                            "когда будешь готов"
-                        ];
-                        
-                        const pressurePhrases = [
-                            "ты должен",
-                            "тебе нужно",
-                            "я сделаю за тебя",
-                            "просто сядь в машину",
-                            "преодолей страх"
-                        ];
-                        
-                        let openCount = 0;
-                        let pressureCount = 0;
-                        
-                        openPhrases.forEach(phrase => {
-                            if (answer.toLowerCase().includes(phrase)) openCount++;
-                        });
-                        
-                        pressurePhrases.forEach(phrase => {
-                            if (answer.toLowerCase().includes(phrase)) pressureCount++;
-                        });
-                        
-                        if (openCount >= 2 && pressureCount === 0) {
-                            return {correct: true, message: "Идеально! Вы создали безопасное пространство с открытыми вопросами и без давления."};
-                        } else if (openCount >= 1) {
-                            return {correct: true, message: "Хорошо, но попробуйте добавить больше открытых предложений ('хочешь...', 'если захочешь...')."};
-                        } else {
-                            return {correct: false, message: "В диалоге чувствуется давление. Используйте больше открытых вопросов и предложений, дающих выбор."};
-                        }
-                    }
-                }
-            }
-        }
-    ],
-    test: {
-        title: "Контрольная работа 2",
-        description: "Тест по общению с людьми, пережившими травму",
-        questions: [
-            {
-                type: "multiple-choice",
-                question: "Что такое токсичная позитивность?",
-                options: [
-                    "Позитивное мышление, которое всегда помогает",
-                    "Навязывание позитивных эмоций и отрицание негативных",
-                    "Способ быстро выйти из депрессии",
-                    "Метод психотерапии при травмах"
-                ],
-                correct: 1
-            },
-            {
-                type: "multiple-choice",
-                question: "Что важнее всего при создании безопасного пространства?",
-                options: [
-                    "Быстро решить проблему человека",
-                    "Дать множество советов",
-                    "Обеспечить контроль и выбор самому человеку",
-                    "Убедить человека забыть о травме"
-                ],
-                correct: 2
-            },
-            {
-                type: "multiple-choice",
-                question: "Какая фраза является обесценивающей?",
-                options: [
-                    "«Это действительно звучит тяжело»",
-                    "«Я рядом, если хочешь поговорить»",
-                    "«Другие пережили и хуже»",
-                    "«Как я могу тебя поддержать?»"
-                ],
-                correct: 2
-            }
-        ],
-        practical: {
-            task: "Перед вами человек, переживший потерю близкого полгода назад. Он говорит: «До сих пор не могу поверить, что его нет. Иногда ловлю себя на мысли, что вот-вот позвоню ему». Напишите ответ, который создает безопасное пространство.",
-            check: function(answer) {
-                const safeKeywords = ["понимаю", "естественно", "нормально", "в своем темпе", "когда будешь готов", "хочешь поговорить"];
-                const unsafeKeywords = ["пора двигаться", "нужно забыть", "все будет хорошо", "не думай об этом"];
-                
-                let safeCount = 0;
-                let unsafeCount = 0;
-                
-                safeKeywords.forEach(word => {
-                    if (answer.toLowerCase().includes(word)) safeCount++;
-                });
-                
-                unsafeKeywords.forEach(word => {
-                    if (answer.toLowerCase().includes(word)) unsafeCount++;
-                });
-                
-                return safeCount >= 2 && unsafeCount === 0;
-            }
-        }
-    }
-},
-{
-    id: 3,
-    title: "Модуль 3. Активное слушание",
-    description: "Техники слышания и понимания",
-    completed: false,
-    submodules: [
-        {
-            id: "3.1",
-            title: "Техника отражения",
-            tabs: {
-                theory: {
-                    title: "Теория",
-                    content: `<p>Техника отражения (рефлексивное слушание) — это повторение ключевых слов и смыслов говорящего, чтобы показать, что вы действительно слышите.</p>
-                    <ul>
-                        <li><strong>Повторение ключевых слов:</strong> «Ты говоришь, что чувствуешь [слово из речи собеседника]»</li>
-                        <li><strong>Перефразирование:</strong> «Если я правильно понял, ты ощущаешь...»</li>
-                        <li><strong>Отражение эмоций:</strong> «Похоже, это вызывает у тебя [эмоция]»</li>
-                        <li><strong>Важно:</strong> Не добавлять свои интерпретации, не давать советов, не перебивать.</li>
-                    </ul>`
-                },
-                assignment: {
-                    title: "Задание",
-                    content: `<div class="assignment">
-                        <h4>Примените технику отражения</h4>
-                        <p>Жалоба: «Меня постоянно критикует начальник. Даже когда я делаю все правильно, он находит к чему придраться. Я уже не знаю, как работать в таком стрессе.»</p>
-                        <p>Напишите ответ, используя технику отражения.</p>
-                        <textarea id="answer3_1" placeholder="Напишите ваш ответ здесь..."></textarea>
-                        <button class="btn-primary" onclick="checkAssignment('3.1')">Проверить задание</button>
-                        <div id="feedback3_1" class="feedback"></div>
-                    </div>`,
-                    check: function(answer) {
-                        const reflectionWords = ["критикует", "придраться", "стрессе", "начальник", "правильно"];
-                        let reflectionCount = 0;
-                        
-                        reflectionWords.forEach(word => {
-                            if (answer.toLowerCase().includes(word)) reflectionCount++;
-                        });
-                        
-                        if (reflectionCount >= 3 && !answer.toLowerCase().includes("советую") && !answer.toLowerCase().includes("надо бы")) {
-                            return {correct: true, message: "Отлично! Вы точно отразили ключевые слова и чувства собеседника без советов."};
-                        } else if (reflectionCount >= 2) {
-                            return {correct: true, message: "Хорошо, но попробуйте отразить больше ключевых слов из жалобы."};
-                        } else {
-                            return {correct: false, message: "Ответ не отражает жалобу. Попробуйте повторить ключевые слова: 'критикует', 'придраться', 'стресс'."};
-                        }
-                    }
-                }
-            }
-        },
-        {
-            id: "3.2",
-            title: "Уточняющие вопросы",
-            tabs: {
-                theory: {
-                    title: "Теория",
-                    content: `<p>Уточняющие вопросы помогают глубже понять чувства и потребности собеседника:</p>
-                    <ul>
-                        <li><strong>Открытые вопросы:</strong> «Что ты чувствуешь?», «Что для тебя самое сложное?», «Чего ты хочешь?»</li>
-                        <li><strong>Уточняющие вопросы:</strong> «Ты имеешь в виду, что...?», «Правильно ли я понимаю, что...?»</li>
-                        <li><strong>Вопросы о чувствах:</strong> «Какая эмоция сейчас самая сильная?», «Что вызывает самое болезненное чувство?»</li>
-                        <li><strong>Избегайте:</strong> Закрытых вопросов («Да/Нет»), вопросов «почему» (могут звучать как обвинение).</li>
-                    </ul>`
-                },
-                source: {
-                    title: "Источник",
-                    content: `<div class="source">
-                        <p><strong>MindTools: Active Listening</strong></p>
-                        <p>Активное слушание включает 5 ключевых элементов: 1) Полное внимание, 2) Отражение, 3) Уточнение, 4) Резюмирование, 5) Отсроченная реакция. Уточняющие вопросы помогают избежать недопонимания.</p>
-                    </div>`
-                }
-            }
-        },
-        {
-            id: "3.3",
-            title: "Невербальное слушание",
-            tabs: {
-                theory: {
-                    title: "Теория",
-                    content: `<p>Невербальные сигналы составляют до 70% коммуникации при активном слушании:</p>
-                    <ul>
-                        <li><strong>Контакт глазами:</strong> Умеренный, не пристальный (60-70% времени).</li>
-                        <li><strong>Кивки:</strong> Подтверждение, что вы следите за рассказом.</li>
-                        <li><strong>Открытая поза:</strong> Руки не скрещены, наклон к собеседнику.</li>
-                        <li><strong>Паузы:</strong> Дают время подумать и выразить чувства.</li>
-                        <li><strong>Соответствующее выражение лица:</strong> Эмпатическое отзеркаливание эмоций.</li>
-                    </ul>`
-                },
-                quote: {
-                    title: "Цитата",
-                    content: `<div class="quote">«Иногда молчание — лучший способ показать, что ты рядом»</div>
-                    <p class="author">— Неизвестный автор</p>`
-                }
-            }
-        }
-    ],
-    test: {
-        title: "Контрольная работа 3",
-        description: "Тест по технике активного слушания",
-        questions: [
-            {
-                type: "multiple-choice",
-                question: "Какой вопрос является открытым?",
-                options: [
-                    "«Тебе плохо?»",
-                    "«Что ты чувствуешь сейчас?»",
-                    "«Ты злишься на начальника?»",
-                    "«Это было вчера?»"
-                ],
-                correct: 1
-            },
-            {
-                type: "multiple-choice",
-                question: "Что такое техника отражения?",
-                options: [
-                    "Критика слов собеседника",
-                    "Повторение ключевых слов собеседника",
-                    "Рассказ о своем похожем опыте",
-                    "Смена темы разговора"
-                ],
-                correct: 1
-            }
-        ],
-        practical: {
-            task: "Жалоба: «Я постоянно ссорюсь с женой из-за мелочей. Кажется, мы разучились понимать друг друга.» Напишите ответ, используя: 1) технику отражения, 2) один уточняющий вопрос.",
-            check: function(answer) {
-                const hasReflection = answer.toLowerCase().includes("ссоришься") || 
-                                     answer.toLowerCase().includes("мелочи") || 
-                                     answer.toLowerCase().includes("разучились понимать");
-                
-                const hasQuestion = answer.includes("?") && 
-                                  (answer.toLowerCase().includes("что") || 
-                                   answer.toLowerCase().includes("как") ||
-                                   answer.toLowerCase().includes("расскажи"));
-                
-                return hasReflection && hasQuestion;
-            }
-        }
-    }
-},
-{
-    id: 4,
-    title: "Модуль 4. Поддержка без давления",
-    description: "Помощь без спасения",
-    completed: false,
-    submodules: [
-        {
-            id: "4.1",
-            title: "Разница между помощью и спасением",
-            tabs: {
-                theory: {
-                    title: "Теория",
-                    content: `<p><strong>Помощь</strong> и <strong>спасение</strong> — принципиально разные подходы:</p>
-                    <table style="width:100%; border-collapse: collapse; margin: 20px 0;">
-                        <tr style="background: #f8f9fa;">
-                            <th style="padding: 10px; border: 1px solid #ddd;">Помощь (здоровая)</th>
-                            <th style="padding: 10px; border: 1px solid #ddd;">Спасение (нездоровое)</th>
-                        </tr>
-                        <tr>
-                            <td style="padding: 10px; border: 1px solid #ddd;">Поддержка самостоятельности</td>
-                            <td style="padding: 10px; border: 1px solid #ddd;">Лишение выбора и контроля</td>
-                        </tr>
-                        <tr style="background: #f8f9fa;">
-                            <td style="padding: 10px; border: 1px solid #ddd;">«Хочешь, я помогу?»</td>
-                            <td style="padding: 10px; border: 1px solid #ddd;">«Я сделаю это за тебя»</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 10px; border: 1px solid #ddd;">Уважение границ</td>
-                            <td style="padding: 10px; border: 1px solid #ddd;">Нарушение границ</td>
-                        </tr>
-                        <tr style="background: #f8f9fa;">
-                            <td style="padding: 10px; border: 1px solid #ddd;">Верит в способности человека</td>
-                            <td style="padding: 10px; border: 1px solid #ddd;">Считает человека беспомощным</td>
-                        </tr>
-                    </table>`
-                }
-            }
-        },
-        {
-            id: "4.2",
-            title: "Формулировка предложений",
-            tabs: {
-                theory: {
-                    title: "Теория",
-                    content: `<p>Как правильно предлагать помощь:</p>
-                    <ul>
-                        <li><strong>Вопросительная форма:</strong> «Хочешь, я помогу с...?» вместо «Я сделаю...»</li>
-                        <li><strong>Конкретные предложения:</strong> «Могу помочь с поиском терапевта» вместо «Я все улажу»</li>
-                        <li><strong>Уважение отказа:</strong> «Хорошо, если передумаешь — я рядом»</li>
-                        <li><strong>Совместное планирование:</strong> «Давай подумаем, какие есть варианты»</li>
-                        <li><strong>Избегайте:</strong> Ультиматумов, манипуляций, чувства вины.</li>
-                    </ul>`
-                },
-                assignment: {
-                    title: "Задание",
-                    content: `<div class="assignment">
-                        <h4>Переформулируйте фразы спасения в фразы помощи</h4>
-                        <p>1. «Не волнуйся, я сам поговорю с твоим начальником»</p>
-                        <p>2. «Я знаю, что для тебя лучше, сделай так, как я говорю»</p>
-                        <p>3. «Дай я все сделаю за тебя, ты все равно не справишься»</p>
-                        <textarea id="answer4_2" placeholder="Напишите ваши варианты здесь..."></textarea>
-                        <button class="btn-primary" onclick="checkAssignment('4.2')">Проверить задание</button>
-                        <div id="feedback4_2" class="feedback"></div>
-                    </div>`,
-                    check: function(answer) {
-                        const helpIndicators = ["хочешь", "может быть", "предлагаю", "давай подумаем", "если хочешь", "как ты считаешь"];
-                        const rescueIndicators = ["я сделаю", "ты должен", "надо", "обязательно", "лучше знаю"];
-                        
-                        let helpCount = 0;
-                        let rescueCount = 0;
-                        
-                        helpIndicators.forEach(phrase => {
-                            if (answer.toLowerCase().includes(phrase)) helpCount++;
-                        });
-                        
-                        rescueIndicators.forEach(phrase => {
-                            if (answer.toLowerCase().includes(phrase)) rescueCount++;
-                        });
-                        
-                        if (helpCount >= 2 && rescueCount === 0) {
-                            return {correct: true, message: "Прекрасно! Вы правильно переформулировали спасение в помощь, сохраняя выбор за человеком."};
-                        } else if (helpCount >= 1) {
-                            return {correct: true, message: "Хорошо, но есть еще место для улучшения. Используйте больше вопросительных форм и предложений выбора."};
-                        } else {
-                            return {correct: false, message: "Ответ все еще содержит элементы спасения. Попробуйте начать с 'Хочешь...' или 'Может быть...'."};
-                        }
-                    }
-                }
-            }
-        },
-        {
-            id: "4.3",
-            title: "Баланс между заботой и границами",
-            tabs: {
-                theory: {
-                    title: "Теория",
-                    content: `<p>Здоровые границы в поддержке:</p>
-                    <ul>
-                        <li><strong>Ваши ресурсы важны:</strong> Вы не можете помочь всем всегда.</li>
-                        <li><strong>«Нет» — это нормально:</strong> Отказ от помощи ≠ отказ от человека.</li>
-                        <li><strong>Распределение ответственности:</strong> Вы не отвечаете за счастье другого.</li>
-                        <li><strong>Своевременность:</strong> Помощь уместна, когда человек готов ее принять.</li>
-                        <li><strong>Профессиональные границы:</strong> Знать, когда направить к специалисту.</li>
-                    </ul>`
-                },
-                source: {
-                    title: "Источник",
-                    content: `<div class="source">
-                        <p><strong>Psychology Today: Boundaries</strong></p>
-                        <p>Здоровые границы — это не стены, а калитки, которые вы контролируете. Они позволяют вам быть рядом с другими, не теряя себя. Границы в помощи означают: «Я могу быть с тобой в твоей боли, но не могу взять ее на себя».</p>
-                    </div>`
-                }
-            }
-        }
-    ],
-    test: {
-        title: "Контрольная работа 4",
-        description: "Тест по поддержке без давления",
-        questions: [
-            {
-                type: "multiple-choice",
-                question: "Какая фраза предлагает помощь, а не спасение?",
-                options: [
-                    "«Я все сделаю за тебя»",
-                    "«Хочешь, помогу составить план?»",
-                    "«Ты должен сделать это немедленно»",
-                    "«Я знаю, что для тебя лучше»"
-                ],
-                correct: 1
-            },
-            {
-                type: "multiple-choice", 
-                question: "Почему важно уважать отказ от помощи?",
-                options: [
-                    "Чтобы быстрее закончить разговор",
-                    "Чтобы сохранить контроль и выбор за человеком",
-                    "Чтобы показать свое превосходство",
-                    "Чтобы не тратить свое время"
-                ],
-                correct: 1
-            }
-        ],
-        practical: {
-            task: "Ваш друг в депрессии уже месяц не может убраться в квартире. Напишите диалог, где вы предлагаете помощь, но не берете на себя ответственность за его жизнь.",
-            check: function(answer) {
-                const hasOffer = answer.toLowerCase().includes("помочь") || 
-                               answer.toLowerCase().includes("предлагаю") ||
-                               answer.toLowerCase().includes("хочешь");
-                
-                const hasChoice = answer.includes("?") || 
-                                answer.toLowerCase().includes("если хочешь") ||
-                                answer.toLowerCase().includes("как ты думаешь");
-                
-                const noRescue = !answer.toLowerCase().includes("я сделаю за тебя") &&
-                               !answer.toLowerCase().includes("обязательно") &&
-                               !answer.toLowerCase().includes("должен");
-                
-                return hasOffer && hasChoice && noRescue;
-            }
-        }
-    }
-},
-{
-    id: 5,
-    title: "Модуль 5. Самоподдержка и границы",
-    description: "Забота о себе и установление границ",
-    completed: false,
-    submodules: [
-        {
-            id: "5.1",
-            title: "Эмоциональное выгорание",
-            tabs: {
-                theory: {
-                    title: "Теория",
-                    content: `<p>Эмоциональное выгорание у помогающих специалистов и эмпатов:</p>
-                    <ul>
-                        <li><strong>Три компонента:</strong> 1) Эмоциональное истощение, 2) Деперсонализация (цинизм), 3) Снижение профессиональной эффективности.</li>
-                        <li><strong>Ранние признаки:</strong> Хроническая усталость, раздражительность, проблемы со сном, частые болезни.</li>
-                        <li><strong>Факторы риска:</strong> Отсутствие границ, перфекционизм, неумение говорить «нет», недостаток поддержки.</li>
-                        <li><strong>Профилактика:</strong> Регулярный отдых, хобби, супервизия, реалистичные ожидания.</li>
-                    </ul>`
-                },
-                source: {
-                    title: "Источник",
-                    content: `<div class="source">
-                        <p><strong>WHO Burnout Definition</strong></p>
-                        <p>Всемирная организация здравоохранения признала выгорание профессиональным феноменом (2019). Это синдром, возникающий в результате хронического стресса на рабочем месте, который не был успешно преодолен.</p>
-                    </div>`
-                }
-            }
-        },
-        {
-            id: "5.2",
-            title: "Методы восстановления",
-            tabs: {
-                theory: {
-                    title: "Теория",
-                    content: `<p>Эффективные методы восстановления для помогающих:</p>
-                    <ul>
-                        <li><strong>Физические:</strong> Сон 7-9 часов, регулярные прогулки, спорт, массаж.</li>
-                        <li><strong>Эмоциональные:</strong> Ведение дневника, творчество, терапия, группы поддержки.</li>
-                        <li><strong>Ментальные:</strong> Медитация, чтение не по работе, цифровой детокс.</li>
-                        <li><strong>Социальные:</strong> Общение с непрофессиональным кругом, хобби, волонтерство в другой сфере.</li>
-                        <li><strong>Профессиональные:</strong> Супервизия, повышение квалификации, расстановка приоритетов.</li>
-                    </ul>`
-                },
-                assignment: {
-                    title: "Задание",
-                    content: `<div class="assignment">
-                        <h4>Составьте свой план восстановления</h4>
-                        <p>Составьте список из 5-7 конкретных действий, которые вы будете делать для профилактики выгорания. Укажите регулярность (ежедневно, еженедельно, при необходимости).</p>
-                        <textarea id="answer5_2" placeholder="Напишите ваш план здесь..."></textarea>
-                        <button class="btn-primary" onclick="checkAssignment('5.2')">Проверить задание</button>
-                        <div id="feedback5_2" class="feedback"></div>
-                    </div>`,
-                    check: function(answer) {
-                        const recoveryMethods = ["сон", "прогулка", "спорт", "медитация", "дневник", "хобби", "отдых", "общение", "терапия", "массаж"];
-                        let methodCount = 0;
-                        
-                        recoveryMethods.forEach(method => {
-                            if (answer.toLowerCase().includes(method)) methodCount++;
-                        });
-                        
-                        if (methodCount >= 3 && answer.length > 50) {
-                            return {correct: true, message: "Отличный план! Вы включили разнообразные методы восстановления."};
-                        } else if (methodCount >= 1) {
-                            return {correct: true, message: "Хорошее начало. Попробуйте добавить больше конкретных действий с указанием регулярности."};
-                        } else {
-                            return {correct: false, message: "План слишком общий. Попробуйте указать конкретные действия: 'ежедневная 20-минутная прогулка', '8 часов сна' и т.д."};
-                        }
-                    }
-                }
-            }
-        },
-        {
-            id: "5.3",
-            title: "Личные границы",
-            tabs: {
-                theory: {
-                    title: "Теория",
-                    content: `<p>Установление и защита личных границ:</p>
-                    <ul>
-                        <li><strong>Виды границ:</strong> Физические, эмоциональные, временные, интеллектуальные, материальные.</li>
-                        <li><strong>Как устанавливать:</strong> Четко, спокойно, без оправданий. «Мне некомфортно обсуждать это».</li>
-                        <li><strong>Как защищать:</strong> Повторять, не поддаваться на манипуляции, уходить при нарушении.</li>
-                        <li><strong>Чувство вины:</strong> Нормально при установлении границ, но не повод от них отказываться.</li>
-                        <li><strong>Границы ≠ жестокость:</strong> Это забота о себе и отношениях.</li>
-                    </ul>`
-                },
-                quote: {
-                    title: "Цитата",
-                    content: `<div class="quote">«Нет — это тоже забота о себе»</div>
-                    <p class="author">— Неизвестный автор</p>`
-                }
-            }
-        }
-    ],
-    test: {
-        title: "Контрольная работа 5",
-        description: "Тест по самоподдержке и границам",
-        questions: [
-            {
-                type: "multiple-choice",
-                question: "Какой из перечисленных признаков НЕ относится к эмоциональному выгоранию?",
-                options: [
-                    "Энтузиазм и повышенная работоспособность",
-                    "Хроническая усталость",
-                    "Циничное отношение к тем, кому помогаешь",
-                    "Частые простудные заболевания"
-                ],
-                correct: 0
-            },
-            {
-                type: "multiple-choice",
-                question: "Почему важно уметь говорить «нет»?",
-                options: [
-                    "Чтобы показать свою власть",
-                    "Чтобы защитить свои ресурсы и избежать выгорания",
-                    "Чтобы обидеть других людей",
-                    "Чтобы меньше работать"
-                ],
-                correct: 1
-            }
-        ],
-        practical: {
-            task: "Коллега постоянно сбрасывает на вас свою работу, ссылаясь на вашу «доброту и отзывчивость». Вы чувствуете, что на грани выгорания. Напишите, как вы установите границу в этой ситуации.",
-            check: function(answer) {
-                const hasBoundary = answer.toLowerCase().includes("не могу") ||
-                                  answer.toLowerCase().includes("границ") ||
-                                  answer.toLowerCase().includes("откажусь") ||
-                                  answer.toLowerCase().includes("нет");
-                
-                const isAssertive = !answer.toLowerCase().includes("извини") ||
-                                   (answer.toLowerCase().includes("извини") && answer.toLowerCase().includes("но"));
-                
-                const hasSelfCare = answer.toLowerCase().includes("ресурс") ||
-                                  answer.toLowerCase().includes("выгора") ||
-                                  answer.toLowerCase().includes("устал");
-                
-                return hasBoundary && isAssertive && hasSelfCare;
-            }
-        }
-    }
-}
