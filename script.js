@@ -111,11 +111,26 @@ function renderTabs(submodule) {
     const moduleTabs = document.getElementById('moduleTabs');
     const contentDisplay = document.getElementById('contentDisplay');
     
-    if (!moduleTabs || !contentDisplay) return;
+    if (!moduleTabs || !contentDisplay || !submodule) {
+        console.error("Элементы не найдены или подмодуль пустой");
+        return;
+    }
     
     // Очистка предыдущих вкладок и контента
     moduleTabs.innerHTML = '';
     contentDisplay.innerHTML = '';
+    
+    // Проверяем, есть ли вкладки у подмодуля
+    if (!submodule.tabs || Object.keys(submodule.tabs).length === 0) {
+        contentDisplay.innerHTML = `
+            <div class="welcome-screen">
+                <i class="fas fa-cogs" style="font-size: 4rem; color: #6a89cc; margin-bottom: 20px;"></i>
+                <h2>Контент в разработке</h2>
+                <p>Этот раздел находится в разработке. Выберите другой подмодуль.</p>
+            </div>
+        `;
+        return;
+    }
     
     // Создание вкладок
     const tabNames = Object.keys(submodule.tabs);
@@ -139,6 +154,24 @@ function renderTabs(submodule) {
         
         moduleTabs.appendChild(tab);
     });
+    
+    // Добавление кнопки для контрольной работы, если она есть у модуля
+    const module = courseData.modules.find(m => m.submodules.some(s => s.id === submodule.id));
+    if (module && module.test) {
+        const testTab = document.createElement('div');
+        testTab.className = 'tab';
+        testTab.innerHTML = '<i class="fas fa-clipboard-check"></i> Контрольная';
+        testTab.addEventListener('click', () => {
+            openTest(module.id);
+        });
+        moduleTabs.appendChild(testTab);
+    }
+    
+    // Показ содержимого первой вкладки
+    if (tabNames.length > 0) {
+        showTabContent(tabNames[0], submodule);
+    }
+}
     
     // Добавление кнопки для контрольной работы, если она есть у модуля
     const module = courseData.modules.find(m => m.submodules.some(s => s.id === submodule.id));
