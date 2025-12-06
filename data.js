@@ -572,50 +572,100 @@ const courseData = {
                     }
                 }
             ],
-            test: {
-                title: "Контрольная работа 3",
-                description: "Тест по технике активного слушания",
-                questions: [
-                    {
-                        type: "multiple-choice",
-                        question: "Какой вопрос является открытым?",
-                        options: [
-                            "«Тебе плохо?»",
-                            "«Что ты чувствуешь сейчас?»",
-                            "«Ты злишься на начальника?»",
-                            "«Это было вчера?»"
-                        ],
-                        correct: 1
-                    },
-                    {
-                        type: "multiple-choice",
-                        question: "Что такое техника отражения?",
-                        options: [
-                            "Критика слов собеседника",
-                            "Повторение ключевых слов собеседника",
-                            "Рассказ о своем похожем опыте",
-                            "Смена темы разговора"
-                        ],
-                        correct: 1
-                    }
-                ],
-                practical: {
-                    task: "Жалоба: «Я постоянно ссорюсь с женой из-за мелочей. Кажется, мы разучились понимать друг друга.» Напишите ответ, используя: 1) технику отражения, 2) один уточняющий вопрос.",
-                    check: function(answer) {
-                        const hasReflection = answer.toLowerCase().includes("ссоришься") || 
-                                             answer.toLowerCase().includes("мелочи") || 
-                                             answer.toLowerCase().includes("разучились понимать");
-                        
-                        const hasQuestion = answer.includes("?") && 
-                                          (answer.toLowerCase().includes("что") || 
-                                           answer.toLowerCase().includes("как") ||
-                                           answer.toLowerCase().includes("расскажи"));
-                        
-                        return hasReflection && hasQuestion;
+    test: {
+    title: "Контрольная работа 3",
+    description: "Тест по технике активного слушания",
+    questions: [
+        {
+            type: "multiple-choice",
+            question: "Какой вопрос является открытым?",
+            options: [
+                "«Тебе плохо?»",
+                "«Что ты чувствуешь сейчас?»",
+                "«Ты злишься на начальника?»",
+                "«Это было вчера?»"
+            ],
+            correct: 1
+        },
+        {
+            type: "multiple-choice",
+            question: "Что такое техника отражения?",
+            options: [
+                "Критика слов собеседника",
+                "Повторение ключевых слов собеседника",
+                "Рассказ о своем похожем опыте",
+                "Смена темы разговора"
+            ],
+            correct: 1
+        }
+    ],
+    practical: {
+        task: "Жалоба: «Я постоянно ссорюсь с женой из-за мелочей. Кажется, мы разучились понимать друг друга.» Напишите ответ, используя: 1) технику отражения, 2) один уточняющий вопрос.",
+        check: function(answer) {
+            console.log("Проверка контрольной 3:", answer);
+            
+            // Приводим к нижнему регистру для удобства
+            const answerLower = answer.toLowerCase();
+            
+            // Проверяем технику отражения (должно отражать ключевые слова из жалобы)
+            const reflectionWords = ["ссор", "мелоч", "разучил", "понимать"];
+            let hasReflection = false;
+            
+            for (const word of reflectionWords) {
+                if (answerLower.includes(word)) {
+                    hasReflection = true;
+                    break;
+                }
+            }
+            
+            // Дополнительные проверки на отражение
+            if (!hasReflection) {
+                // Проверяем синонимы
+                const synonyms = ["конфликт", "спор", "разногласи", "непонимание"];
+                for (const word of synonyms) {
+                    if (answerLower.includes(word)) {
+                        hasReflection = true;
+                        break;
                     }
                 }
             }
-        },
+            
+            // Проверяем наличие вопроса
+            const hasQuestion = answer.includes("?");
+            
+            // Проверяем, что вопрос уточняющий (открытый)
+            let hasGoodQuestion = false;
+            if (hasQuestion) {
+                const questionWords = ["что", "как", "почему", "расскажи", "опиши", "объясни"];
+                for (const word of questionWords) {
+                    if (answerLower.includes(word + " ") || answerLower.includes(word + "?")) {
+                        hasGoodQuestion = true;
+                        break;
+                    }
+                }
+                
+                // Также проверяем вопросы типа "Что для тебя..."
+                if (answerLower.includes("что для") || answerLower.includes("как для")) {
+                    hasGoodQuestion = true;
+                }
+            }
+            
+            console.log("Результат проверки:", {
+                hasReflection,
+                hasQuestion,
+                hasGoodQuestion,
+                answerLength: answer.length
+            });
+            
+            // Условия прохождения:
+            // 1) Есть отражение ИЛИ хороший вопрос
+            // 2) Ответ не слишком короткий
+            return (hasReflection && hasGoodQuestion && answer.length > 20) || 
+                   (hasReflection && answer.length > 30) || 
+                   (hasGoodQuestion && answer.length > 40);
+        }
+    }
+}
         {
             id: 4,
             title: "Модуль 4. Поддержка без давления",
