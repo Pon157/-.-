@@ -109,6 +109,50 @@
                             </div>
                             
                             <div class="auth-content">
+                                <!-- Форма входа -->
+                                <div id="loginForm" class="auth-form active">
+                                    <h3>Вход в аккаунт</h3>
+                                    <div class="form-group">
+                                        <label for="loginEmail">Email</label>
+                                        <input type="email" id="loginEmail" placeholder="Введите ваш email">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="loginPassword">Пароль</label>
+                                        <input type="password" id="loginPassword" placeholder="Введите пароль">
+                                    </div>
+                                    <button id="submitLogin" class="btn-primary">Войти</button>
+                                    <p class="auth-error" id="loginError"></p>
+                                </div>
+                                
+                                <!-- Форма регистрации -->
+                                <div id="registerForm" class="auth-form">
+                                    <h3>Регистрация</h3>
+                                    <div class="form-group">
+                                        <label for="registerName">Имя</label>
+                                        <input type="text" id="registerName" placeholder="Введите ваше имя">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="registerEmail">Email</label>
+                                        <input type="email" id="registerEmail" placeholder="Введите email">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="registerPassword">Пароль</label>
+                                        <input type="password" id="registerPassword" placeholder="Придумайте пароль">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="registerConfirm">Подтверждение пароля</label>
+                                        <input type="password" id="registerConfirm" placeholder="Повторите пароль">
+                                    </div>
+                                    <button id="submitRegister" class="btn-primary">Зарегистрироваться</button>
+                                    <p class="auth-error" id="registerError"></p>
+                                </div>
+                            </div>
+                            
+                            <button class="auth-close" id="closeAuth">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
 
                     <!-- Область для контента модуля -->
                     <div class="module-area" id="moduleArea">
