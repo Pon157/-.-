@@ -581,7 +581,6 @@ window.showCertificate = showCertificate;
 
 console.log("✅ Курс эмпатии загружен и готов к работе!");
 
-// Добавьте эти функции в ваш существующий script.js
 
 // Инициализация темы
 function initTheme() {
