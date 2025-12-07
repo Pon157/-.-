@@ -1,3 +1,4 @@
+// =============================================
 // СИСТЕМА ПРОГРЕССА И МОДУЛЕЙ
 // =============================================
 
@@ -7,17 +8,70 @@ let userProgress;
 // Инициализация при загрузке страницы
 document.addEventListener('DOMContentLoaded', function() {
     console.log("Курс эмпатии загружается...");
+    console.log("courseData доступен?", typeof courseData !== 'undefined');
     
-    // Ждем загрузки данных курса
-    if (typeof courseData === 'undefined') {
-        console.error("courseData не загружен! Проверьте порядок загрузки скриптов.");
-        // Ждем немного и пробуем снова
-        setTimeout(initApp, 100);
-    } else {
+    if (typeof courseData !== 'undefined') {
+        console.log("✅ courseData загружен, модулей:", courseData.modules.length);
         initApp();
+    } else {
+        console.error("❌ courseData не загружен! Проверьте порядок скриптов.");
+        // Показываем сообщение об ошибке
+        showErrorScreen();
     }
 });
 
+function initApp() {
+    console.log("Инициализация приложения...");
+    
+    // Инициализируем в правильном порядке
+    initTheme();
+    initProgress();
+    renderModulesList();
+    updateProgressUI();
+    setupEventListeners();
+    initProfileDropdown();
+    
+    // Проверяем состояние и показываем соответствующий контент
+    if (userProgress.currentModule && userProgress.currentSubmodule) {
+        console.log("Открываем сохраненный модуль:", userProgress.currentModule, userProgress.currentSubmodule);
+        // Открываем последний сохраненный модуль
+        setTimeout(() => {
+            openModule(userProgress.currentModule, userProgress.currentSubmodule);
+        }, 100);
+    } else {
+        console.log("Нет сохраненного прогресса, показываем приветственный экран");
+        // Показываем приветственный экран
+        setTimeout(() => {
+            showWelcomeScreen();
+        }, 100);
+    }
+    
+    console.log("Приложение инициализировано");
+}
+
+// Показать экран ошибки
+function showErrorScreen() {
+    const contentDisplay = document.getElementById('contentDisplay');
+    if (contentDisplay) {
+        contentDisplay.innerHTML = `
+            <div class="error-screen">
+                <div class="error-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h1>Ошибка загрузки курса</h1>
+                <p>Не удалось загрузить данные курса. Пожалуйста:</p>
+                <ol>
+                    <li>Проверьте подключение к интернету</li>
+                    <li>Обновите страницу (F5)</li>
+                    <li>Если проблема повторяется, свяжитесь с поддержкой</li>
+                </ol>
+                <button class="btn-primary" onclick="location.reload()">
+                    <i class="fas fa-redo"></i> Обновить страницу
+                </button>
+            </div>
+        `;
+    }
+}
 function initApp() {
     console.log("Инициализация приложения...");
     
