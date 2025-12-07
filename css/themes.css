@@ -143,3 +143,11 @@ body {
 [data-theme="blue"] .auth-promo {
     background: linear-gradient(135deg, #3498db, #1abc9c);
 }
+
+[data-theme="dark"] .progress-fill {
+    background: linear-gradient(to right, #3498db, #2980b9);
+}
+
+[data-theme="blue"] .progress-fill {
+    background: linear-gradient(to right, #3498db, #1abc9c);
+}
