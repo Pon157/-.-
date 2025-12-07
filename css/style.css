@@ -1059,3 +1059,347 @@ a:not(.sidebar a):not(.main-header a):not(.modal-header a):not(.dropdown-content
     color: var(--primary-light) !important;
     text-decoration: underline;
 }
+
+/* =============================================
+   КНОПКИ В САЙДБАРЕ
+============================================= */
+.sidebar-controls {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.btn-certificate, .btn-reset {
+    padding: 12px 15px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+}
+
+.btn-certificate {
+    background: var(--gradient-primary);
+    color: #ffffff !important;
+}
+
+.btn-certificate:hover:not(.disabled) {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+}
+
+.btn-certificate.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: var(--border-color) !important;
+}
+
+.btn-reset {
+    background: var(--card-bg);
+    color: #ffffff !important;
+    border: 1px solid var(--border-color);
+}
+
+.btn-reset:hover {
+    background: var(--hover-color);
+    border-color: var(--secondary-color);
+    color: var(--secondary-color) !important;
+}
+
+/* =============================================
+   ИСПРАВЛЕНИЕ DROPDOWN (СДЕЛАЕМ ТЕМНЫЙ ТЕКСТ НА СВЕТЛОМ ФОНЕ)
+============================================= */
+
+/* ВАЖНО: Переопределяем цвета для dropdown */
+.profile-dropdown {
+    background: #ffffff !important; /* Белый фон */
+}
+
+.profile-dropdown *:not(i) {
+    color: #333333 !important; /* Темный текст */
+}
+
+.profile-dropdown a {
+    color: #333333 !important; /* Темный текст для ссылок */
+}
+
+.profile-dropdown a:hover {
+    background: #f8f9fa !important; /* Светлый ховер */
+    color: var(--primary-color) !important; /* Цветной текст при ховере */
+}
+
+.profile-dropdown .user-details strong {
+    color: #222222 !important; /* Темный текст для имени */
+}
+
+.profile-dropdown .user-details small {
+    color: #666666 !important; /* Серый текст для email */
+}
+
+/* Стрелочка для dropdown */
+.profile-dropdown::before {
+    border-bottom-color: #ffffff !important; /* Белая стрелочка */
+}
+
+.profile-dropdown::after {
+    border-bottom-color: var(--border-color) !important; /* Темная граница стрелочки */
+}
+
+/* =============================================
+   СЕРТИФИКАТ (СТИЛИ ДЛЯ МОДАЛЬНОГО ОКНА)
+============================================= */
+.certificate-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.certificate {
+    background: linear-gradient(135deg, #fff9e6 0%, #fff 100%);
+    border: 20px solid #f8d7da;
+    padding: 40px;
+    border-radius: 20px;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    color: #333333 !important;
+}
+
+.certificate-border {
+    border: 2px solid #e74c3c;
+    padding: 30px;
+    position: relative;
+}
+
+.certificate-header {
+    text-align: center;
+    margin-bottom: 40px;
+    border-bottom: 2px solid #e74c3c;
+    padding-bottom: 20px;
+}
+
+.certificate-header h1 {
+    color: #e74c3c !important;
+    font-size: 3rem;
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+.certificate-header p {
+    color: #666666 !important;
+    font-size: 1.2rem;
+}
+
+.certificate-body {
+    text-align: center;
+    margin: 40px 0;
+}
+
+.certificate-body h2 {
+    color: #2c3e50 !important;
+    font-size: 1.8rem;
+    margin-bottom: 30px;
+}
+
+.certificate-award {
+    font-size: 4rem;
+    color: #f39c12 !important;
+    margin: 20px 0;
+}
+
+.certificate-text {
+    color: #555555 !important;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin: 20px 0;
+}
+
+.certificate-name {
+    color: #2c3e50 !important;
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 30px 0;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    display: inline-block;
+    border: 2px dashed #3498db;
+}
+
+.certificate-details {
+    display: flex;
+    justify-content: space-around;
+    margin: 40px 0;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 10px;
+}
+
+.detail {
+    text-align: center;
+}
+
+.detail strong {
+    color: #2c3e50 !important;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.detail p {
+    color: #666666 !important;
+    font-size: 1rem;
+}
+
+.certificate-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #ddd;
+}
+
+.signature {
+    text-align: center;
+}
+
+.signature-line {
+    width: 200px;
+    height: 1px;
+    background: #333;
+    margin: 20px 0 5px;
+}
+
+.signature p {
+    color: #666666 !important;
+    font-size: 0.9rem;
+}
+
+.logo-cert {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #e74c3c !important;
+    font-weight: 600;
+    font-size: 1.2rem;
+}
+
+.logo-cert i {
+    font-size: 2rem;
+}
+
+.certificate-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin: 30px 0;
+    flex-wrap: wrap;
+}
+
+.certificate-note {
+    text-align: center;
+    color: #666666 !important;
+    font-size: 0.9rem;
+    margin-top: 20px;
+}
+
+/* =============================================
+   АВТОРИЗАЦИЯ УПРОЩЕННАЯ (ИМЯ)
+============================================= */
+.auth-form-simple {
+    background: var(--card-bg);
+    padding: 30px;
+    border-radius: 15px;
+    max-width: 400px;
+    margin: 50px auto;
+    text-align: center;
+    border: 1px solid var(--border-color);
+}
+
+.auth-form-simple h3 {
+    color: #ffffff !important;
+    margin-bottom: 20px;
+}
+
+.name-input-container {
+    margin: 30px 0;
+}
+
+.name-input-container input {
+    width: 100%;
+    padding: 15px;
+    font-size: 1.2rem;
+    text-align: center;
+    background: var(--input-bg) !important;
+    color: #ffffff !important;
+    border: 2px solid var(--border-color);
+    border-radius: 10px;
+}
+
+.name-input-container input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
+}
+
+/* =============================================
+   ИСПРАВЛЕНИЕ ЦВЕТОВ В КОНТЕНТЕ
+============================================= */
+.content-display p,
+.content-display li,
+.content-display span,
+.content-display div:not(.btn):not(.feature):not(.auth-promo-content) {
+    color: #cccccc !important;
+}
+
+.content-display h1,
+.content-display h2,
+.content-display h3,
+.content-display h4 {
+    color: #ffffff !important;
+}
+
+/* =============================================
+   АДАПТИВНОСТЬ ДЛЯ СЕРТИФИКАТА
+============================================= */
+@media (max-width: 768px) {
+    .certificate {
+        padding: 20px;
+        border-width: 10px;
+    }
+    
+    .certificate-border {
+        padding: 15px;
+    }
+    
+    .certificate-header h1 {
+        font-size: 2rem;
+    }
+    
+    .certificate-body h2 {
+        font-size: 1.4rem;
+    }
+    
+    .certificate-name {
+        font-size: 1.8rem;
+    }
+    
+    .certificate-details {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .certificate-footer {
+        flex-direction: column;
+        gap: 30px;
+        align-items: center;
+    }
+    
+    .signature-line {
+        width: 150px;
+    }
+}
