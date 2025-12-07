@@ -1,597 +1,4 @@
 // =============================================
-// СИСТЕМА АВТОРИЗАЦИИ (УПРОЩЕННАЯ - ТОЛЬКО ИМЯ)
-// =============================================
-
-const Auth = {
-    currentUser: null,
-    isAuthenticated: false,
-
-    // Инициализация
-    init() {
-        this.loadUser();
-        this.setupEventListeners();
-        this.updateUI();
-        
-        // Если пользователь не зарегистрирован, показываем простую форму
-        if (!this.isAuthenticated) {
-            setTimeout(() => this.showSimpleAuth(), 1000);
-        }
-    },
-
-    // Загрузка пользователя из хранилища
-    loadUser() {
-        this.currentUser = this.getUser();
-        this.isAuthenticated = !!this.currentUser;
-        console.log('Пользователь загружен:', this.currentUser);
-    },
-
-    // Получить пользователя
-    getUser() {
-        const userJson = localStorage.getItem('empathy_course_user');
-        return userJson ? JSON.parse(userJson) : null;
-    },
-
-    // Сохранить пользователя
-    saveUser(user) {
-        localStorage.setItem('empathy_course_user', JSON.stringify(user));
-    },
-
-    // Удалить пользователя
-    removeUser() {
-        localStorage.removeItem('empathy_course_user');
-    },
-
-    // Простая регистрация (только имя)
-    async registerSimple(name) {
-        try {
-            if (!name || name.trim().length < 2) {
-                throw new Error('Введите имя (минимум 2 символа)');
-            }
-
-            // Создание пользователя
-            const user = {
-                id: this.generateId(),
-                name: name.trim(),
-                createdAt: new Date().toISOString(),
-                lastLogin: new Date().toISOString(),
-                role: 'student',
-                avatar: this.generateAvatar(name)
-            };
-
-            // Сохранение
-            this.saveUser(user);
-            this.currentUser = user;
-            this.isAuthenticated = true;
-
-            // Обновление UI
-            this.updateUI();
-            this.showMessage('success', `Добро пожаловать, ${user.name}!`);
-            
-            // Скрываем форму
-            this.hideSimpleAuth();
-
-            return { success: true, user };
-        } catch (error) {
-            this.showMessage('error', error.message);
-            return { success: false, error: error.message };
-        }
-    },
-
-    // Выход
-    logout() {
-        this.currentUser = null;
-        this.isAuthenticated = false;
-        this.removeUser();
-        
-        // Обновление UI
-        this.updateUI();
-        this.showMessage('info', 'Вы вышли из системы');
-        
-        // Показываем форму ввода имени
-        setTimeout(() => this.showSimpleAuth(), 500);
-    },
-
-    // Генерация ID
-    generateId() {
-        return 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-    },
-
-    // Генерация аватара
-    generateAvatar(name) {
-        const colors = ['#6a89cc', '#4a69bd', '#3498db', '#2ecc71', '#e74c3c', '#f39c12'];
-        const color = colors[Math.floor(Math.random() * colors.length)];
-        
-        // Создаем инициалы
-        const initials = name.split(' ')
-            .map(n => n[0])
-            .join('')
-            .toUpperCase()
-            .substring(0, 2);
-        
-        return {
-            initials,
-            color,
-            type: 'initials'
-        };
-    },
-
-    // Обновление UI
-    updateUI() {
-        const userInfo = document.getElementById('userName');
-        const dropdownUserName = document.getElementById('dropdownUserName');
-        const logoutBtn = document.getElementById('logoutBtn');
-        const loginBtn = document.getElementById('loginBtn');
-        const registerBtn = document.getElementById('registerBtn');
-        const certificateBtn = document.getElementById('certificateBtn');
-        const resetBtn = document.getElementById('resetBtn');
-        const myProgressBtn = document.getElementById('myProgressBtn');
-
-        if (this.isAuthenticated && this.currentUser) {
-            // Пользователь авторизован
-            if (userInfo) userInfo.textContent = this.currentUser.name;
-            if (dropdownUserName) dropdownUserName.textContent = this.currentUser.name;
-            
-            if (logoutBtn) logoutBtn.style.display = 'block';
-            if (loginBtn) loginBtn.style.display = 'none';
-            if (registerBtn) registerBtn.style.display = 'none';
-            if (myProgressBtn) myProgressBtn.style.display = 'block';
-            
-            // Активируем кнопки
-            if (certificateBtn) {
-                certificateBtn.classList.remove('disabled');
-            }
-        } else {
-            // Гость
-            if (userInfo) userInfo.textContent = 'Гость';
-            if (dropdownUserName) dropdownUserName.textContent = 'Гость';
-            
-            if (logoutBtn) logoutBtn.style.display = 'none';
-            if (loginBtn) loginBtn.style.display = 'block';
-            if (registerBtn) registerBtn.style.display = 'block';
-            if (myProgressBtn) myProgressBtn.style.display = 'none';
-            
-            // Деактивируем кнопки
-            if (certificateBtn) {
-                certificateBtn.classList.add('disabled');
-            }
-        }
-    },
-
-    // Показать упрощенную форму авторизации
-    showSimpleAuth() {
-        if (this.isAuthenticated) return;
-        
-        const modalTitle = document.getElementById('modalTitle');
-        const modalBody = document.getElementById('modalBody');
-        const modalOverlay = document.getElementById('modalOverlay');
-        
-        if (!modalTitle || !modalBody || !modalOverlay) return;
-        
-        modalTitle.textContent = 'Введите ваше имя';
-        
-        const authHTML = `
-            <div class="auth-form-simple">
-                <div class="welcome-icon">
-                    <i class="fas fa-user-circle"></i>
-                </div>
-                <h3>Как вас зовут?</h3>
-                <p>Введите ваше имя для персонализации курса и получения сертификата</p>
-                
-                <div class="name-input-container">
-                    <input type="text" id="simpleUserName" placeholder="Например: Алексей" maxlength="50" autofocus>
-                </div>
-                
-                <div class="auth-buttons">
-                    <button class="btn-primary" onclick="Auth.submitSimpleAuth()">
-                        <i class="fas fa-check"></i> Продолжить
-                    </button>
-                    <button class="btn-secondary" onclick="Auth.hideSimpleAuth()">
-                        <i class="fas fa-times"></i> Позже
-                    </button>
-                </div>
-                
-                <p class="auth-note">
-                    <i class="fas fa-info-circle"></i>
-                    Ваше имя будет отображаться в сертификате после завершения курса
-                </p>
-            </div>
-        `;
-        
-        modalBody.innerHTML = authHTML;
-        modalOverlay.style.display = 'flex';
-        
-        // Настройка Enter для отправки
-        document.getElementById('simpleUserName')?.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                this.submitSimpleAuth();
-            }
-        });
-    },
-
-    // Скрыть упрощенную форму
-    hideSimpleAuth() {
-        document.getElementById('modalOverlay').style.display = 'none';
-    },
-
-    // Отправить упрощенную форму
-    submitSimpleAuth() {
-        const nameInput = document.getElementById('simpleUserName');
-        if (!nameInput) return;
-        
-        const name = nameInput.value.trim();
-        this.registerSimple(name);
-    },
-
-    // Показать сертификат
-    showCertificate() {
-        if (!this.isAuthenticated) {
-            this.showSimpleAuth();
-            return;
-        }
-
-        // Проверяем прогресс
-        if (!window.userProgress || !window.courseData) {
-            this.showMessage('error', 'Не удалось загрузить данные прогресса');
-            return;
-        }
-
-        const totalModules = window.courseData.modules.length;
-        const completedModules = window.userProgress.completedModules.length;
-
-        if (completedModules < totalModules) {
-            this.showMessage('warning', `Завершите все модули! Вы прошли ${completedModules} из ${totalModules}.`);
-            return;
-        }
-
-        // Генерация именного сертификата
-        this.generateCertificate();
-    },
-
-    // Генерация сертификата
-    generateCertificate() {
-        const modalTitle = document.getElementById('modalTitle');
-        const modalBody = document.getElementById('modalBody');
-        
-        if (!modalTitle || !modalBody) return;
-
-        modalTitle.textContent = '🎓 Ваш именной сертификат';
-        
-        const certificateHTML = `
-            <div class="certificate-container">
-                <div class="certificate" id="certificateContent">
-                    <div class="certificate-border">
-                        <div class="certificate-header">
-                            <h1>СЕРТИФИКАТ</h1>
-                            <p>о успешном прохождении курса</p>
-                        </div>
-                        
-                        <div class="certificate-body">
-                            <h2>«Эмпатия и поддержка в общении»</h2>
-                            <div class="certificate-award">
-                                <i class="fas fa-award"></i>
-                            </div>
-                            
-                            <p class="certificate-text">
-                                Настоящим удостоверяется, что
-                            </p>
-                            
-                            <h3 class="certificate-name">${this.currentUser.name}</h3>
-                            
-                            <p class="certificate-text">
-                                успешно освоил(а) программу из 5 модулей
-                                и проявил(а) компетенции в области эмпатического общения,
-                                активного слушания и поддержки людей.
-                            </p>
-                            
-                            <div class="certificate-details">
-                                <div class="detail">
-                                    <strong>Дата выдачи:</strong>
-                                    <p>${new Date().toLocaleDateString('ru-RU')}</p>
-                                </div>
-                                <div class="detail">
-                                    <strong>Идентификатор:</strong>
-                                    <p>EMP-${this.currentUser.id.substring(0, 8).toUpperCase()}</p>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="certificate-footer">
-                            <div class="signature">
-                                <div class="signature-line"></div>
-                                <p>Подпись</p>
-                            </div>
-                            <div class="logo-cert">
-                                <i class="fas fa-heart"></i>
-                                <span>Курс Эмпатии</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="certificate-actions">
-                    <button class="btn-primary" onclick="Auth.downloadCertificate()">
-                        <i class="fas fa-download"></i> Скачать сертификат
-                    </button>
-                    <button class="btn-secondary" onclick="Auth.shareCertificate()">
-                        <i class="fas fa-share-alt"></i> Поделиться
-                    </button>
-                    <button class="btn-secondary" onclick="Auth.printCertificate()">
-                        <i class="fas fa-print"></i> Распечатать
-                    </button>
-                </div>
-                
-                <p class="certificate-note">
-                    <i class="fas fa-info-circle"></i>
-                    Сертификат можно сохранить как PDF или изображение
-                </p>
-            </div>
-        `;
-        
-        modalBody.innerHTML = certificateHTML;
-        document.getElementById('modalOverlay').style.display = 'flex';
-    },
-
-    // Скачать сертификат
-    downloadCertificate() {
-        this.showMessage('success', 'Функция скачивания в разработке. Вы можете сделать скриншот.');
-    },
-
-    // Поделиться сертификатом
-    shareCertificate() {
-        if (navigator.share) {
-            navigator.share({
-                title: 'Мой сертификат курса эмпатии',
-                text: `Я прошел(а) курс «Эмпатия и поддержка в общении»!`,
-                url: window.location.href
-            });
-        } else {
-            this.showMessage('info', 'Скопируйте ссылку на эту страницу, чтобы поделиться.');
-        }
-    },
-
-    // Печать сертификата
-    printCertificate() {
-        window.print();
-    },
-
-    // Сбросить прогресс
-    resetProgress() {
-        if (!this.isAuthenticated) {
-            this.showSimpleAuth();
-            return;
-        }
-
-        const modalTitle = document.getElementById('modalTitle');
-        const modalBody = document.getElementById('modalBody');
-        
-        if (!modalTitle || !modalBody) return;
-
-        modalTitle.textContent = 'Сброс прогресса';
-        
-        const confirmHTML = `
-            <div class="confirm-reset">
-                <i class="fas fa-exclamation-triangle" style="font-size: 4rem; color: #e74c3c; margin-bottom: 20px;"></i>
-                <h3>Вы уверены?</h3>
-                <p>Это действие сбросит весь ваш прогресс:</p>
-                <ul style="text-align: left; margin: 20px 0;">
-                    <li>Завершенные модули</li>
-                    <li>Результаты тестов</li>
-                    <li>Выполненные задания</li>
-                </ul>
-                <p style="color: #e74c3c;">Действие нельзя отменить!</p>
-                
-                <div class="reset-buttons" style="display: flex; gap: 15px; margin-top: 30px;">
-                    <button class="btn-secondary" onclick="Auth.performReset()" style="background: #e74c3c;">
-                        <i class="fas fa-redo"></i> Сбросить всё
-                    </button>
-                    <button class="btn-primary" onclick="document.getElementById('modalOverlay').style.display='none'">
-                        <i class="fas fa-times"></i> Отмена
-                    </button>
-                </div>
-            </div>
-        `;
-        
-        modalBody.innerHTML = confirmHTML;
-        document.getElementById('modalOverlay').style.display = 'flex';
-    },
-
-    // Выполнить сброс
-    performReset() {
-        if (!this.isAuthenticated) return;
-        
-        // Сброс прогресса в Storage
-        localStorage.removeItem('empathyCourseProgress');
-        
-        // Сброс переменной
-        if (window.userProgress) {
-            window.userProgress = getDefaultProgress();
-        }
-        
-        // Обновление UI
-        this.updateUI();
-        
-        // Закрытие модального окна
-        document.getElementById('modalOverlay').style.display = 'none';
-        
-        // Показ сообщения
-        this.showMessage('success', 'Прогресс успешно сброшен!');
-        
-        // Обновление прогресса в сайдбаре
-        if (window.updateProgressUI) {
-            window.updateProgressUI();
-        }
-        
-        // Обновление списка модулей
-        if (window.renderModulesList) {
-            window.renderModulesList();
-        }
-        
-        // Показ экрана приветствия
-        if (window.showWelcomeScreen) {
-            window.showWelcomeScreen();
-        }
-    },
-
-    // Показать сообщение
-    showMessage(type, text) {
-        // Создаем элемент сообщения
-        const message = document.createElement('div');
-        message.className = `message message-${type}`;
-        message.innerHTML = `
-            <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
-            <span>${text}</span>
-            <button class="message-close"><i class="fas fa-times"></i></button>
-        `;
-        
-        // Добавляем в тело документа
-        document.body.appendChild(message);
-        
-        // Анимация появления
-        setTimeout(() => message.classList.add('show'), 10);
-        
-        // Закрытие сообщения
-        const closeBtn = message.querySelector('.message-close');
-        closeBtn.onclick = () => this.hideMessage(message);
-        
-        // Автоматическое закрытие
-        setTimeout(() => this.hideMessage(message), 5000);
-    },
-
-    // Скрыть сообщение
-    hideMessage(message) {
-        message.classList.remove('show');
-        setTimeout(() => message.remove(), 300);
-    },
-
-    // Настройка обработчиков событий
-    setupEventListeners() {
-        // Клик по профилю для показа dropdown
-        document.getElementById('userInfo')?.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const dropdown = document.getElementById('profileDropdown');
-            if (dropdown) {
-                dropdown.classList.toggle('show');
-            }
-        });
-
-        // Закрытие dropdown при клике снаружи
-        document.addEventListener('click', (e) => {
-            const dropdown = document.getElementById('profileDropdown');
-            const userInfo = document.getElementById('userInfo');
-            
-            if (dropdown && !dropdown.contains(e.target) && !userInfo.contains(e.target)) {
-                dropdown.classList.remove('show');
-            }
-        });
-
-        // Вход (упрощенный)
-        document.getElementById('loginBtn')?.addEventListener('click', (e) => {
-            e.preventDefault();
-            this.showSimpleAuth();
-        });
-        
-        // Регистрация (упрощенная)
-        document.getElementById('registerBtn')?.addEventListener('click', (e) => {
-            e.preventDefault();
-            this.showSimpleAuth();
-        });
-        
-        document.getElementById('promoRegister')?.addEventListener('click', (e) => {
-            e.preventDefault();
-            this.showSimpleAuth();
-        });
-        
-        // Выход
-        document.getElementById('logoutBtn')?.addEventListener('click', (e) => {
-            e.preventDefault();
-            this.logout();
-        });
-        
-        // Закрытие формы авторизации
-        document.getElementById('closeAuth')?.addEventListener('click', () => {
-            document.getElementById('authArea').style.display = 'none';
-        });
-    },
-
-    // Получить текущего пользователя
-    getCurrentUser() {
-        return this.currentUser;
-    },
-
-    // Проверить авторизацию
-    checkAuth() {
-        return this.isAuthenticated;
-    }
-};
-
-// Стили для сообщений (добавить в CSS)
-const messageStyles = document.createElement('style');
-messageStyles.textContent = `
-    .message {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 15px 20px;
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        z-index: 3000;
-        transform: translateX(120%);
-        transition: transform 0.3s ease;
-        max-width: 400px;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-    }
-    
-    .message.show {
-        transform: translateX(0);
-    }
-    
-    .message-success {
-        background: #d4edda;
-        color: #155724;
-        border: 1px solid #c3e6cb;
-    }
-    
-    .message-error {
-        background: #f8d7da;
-        color: #721c24;
-        border: 1px solid #f5c6cb;
-    }
-    
-    .message-info {
-        background: #d1ecf1;
-        color: #0c5460;
-        border: 1px solid #bee5eb;
-    }
-    
-    .message-warning {
-        background: #fff3cd;
-        color: #856404;
-        border: 1px solid #ffeaa7;
-    }
-    
-    .message-close {
-        background: none;
-        border: none;
-        color: inherit;
-        cursor: pointer;
-        margin-left: auto;
-        padding: 0;
-    }
-`;
-
-document.head.appendChild(messageStyles);
-
-// Инициализация при загрузке
-document.addEventListener('DOMContentLoaded', () => {
-    Auth.init();
-});
-
-// Экспорт для использования в других файлах
-window.Auth = Auth;
-
-// =============================================
 // СИСТЕМА ПРОГРЕССА И МОДУЛЕЙ
 // =============================================
 
@@ -600,7 +7,7 @@ let userProgress;
 
 // Инициализация при загрузке страницы
 document.addEventListener('DOMContentLoaded', function() {
-    console.log("Курс эмпетии загружается...");
+    console.log("Курс эмпатии загружается...");
     
     // Ждем загрузки данных курса
     if (typeof courseData === 'undefined') {
@@ -1100,10 +507,10 @@ function setupEventListeners() {
     const resetBtn = document.getElementById('resetBtn');
     if (resetBtn) {
         resetBtn.addEventListener('click', () => {
-            if (Auth.checkAuth()) {
-                Auth.resetProgress();
+            if (window.Auth && window.Auth.checkAuth()) {
+                window.Auth.resetProgress();
             } else {
-                Auth.showSimpleAuth();
+                if (window.Auth) window.Auth.showSimpleAuth();
             }
         });
     }
@@ -1127,7 +534,17 @@ function setupEventListeners() {
     // Кнопка сертификата
     document.getElementById('certificateBtn')?.addEventListener('click', (e) => {
         e.preventDefault();
-        Auth.showCertificate();
+        if (window.Auth) {
+            window.Auth.showCertificate();
+        }
+    });
+    
+    // Кнопка "Мой прогресс"
+    document.getElementById('myProgressBtn')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (window.Auth && window.Auth.showProgress) {
+            window.Auth.showProgress();
+        }
     });
 }
 
@@ -1179,12 +596,7 @@ function submitTest() {
     }
 }
 
-// Показать сертификат (глобальная функция)
-function showCertificate() {
-    Auth.showCertificate();
-}
-
-// Сброс прогресса
+// Сброс прогресса (старая функция для обратной совместимости)
 function resetProgress() {
     if (confirm("Вы уверены, что хотите сбросить весь прогресс? Все данные будут удалены.")) {
         userProgress = getDefaultProgress();
@@ -1256,7 +668,9 @@ function showWelcomeScreen() {
     const promoRegisterBtn = document.getElementById('promoRegister');
     if (promoRegisterBtn) {
         promoRegisterBtn.addEventListener('click', () => {
-            Auth.showSimpleAuth();
+            if (window.Auth) {
+                window.Auth.showSimpleAuth();
+            }
         });
     }
 }
@@ -1264,10 +678,10 @@ function showWelcomeScreen() {
 // Делаем функции глобальными
 window.checkAssignment = checkAssignment;
 window.openModule = openModule;
-window.Auth = Auth;
 window.showWelcomeScreen = showWelcomeScreen;
 window.getDefaultProgress = getDefaultProgress;
 window.updateProgressUI = updateProgressUI;
 window.renderModulesList = renderModulesList;
+window.resetProgress = resetProgress;
 
 console.log("✅ Курс эмпатии загружен и готов к работе!");
