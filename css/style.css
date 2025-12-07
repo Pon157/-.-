@@ -1403,3 +1403,173 @@ a:not(.sidebar a):not(.main-header a):not(.modal-header a):not(.dropdown-content
         width: 150px;
     }
 }
+
+/* =============================================
+   МОДАЛЬНОЕ ОКНО СЕРТИФИКАТА (ПО ЦЕНТРУ ЭКРАНА)
+============================================= */
+.certificate-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    padding: 20px;
+}
+
+.certificate-modal {
+    background: var(--modal-bg);
+    border-radius: 15px;
+    box-shadow: var(--shadow-xl);
+    max-width: 900px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: fadeIn 0.3s ease;
+    position: relative;
+    border: 1px solid var(--border-color);
+}
+
+.certificate-modal-header {
+    background: var(--gradient-primary);
+    padding: 20px 30px;
+    border-radius: 15px 15px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.certificate-modal-header h3 {
+    color: #ffffff !important;
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.certificate-close-btn {
+    background: none;
+    border: none;
+    color: #ffffff !important;
+    font-size: 1.5rem;
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.certificate-close-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: rotate(90deg);
+}
+
+.certificate-modal-body {
+    padding: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 600px;
+}
+
+/* Контейнер сертификата по центру */
+.certificate-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+
+/* Сам сертификат */
+.certificate {
+    background: linear-gradient(135deg, #fff9e6 0%, #fff 100%);
+    border: 20px solid #f8d7da;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    color: #333333 !important;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    transform-origin: center;
+    animation: scaleIn 0.4s ease;
+}
+
+/* Анимация появления */
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Адаптивность для модального окна */
+@media (max-width: 992px) {
+    .certificate-modal {
+        max-width: 95%;
+    }
+    
+    .certificate {
+        padding: 25px;
+        border-width: 15px;
+    }
+    
+    .certificate-border {
+        padding: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .certificate-modal {
+        max-height: 85vh;
+    }
+    
+    .certificate {
+        padding: 15px;
+        border-width: 10px;
+    }
+    
+    .certificate-border {
+        padding: 15px;
+    }
+    
+    .certificate-header h1 {
+        font-size: 2rem !important;
+    }
+    
+    .certificate-name {
+        font-size: 1.8rem !important;
+    }
+}
+
+/* Улучшение прокрутки */
+.certificate-modal::-webkit-scrollbar {
+    width: 8px;
+}
+
+.certificate-modal::-webkit-scrollbar-track {
+    background: var(--body-bg);
+    border-radius: 4px;
+}
+
+.certificate-modal::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 4px;
+}
+
+.certificate-modal::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-dark);
+}
