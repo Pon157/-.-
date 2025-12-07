@@ -584,13 +584,62 @@ function setupEventListeners() {
         document.getElementById('authArea').style.display = 'none';
     });
     
-    // Кнопка сертификата
-    document.getElementById('certificateBtn')?.addEventListener('click', (e) => {
-        e.preventDefault();
-        if (window.Auth) {
-            window.Auth.showCertificate();
+  // Показать сертификат
+showCertificate() {
+    if (!this.isAuthenticated) {
+        this.showSimpleAuth();
+        return;
+    }
+
+    // Проверяем прогресс через глобальные переменные или localStorage
+    let userProgress;
+    const savedProgress = localStorage.getItem('empathyCourseProgress');
+    
+    if (savedProgress) {
+        try {
+            userProgress = JSON.parse(savedProgress);
+        } catch (e) {
+            console.error("Ошибка парсинга прогресса:", e);
+            this.showMessage('error', 'Ошибка загрузки прогресса');
+            return;
         }
-    });
+    } else {
+        userProgress = {
+            completedModules: [],
+            completedSubmodules: []
+        };
+    }
+
+    // Получаем данные курса
+    let courseData = window.courseData;
+    if (!courseData) {
+        // Если нет в глобальной переменной, пытаемся получить из localStorage
+        const savedCourse = localStorage.getItem('empathyCourseData');
+        if (savedCourse) {
+            try {
+                courseData = JSON.parse(savedCourse);
+            } catch (e) {
+                console.error("Ошибка парсинга данных курса:", e);
+            }
+        }
+    }
+
+    if (!courseData) {
+        this.showMessage('error', 'Не удалось загрузить данные курса');
+        return;
+    }
+
+    const totalModules = courseData.modules.length;
+    const completedModules = userProgress.completedModules.length;
+
+    if (completedModules < totalModules) {
+        this.showMessage('warning', `Завершите все модули! Вы прошли ${completedModules} из ${totalModules}.`);
+        return;
+    }
+
+    // Генерация именного сертификата
+    this.generateCertificate();
+},
     
     // Кнопка "Мой прогресс"
     document.getElementById('myProgressBtn')?.addEventListener('click', (e) => {
