@@ -26,7 +26,7 @@
     
     <!-- Подключаем наши файлы -->
     <link rel="stylesheet" href="css/style.css">
-    <!-- themes.css удаляем, если файла нет -->
+    <link rel="stylesheet" href="css/themes.css">
 </head>
 <body>
     <!-- Показываем загрузку -->
@@ -242,8 +242,9 @@
         </div>
     </div>
 
-    <!-- Важно: правильный порядок загрузки скриптов -->
+    <!-- Подключение скриптов -->
     <script src="js/data.js"></script>
+    <script src="js/storage.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/script.js"></script>
     
@@ -253,11 +254,6 @@
             setTimeout(function() {
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('app').style.display = 'block';
-                
-                // Запускаем инициализацию после полной загрузки
-                if (typeof initApp === 'function') {
-                    setTimeout(initApp, 100);
-                }
             }, 500);
         });
     </script>
