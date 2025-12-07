@@ -1,3 +1,644 @@
+// Система авторизации (только имя)
+const Auth = {
+    currentUser: null,
+    isAuthenticated: false,
+
+    // Инициализация
+    init() {
+        this.loadUser();
+        this.setupEventListeners();
+        this.updateUI();
+        
+        // Если пользователь не зарегистрирован, показываем простую форму
+        if (!this.isAuthenticated) {
+            setTimeout(() => this.showSimpleAuth(), 1000);
+        }
+    },
+
+    // Загрузка пользователя из хранилища
+    loadUser() {
+        this.currentUser = this.getUser();
+        this.isAuthenticated = !!this.currentUser;
+        console.log('Пользователь загружен:', this.currentUser);
+    },
+
+    // Получить пользователя
+    getUser() {
+        const userJson = localStorage.getItem('empathy_course_user');
+        return userJson ? JSON.parse(userJson) : null;
+    },
+
+    // Сохранить пользователя
+    saveUser(user) {
+        localStorage.setItem('empathy_course_user', JSON.stringify(user));
+    },
+
+    // Удалить пользователя
+    removeUser() {
+        localStorage.removeItem('empathy_course_user');
+    },
+
+    // Простая регистрация (только имя)
+    async registerSimple(name) {
+        try {
+            if (!name || name.trim().length < 2) {
+                throw new Error('Введите имя (минимум 2 символа)');
+            }
+
+            // Создание пользователя
+            const user = {
+                id: this.generateId(),
+                name: name.trim(),
+                createdAt: new Date().toISOString(),
+                lastLogin: new Date().toISOString(),
+                role: 'student',
+                avatar: this.generateAvatar(name)
+            };
+
+            // Сохранение
+            this.saveUser(user);
+            this.currentUser = user;
+            this.isAuthenticated = true;
+
+            // Обновление UI
+            this.updateUI();
+            this.showMessage('success', `Добро пожаловать, ${user.name}!`);
+            
+            // Скрываем форму
+            this.hideSimpleAuth();
+
+            return { success: true, user };
+        } catch (error) {
+            this.showMessage('error', error.message);
+            return { success: false, error: error.message };
+        }
+    },
+
+    // Выход
+    logout() {
+        this.currentUser = null;
+        this.isAuthenticated = false;
+        this.removeUser();
+        
+        // Обновление UI
+        this.updateUI();
+        this.showMessage('info', 'Вы вышли из системы');
+        
+        // Показываем форму ввода имени
+        setTimeout(() => this.showSimpleAuth(), 500);
+    },
+
+    // Генерация ID
+    generateId() {
+        return 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    },
+
+    // Генерация аватара
+    generateAvatar(name) {
+        const colors = ['#6a89cc', '#4a69bd', '#3498db', '#2ecc71', '#e74c3c', '#f39c12'];
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        
+        // Создаем инициалы
+        const initials = name.split(' ')
+            .map(n => n[0])
+            .join('')
+            .toUpperCase()
+            .substring(0, 2);
+        
+        return {
+            initials,
+            color,
+            type: 'initials'
+        };
+    },
+
+    // Обновление UI
+    updateUI() {
+        const userInfo = document.getElementById('userName');
+        const dropdownUserName = document.getElementById('dropdownUserName');
+        const dropdownUserEmail = document.getElementById('dropdownUserEmail');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const loginBtn = document.getElementById('loginBtn');
+        const registerBtn = document.getElementById('registerBtn');
+        const certificateBtn = document.getElementById('certificateBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const myProgressBtn = document.getElementById('myProgressBtn');
+
+        if (this.isAuthenticated && this.currentUser) {
+            // Пользователь авторизован
+            if (userInfo) userInfo.textContent = this.currentUser.name;
+            if (dropdownUserName) dropdownUserName.textContent = this.currentUser.name;
+            if (dropdownUserEmail) dropdownUserEmail.textContent = '';
+            
+            if (logoutBtn) logoutBtn.style.display = 'block';
+            if (loginBtn) loginBtn.style.display = 'none';
+            if (registerBtn) registerBtn.style.display = 'none';
+            if (myProgressBtn) myProgressBtn.style.display = 'block';
+            
+            // Активируем кнопки
+            if (certificateBtn) {
+                certificateBtn.classList.remove('disabled');
+            }
+            
+            if (resetBtn) {
+                resetBtn.onclick = () => this.resetProgress();
+            }
+        } else {
+            // Гость
+            if (userInfo) userInfo.textContent = 'Гость';
+            if (dropdownUserName) dropdownUserName.textContent = 'Гость';
+            if (dropdownUserEmail) dropdownUserEmail.textContent = '';
+            
+            if (logoutBtn) logoutBtn.style.display = 'none';
+            if (loginBtn) loginBtn.style.display = 'block';
+            if (registerBtn) registerBtn.style.display = 'block';
+            if (myProgressBtn) myProgressBtn.style.display = 'none';
+            
+            // Деактивируем кнопки
+            if (certificateBtn) {
+                certificateBtn.classList.add('disabled');
+            }
+            
+            if (resetBtn) {
+                resetBtn.onclick = () => {
+                    this.showMessage('info', 'Войдите, чтобы управлять прогрессом');
+                };
+            }
+        }
+    },
+
+    // Показать упрощенную форму авторизации
+    showSimpleAuth() {
+        if (this.isAuthenticated) return;
+        
+        const modalTitle = document.getElementById('modalTitle');
+        const modalBody = document.getElementById('modalBody');
+        const modalOverlay = document.getElementById('modalOverlay');
+        
+        if (!modalTitle || !modalBody || !modalOverlay) return;
+        
+        modalTitle.textContent = 'Введите ваше имя';
+        
+        const authHTML = `
+            <div class="auth-form-simple">
+                <div class="welcome-icon">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <h3>Как вас зовут?</h3>
+                <p>Введите ваше имя для персонализации курса и получения сертификата</p>
+                
+                <div class="name-input-container">
+                    <input type="text" id="simpleUserName" placeholder="Например: Алексей" maxlength="50" autofocus>
+                </div>
+                
+                <div class="auth-buttons">
+                    <button class="btn-primary" onclick="Auth.submitSimpleAuth()">
+                        <i class="fas fa-check"></i> Продолжить
+                    </button>
+                    <button class="btn-secondary" onclick="Auth.hideSimpleAuth()">
+                        <i class="fas fa-times"></i> Позже
+                    </button>
+                </div>
+                
+                <p class="auth-note">
+                    <i class="fas fa-info-circle"></i>
+                    Ваше имя будет отображаться в сертификате после завершения курса
+                </p>
+            </div>
+        `;
+        
+        modalBody.innerHTML = authHTML;
+        modalOverlay.style.display = 'flex';
+        
+        // Настройка Enter для отправки
+        document.getElementById('simpleUserName')?.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                this.submitSimpleAuth();
+            }
+        });
+    },
+
+    // Скрыть упрощенную форму
+    hideSimpleAuth() {
+        document.getElementById('modalOverlay').style.display = 'none';
+    },
+
+    // Отправить упрощенную форму
+    submitSimpleAuth() {
+        const nameInput = document.getElementById('simpleUserName');
+        if (!nameInput) return;
+        
+        const name = nameInput.value.trim();
+        this.registerSimple(name);
+    },
+
+    // Показать сертификат
+    showCertificate() {
+        if (!this.isAuthenticated) {
+            this.showSimpleAuth();
+            return;
+        }
+
+        // Проверяем прогресс
+        const progress = window.userProgress || getDefaultProgress();
+        const totalModules = courseData?.modules?.length || 5;
+        const completedModules = progress?.completedModules?.length || 0;
+
+        if (completedModules < totalModules) {
+            this.showMessage('warning', `Завершите все модули! Вы прошли ${completedModules} из ${totalModules}.`);
+            return;
+        }
+
+        // Генерация именного сертификата
+        this.generateCertificate();
+    },
+
+    // Генерация сертификата
+    generateCertificate() {
+        const modalTitle = document.getElementById('modalTitle');
+        const modalBody = document.getElementById('modalBody');
+        
+        if (!modalTitle || !modalBody) return;
+
+        modalTitle.textContent = '🎓 Ваш именной сертификат';
+        
+        const certificateHTML = `
+            <div class="certificate-container">
+                <div class="certificate" id="certificateContent">
+                    <div class="certificate-border">
+                        <div class="certificate-header">
+                            <h1>СЕРТИФИКАТ</h1>
+                            <p>о успешном прохождении курса</p>
+                        </div>
+                        
+                        <div class="certificate-body">
+                            <h2>«Эмпатия и поддержка в общении»</h2>
+                            <div class="certificate-award">
+                                <i class="fas fa-award"></i>
+                            </div>
+                            
+                            <p class="certificate-text">
+                                Настоящим удостоверяется, что
+                            </p>
+                            
+                            <h3 class="certificate-name">${this.currentUser.name}</h3>
+                            
+                            <p class="certificate-text">
+                                успешно освоил(а) программу из 5 модулей
+                                и проявил(а) компетенции в области эмпатического общения,
+                                активного слушания и поддержки людей.
+                            </p>
+                            
+                            <div class="certificate-details">
+                                <div class="detail">
+                                    <strong>Дата выдачи:</strong>
+                                    <p>${new Date().toLocaleDateString('ru-RU')}</p>
+                                </div>
+                                <div class="detail">
+                                    <strong>Идентификатор:</strong>
+                                    <p>EMP-${this.currentUser.id.substring(0, 8).toUpperCase()}</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="certificate-footer">
+                            <div class="signature">
+                                <div class="signature-line"></div>
+                                <p>Подпись</p>
+                            </div>
+                            <div class="logo-cert">
+                                <i class="fas fa-heart"></i>
+                                <span>Курс Эмпатии</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="certificate-actions">
+                    <button class="btn-primary" onclick="Auth.downloadCertificate()">
+                        <i class="fas fa-download"></i> Скачать сертификат
+                    </button>
+                    <button class="btn-secondary" onclick="Auth.shareCertificate()">
+                        <i class="fas fa-share-alt"></i> Поделиться
+                    </button>
+                    <button class="btn-secondary" onclick="Auth.printCertificate()">
+                        <i class="fas fa-print"></i> Распечатать
+                    </button>
+                </div>
+                
+                <p class="certificate-note">
+                    <i class="fas fa-info-circle"></i>
+                    Сертификат можно сохранить как PDF или изображение
+                </p>
+            </div>
+        `;
+        
+        modalBody.innerHTML = certificateHTML;
+        document.getElementById('modalOverlay').style.display = 'flex';
+    },
+
+    // Скачать сертификат
+    downloadCertificate() {
+        this.showMessage('success', 'Функция скачивания в разработке. Вы можете сделать скриншот.');
+    },
+
+    // Поделиться сертификатом
+    shareCertificate() {
+        if (navigator.share) {
+            navigator.share({
+                title: 'Мой сертификат курса эмпатии',
+                text: `Я прошел(а) курс «Эмпатия и поддержка в общении»!`,
+                url: window.location.href
+            });
+        } else {
+            this.showMessage('info', 'Скопируйте ссылку на эту страницу, чтобы поделиться.');
+        }
+    },
+
+    // Печать сертификата
+    printCertificate() {
+        window.print();
+    },
+
+    // Сбросить прогресс
+    resetProgress() {
+        if (!this.isAuthenticated) {
+            this.showSimpleAuth();
+            return;
+        }
+
+        const modalTitle = document.getElementById('modalTitle');
+        const modalBody = document.getElementById('modalBody');
+        
+        if (!modalTitle || !modalBody) return;
+
+        modalTitle.textContent = 'Сброс прогресса';
+        
+        const confirmHTML = `
+            <div class="confirm-reset">
+                <i class="fas fa-exclamation-triangle" style="font-size: 4rem; color: #e74c3c; margin-bottom: 20px;"></i>
+                <h3>Вы уверены?</h3>
+                <p>Это действие сбросит весь ваш прогресс:</p>
+                <ul style="text-align: left; margin: 20px 0;">
+                    <li>Завершенные модули</li>
+                    <li>Результаты тестов</li>
+                    <li>Выполненные задания</li>
+                </ul>
+                <p style="color: #e74c3c;">Действие нельзя отменить!</p>
+                
+                <div class="reset-buttons" style="display: flex; gap: 15px; margin-top: 30px;">
+                    <button class="btn-secondary" onclick="Auth.performReset()" style="background: #e74c3c;">
+                        <i class="fas fa-redo"></i> Сбросить всё
+                    </button>
+                    <button class="btn-primary" onclick="document.getElementById('modalOverlay').style.display='none'">
+                        <i class="fas fa-times"></i> Отмена
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        modalBody.innerHTML = confirmHTML;
+        document.getElementById('modalOverlay').style.display = 'flex';
+    },
+
+    // Выполнить сброс
+    performReset() {
+        if (!this.isAuthenticated) return;
+        
+        // Сброс прогресса в Storage
+        localStorage.removeItem('empathyCourseProgress');
+        
+        // Сброс переменной
+        if (window.userProgress) {
+            window.userProgress = getDefaultProgress();
+        }
+        
+        // Обновление UI
+        this.updateUI();
+        
+        // Закрытие модального окна
+        document.getElementById('modalOverlay').style.display = 'none';
+        
+        // Показ сообщения
+        this.showMessage('success', 'Прогресс успешно сброшен!');
+        
+        // Обновление прогресса в сайдбаре
+        if (window.updateProgressUI) {
+            window.updateProgressUI();
+        }
+        
+        // Обновление списка модулей
+        if (window.renderModulesList) {
+            window.renderModulesList();
+        }
+        
+        // Показ экрана приветствия
+        if (window.showWelcomeScreen) {
+            window.showWelcomeScreen();
+        }
+    },
+
+    // Показать сообщение
+    showMessage(type, text) {
+        // Создаем элемент сообщения
+        const message = document.createElement('div');
+        message.className = `message message-${type}`;
+        message.innerHTML = `
+            <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+            <span>${text}</span>
+            <button class="message-close"><i class="fas fa-times"></i></button>
+        `;
+        
+        // Добавляем в тело документа
+        document.body.appendChild(message);
+        
+        // Анимация появления
+        setTimeout(() => message.classList.add('show'), 10);
+        
+        // Закрытие сообщения
+        const closeBtn = message.querySelector('.message-close');
+        closeBtn.onclick = () => this.hideMessage(message);
+        
+        // Автоматическое закрытие
+        setTimeout(() => this.hideMessage(message), 5000);
+    },
+
+    // Скрыть сообщение
+    hideMessage(message) {
+        message.classList.remove('show');
+        setTimeout(() => message.remove(), 300);
+    },
+
+    // Настройка обработчиков событий
+    setupEventListeners() {
+        // Клик по профилю для показа dropdown
+        document.getElementById('userInfo')?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const dropdown = document.getElementById('profileDropdown');
+            if (dropdown) {
+                dropdown.classList.toggle('show');
+            }
+        });
+
+        // Закрытие dropdown при клике снаружи
+        document.addEventListener('click', (e) => {
+            const dropdown = document.getElementById('profileDropdown');
+            const userInfo = document.getElementById('userInfo');
+            
+            if (dropdown && !dropdown.contains(e.target) && !userInfo.contains(e.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
+
+        // Вход (упрощенный)
+        document.getElementById('loginBtn')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.showSimpleAuth();
+        });
+        
+        // Регистрация (упрощенная)
+        document.getElementById('registerBtn')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.showSimpleAuth();
+        });
+        
+        document.getElementById('promoRegister')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.showSimpleAuth();
+        });
+        
+        // Выход
+        document.getElementById('logoutBtn')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.logout();
+        });
+        
+        // Закрытие формы авторизации
+        document.getElementById('closeAuth')?.addEventListener('click', () => {
+            document.getElementById('authArea').style.display = 'none';
+        });
+        
+        // Сертификат
+        document.getElementById('certificateBtn')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.showCertificate();
+        });
+        
+        // Мой прогресс
+        document.getElementById('myProgressBtn')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.showProgress();
+        });
+    },
+
+    // Показать прогресс
+    showProgress() {
+        if (!this.isAuthenticated) {
+            this.showSimpleAuth();
+            return;
+        }
+
+        const progress = window.userProgress || getDefaultProgress();
+        const totalModules = courseData?.modules?.length || 5;
+        const completedModules = progress?.completedModules?.length || 0;
+        const totalSubmodules = courseData?.modules?.reduce((sum, module) => {
+            return sum + (module.submodules ? module.submodules.length : 0);
+        }, 0) || 0;
+        const completedSubmodules = progress?.completedSubmodules?.length || 0;
+        
+        const modalTitle = document.getElementById('modalTitle');
+        const modalBody = document.getElementById('modalBody');
+        
+        modalTitle.textContent = '📊 Мой прогресс';
+        
+        const progressHTML = `
+            <div class="progress-report">
+                <div class="user-info-progress">
+                    <div class="avatar-progress" style="background: ${this.currentUser.avatar?.color || '#3498db'}; 
+                         width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; 
+                         color: white; font-weight: bold; font-size: 1.5rem;">
+                        ${this.currentUser.avatar?.initials || this.currentUser.name.substring(0, 2).toUpperCase()}
+                    </div>
+                    <div>
+                        <h3>${this.currentUser.name}</h3>
+                        <p>Зарегистрирован: ${new Date(this.currentUser.createdAt).toLocaleDateString('ru-RU')}</p>
+                    </div>
+                </div>
+                
+                <div class="progress-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: #3498db;">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h4>${completedModules} / ${totalModules}</h4>
+                            <p>Модулей завершено</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: #2ecc71;">
+                            <i class="fas fa-tasks"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h4>${completedSubmodules} / ${totalSubmodules}</h4>
+                            <p>Заданий выполнено</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: #f39c12;">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h4>${totalSubmodules > 0 ? Math.round((completedSubmodules / totalSubmodules) * 100) : 0}%</h4>
+                            <p>Общий прогресс</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="module-progress">
+                    <h4>Прогресс по модулям:</h4>
+                    ${courseData?.modules?.map(module => {
+                        const submodulesCount = module.submodules?.length || 0;
+                        const completedCount = progress?.completedSubmodules?.filter(id => id.startsWith(module.id + '.'))?.length || 0;
+                        const percent = submodulesCount > 0 ? Math.round((completedCount / submodulesCount) * 100) : 0;
+                        
+                        return `
+                            <div class="module-progress-item">
+                                <div class="module-title">
+                                    <span>${module.title}</span>
+                                    <span>${completedCount}/${submodulesCount}</span>
+                                </div>
+                                <div class="progress-bar-small">
+                                    <div class="progress-fill-small" style="width: ${percent}%"></div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('') || ''}
+                </div>
+            </div>
+        `;
+        
+        modalBody.innerHTML = progressHTML;
+        document.getElementById('modalOverlay').style.display = 'flex';
+    },
+
+    // Получить текущего пользователя
+    getCurrentUser() {
+        return this.currentUser;
+    },
+
+    // Проверить авторизацию
+    checkAuth() {
+        return this.isAuthenticated;
+    }
+};
+
+// =============================================
+// СИСТЕМА ПРОГРЕССА
+// =============================================
+
 // Состояние прогресса - ОБЪЯВЛЯЕМ ТОЛЬКО ЗДЕСЬ!
 let userProgress;
 
@@ -10,7 +651,10 @@ document.addEventListener('DOMContentLoaded', function() {
     renderModulesList();
     updateProgressUI();
     setupEventListeners();
-    initProfileDropdown(); // Инициализируем улучшенный dropdown
+    initProfileDropdown();
+    
+    // Инициализация авторизации
+    Auth.init();
     
     // Открываем последний сохраненный модуль
     if (userProgress.currentModule && userProgress.currentSubmodule) {
@@ -66,22 +710,23 @@ function updateProgressUI() {
     
     const progressFill = document.getElementById('progressFill');
     const progressText = document.getElementById('progressText');
+    const certificateBtn = document.getElementById('certificateBtn');
     
     if (progressFill) progressFill.style.width = percent + '%';
     if (progressText) progressText.textContent = `Прогресс: ${percent}%`;
     
-    // Сертификат
-    const certBtn = document.getElementById('certificateBtn');
-    if (certBtn) {
-        if (percent === 100) {
-            certBtn.classList.remove('disabled');
-            certBtn.onclick = showCertificate;
+    // Обновляем сертификат
+    if (certificateBtn) {
+        const totalModules = courseData.modules.length;
+        const completedModules = userProgress.completedModules.length;
+        const allCompleted = completedModules >= totalModules;
+        
+        if (allCompleted) {
+            certificateBtn.classList.remove('disabled');
+            certificateBtn.title = "Получить сертификат";
         } else {
-            certBtn.classList.add('disabled');
-            certBtn.onclick = function(e) {
-                e.preventDefault();
-                alert(`Завершите все модули! Прогресс: ${percent}%`);
-            };
+            certificateBtn.classList.add('disabled');
+            certificateBtn.title = `Завершите все модули! ${completedModules}/${totalModules}`;
         }
     }
 }
@@ -135,8 +780,11 @@ function renderModulesList() {
         if (userProgress.currentModule === module.id && module.submodules) {
             module.submodules.forEach(submodule => {
                 const submoduleItem = document.createElement('div');
-                submoduleItem.className = `submodule-item ${userProgress.currentSubmodule === submodule.id ? 'active' : ''}`;
-                submoduleItem.innerHTML = `<h4>${submodule.title}</h4>`;
+                submoduleItem.className = `submodule-item ${userProgress.currentSubmodule === submodule.id ? 'active' : ''} ${userProgress.completedSubmodules.includes(submodule.id) ? 'completed' : ''}`;
+                submoduleItem.innerHTML = `
+                    <h4>${submodule.title}</h4>
+                    ${userProgress.completedSubmodules.includes(submodule.id) ? '<i class="fas fa-check-circle"></i>' : ''}
+                `;
                 
                 submoduleItem.addEventListener('click', (e) => {
                     e.stopPropagation();
@@ -536,7 +1184,13 @@ function setupEventListeners() {
     // Кнопка сброса прогресса
     const resetBtn = document.getElementById('resetBtn');
     if (resetBtn) {
-        resetBtn.addEventListener('click', resetProgress);
+        resetBtn.addEventListener('click', () => {
+            if (Auth.checkAuth()) {
+                Auth.resetProgress();
+            } else {
+                Auth.showSimpleAuth();
+            }
+        });
     }
     
     // Модальное окно
@@ -549,6 +1203,11 @@ function setupEventListeners() {
         if (e.target === modalOverlay) modalOverlay.style.display = 'none';
     };
     if (modalOk) modalOk.onclick = () => modalOverlay.style.display = 'none';
+    
+    // Закрытие формы авторизации
+    document.getElementById('closeAuth')?.addEventListener('click', () => {
+        document.getElementById('authArea').style.display = 'none';
+    });
 }
 
 // Отправка теста
@@ -603,164 +1262,25 @@ function submitTest() {
     }
 }
 
-// Показать сертификат
-function showCertificate() {
-    const total = courseData.modules.length;
-    const completed = userProgress.completedModules.length;
-    
-    if (completed < total) {
-        alert(`Завершите все модули! Вы прошли ${completed} из ${total}.`);
-        return;
-    }
-    
-    const modalTitle = document.getElementById('modalTitle');
-    const modalBody = document.getElementById('modalBody');
-    
-    modalTitle.textContent = '🎓 Ваш сертификат';
-    modalBody.innerHTML = `
-        <div class="certificate">
-            <div class="certificate-content">
-                <h1>СЕРТИФИКАТ</h1>
-                <p>о прохождении курса</p>
-                <h2>«Эмпатия и поддержка в общении»</h2>
-                <p>Настоящим удостоверяется, что слушатель успешно освоил</p>
-                <p>программу из 5 модулей и проявил компетенции в области</p>
-                <p>эмпатического общения и психологической поддержки.</p>
-                <div style="margin-top: 30px;">
-                    <p>Дата выдачи: ${new Date().toLocaleDateString('ru-RU')}</p>
-                </div>
-            </div>
-        </div>
-    `;
-    
-    document.getElementById('modalOverlay').style.display = 'flex';
-}
-
-// Сброс прогресса
-function resetProgress() {
-    if (confirm("Вы уверены, что хотите сбросить весь прогресс? Все данные будут удалены.")) {
-        userProgress = getDefaultProgress();
-        
-        // Сброс в данных курса
-        courseData.modules.forEach(module => {
-            module.completed = false;
-        });
-        
-        localStorage.removeItem('empathyCourseProgress');
-        location.reload();
-    }
-}
-
 // Инициализация темы
 function initTheme() {
-    const savedTheme = localStorage.getItem('empathyCourseTheme') || 'light';
+    const savedTheme = localStorage.getItem('empathyCourseTheme') || 'dark';
     setTheme(savedTheme);
-    
-    // Настройка переключателей тем
-    document.querySelectorAll('.theme-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const theme = btn.dataset.theme;
-            setTheme(theme);
-            localStorage.setItem('empathyCourseTheme', theme);
-        });
-        
-        // Активный переключатель
-        if (btn.dataset.theme === savedTheme) {
-            btn.classList.add('active');
-        }
-    });
 }
 
 // Установка темы
 function setTheme(theme) {
     document.documentElement.setAttribute('data-theme', theme);
-    
-    // Обновление активных кнопок
-    document.querySelectorAll('.theme-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.theme === theme);
-    });
-    
     console.log('Тема установлена:', theme);
 }
 
 // Делаем функции глобальными
 window.checkAssignment = checkAssignment;
 window.openModule = openModule;
-window.resetProgress = resetProgress;
-window.showCertificate = showCertificate;
+window.Auth = Auth;
+window.showWelcomeScreen = showWelcomeScreen;
 
 console.log("✅ Курс эмпатии загружен и готов к работе!");
-
-// Добавляем CSS для улучшенного dropdown
-const dropdownStyles = `
-    .user-profile {
-        position: relative;
-    }
-    
-    .profile-dropdown {
-        position: absolute;
-        top: calc(100% + 5px);
-        right: 0;
-        width: 250px;
-        background: white;
-        border-radius: 10px;
-        box-shadow: 0 5px 20px rgba(0,0,0,0.15);
-        z-index: 1000;
-        opacity: 0;
-        visibility: hidden;
-        transform: translateY(-10px);
-        transition: all 0.3s ease;
-        display: none;
-    }
-    
-    .profile-dropdown::before {
-        content: '';
-        position: absolute;
-        top: -8px;
-        right: 15px;
-        width: 0;
-        height: 0;
-        border-left: 8px solid transparent;
-        border-right: 8px solid transparent;
-        border-bottom: 8px solid white;
-    }
-    
-    .dropdown-content {
-        padding: 15px;
-    }
-    
-    .user-details {
-        padding: 10px 0;
-        border-bottom: 1px solid #eee;
-        margin-bottom: 10px;
-    }
-    
-    .dropdown-content a {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 10px;
-        color: #333;
-        text-decoration: none;
-        border-radius: 5px;
-        transition: background 0.3s;
-    }
-    
-    .dropdown-content a:hover {
-        background: #f8f9fa;
-    }
-    
-    .dropdown-content hr {
-        border: none;
-        border-top: 1px solid #eee;
-        margin: 10px 0;
-    }
-`;
-
-// Добавляем стили в документ
-const styleElement = document.createElement('style');
-styleElement.textContent = dropdownStyles;
-document.head.appendChild(styleElement);
 
 // Показать приветственный экран
 function showWelcomeScreen() {
@@ -776,9 +1296,9 @@ function showWelcomeScreen() {
             <div class="auth-promo">
                 <div class="auth-promo-content">
                     <i class="fas fa-user-check"></i>
-                    <h3>Зарегистрируйтесь для сохранения прогресса!</h3>
+                    <h3>Введите ваше имя для сохранения прогресса!</h3>
                     <p>Получите именной сертификат после прохождения курса</p>
-                    <button id="promoRegister" class="btn-primary">Зарегистрироваться</button>
+                    <button id="promoRegister" class="btn-primary">Начать обучение</button>
                 </div>
             </div>
             
@@ -802,18 +1322,16 @@ function showWelcomeScreen() {
         </div>
     `;
     
-    // Добавляем обработчик для кнопки регистрации
+    // Добавляем обработчик для кнопки
     const promoRegisterBtn = document.getElementById('promoRegister');
     if (promoRegisterBtn) {
         promoRegisterBtn.addEventListener('click', () => {
-            // Показываем окно авторизации
-            const authArea = document.getElementById('authArea');
-            if (authArea) {
-                authArea.style.display = 'block';
-                // Переключаем на вкладку регистрации
-                const registerTab = document.querySelector('.auth-tab[data-tab="register"]');
-                if (registerTab) registerTab.click();
-            }
+            Auth.showSimpleAuth();
         });
     }
+}
+
+// Если нет текущего модуля, показываем приветственный экран
+if (!userProgress.currentModule) {
+    showWelcomeScreen();
 }
