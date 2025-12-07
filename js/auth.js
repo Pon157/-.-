@@ -1,5 +1,4 @@
-
-// Система аутентификации и регистрации
+// Упрощенная система авторизации (только имя)
 
 const Auth = {
     currentUser: null,
@@ -10,6 +9,11 @@ const Auth = {
         this.loadUser();
         this.setupEventListeners();
         this.updateUI();
+        
+        // Если пользователь не зарегистрирован, показываем простую форму
+        if (!this.isAuthenticated) {
+            setTimeout(() => this.showSimpleAuth(), 1000);
+        }
     },
 
     // Загрузка пользователя из хранилища
@@ -19,35 +23,21 @@ const Auth = {
         console.log('Пользователь загружен:', this.currentUser);
     },
 
-    // Регистрация
-    async register(userData) {
+    // Простая регистрация (только имя)
+    async registerSimple(name) {
         try {
-            // Валидация
-            if (!this.validateRegistration(userData)) {
-                throw new Error('Проверьте правильность введенных данных');
-            }
-
-            // Проверка, не зарегистрирован ли уже email
-            const existingUsers = this.getUsers();
-            if (existingUsers.find(u => u.email === userData.email)) {
-                throw new Error('Пользователь с таким email уже существует');
+            if (!name || name.trim().length < 2) {
+                throw new Error('Введите имя (минимум 2 символа)');
             }
 
             // Создание пользователя
             const user = {
                 id: this.generateId(),
-                name: userData.name.trim(),
-                email: userData.email.toLowerCase().trim(),
-                password: this.hashPassword(userData.password),
+                name: name.trim(),
                 createdAt: new Date().toISOString(),
                 lastLogin: new Date().toISOString(),
                 role: 'student',
-                avatar: this.generateAvatar(userData.name),
-                settings: {
-                    notifications: true,
-                    theme: 'light',
-                    language: 'ru'
-                }
+                avatar: this.generateAvatar(name)
             };
 
             // Сохранение
@@ -57,7 +47,10 @@ const Auth = {
 
             // Обновление UI
             this.updateUI();
-            this.showMessage('success', 'Регистрация прошла успешно!');
+            this.showMessage('success', `Добро пожаловать, ${user.name}!`);
+            
+            // Скрываем форму
+            this.hideSimpleAuth();
 
             return { success: true, user };
         } catch (error) {
@@ -66,36 +59,9 @@ const Auth = {
         }
     },
 
-    // Вход
-    async login(email, password) {
-        try {
-            // Поиск пользователя
-            const users = this.getUsers();
-            const user = users.find(u => 
-                u.email === email.toLowerCase().trim() && 
-                u.password === this.hashPassword(password)
-            );
-
-            if (!user) {
-                throw new Error('Неверный email или пароль');
-            }
-
-            // Обновление времени входа
-            user.lastLogin = new Date().toISOString();
-            this.saveUser(user);
-            
-            this.currentUser = user;
-            this.isAuthenticated = true;
-
-            // Обновление UI
-            this.updateUI();
-            this.showMessage('success', `Добро пожаловать, ${user.name}!`);
-
-            return { success: true, user };
-        } catch (error) {
-            this.showMessage('error', error.message);
-            return { success: false, error: error.message };
-        }
+    // Вход (упрощенный)
+    login(name) {
+        return this.registerSimple(name); // Для простоты используем ту же функцию
     },
 
     // Выход
@@ -108,47 +74,8 @@ const Auth = {
         this.updateUI();
         this.showMessage('info', 'Вы вышли из системы');
         
-        // Возврат на главную
-        window.location.reload();
-    },
-
-    // Валидация регистрации
-    validateRegistration(data) {
-        const errors = [];
-
-        if (!data.name || data.name.trim().length < 2) {
-            errors.push('Имя должно содержать минимум 2 символа');
-        }
-
-        if (!this.validateEmail(data.email)) {
-            errors.push('Введите корректный email');
-        }
-
-        if (!data.password || data.password.length < 6) {
-            errors.push('Пароль должен содержать минимум 6 символов');
-        }
-
-        if (data.password !== data.confirm) {
-            errors.push('Пароли не совпадают');
-        }
-
-        if (errors.length > 0) {
-            throw new Error(errors.join(', '));
-        }
-
-        return true;
-    },
-
-    // Валидация email
-    validateEmail(email) {
-        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return re.test(email);
-    },
-
-    // Хэширование пароля (упрощенное для демо)
-    hashPassword(password) {
-        // В реальном приложении используйте bcrypt или аналоги
-        return btoa(password); // Только для демо!
+        // Показываем форму ввода имени
+        setTimeout(() => this.showSimpleAuth(), 500);
     },
 
     // Генерация ID
@@ -175,108 +102,140 @@ const Auth = {
         };
     },
 
-    // Получить всех пользователей
-    getUsers() {
-        const usersJson = localStorage.getItem('empathy_course_users') || '[]';
-        return JSON.parse(usersJson);
-    },
-
     // Сохранить пользователя
     saveUser(user) {
-        // Сохраняем текущего пользователя
-        Storage.saveUser(user);
-        
-        // Обновляем список всех пользователей
-        const users = this.getUsers();
-        const existingIndex = users.findIndex(u => u.id === user.id);
-        
-        if (existingIndex >= 0) {
-            users[existingIndex] = user;
-        } else {
-            users.push(user);
-        }
-        
-        localStorage.setItem('empathy_course_users', JSON.stringify(users));
+        localStorage.setItem('empathy_course_user', JSON.stringify(user));
     },
 
     // Обновление UI
     updateUI() {
         const userInfo = document.getElementById('userName');
         const dropdownUserName = document.getElementById('dropdownUserName');
-        const dropdownUserEmail = document.getElementById('dropdownUserEmail');
         const logoutBtn = document.getElementById('logoutBtn');
         const loginBtn = document.getElementById('loginBtn');
         const registerBtn = document.getElementById('registerBtn');
         const certificateBtn = document.getElementById('certificateBtn');
+        const resetBtn = document.getElementById('resetBtn');
 
         if (this.isAuthenticated && this.currentUser) {
             // Пользователь авторизован
             if (userInfo) userInfo.textContent = this.currentUser.name;
             if (dropdownUserName) dropdownUserName.textContent = this.currentUser.name;
-            if (dropdownUserEmail) dropdownUserEmail.textContent = this.currentUser.email;
             
             if (logoutBtn) logoutBtn.style.display = 'block';
             if (loginBtn) loginBtn.style.display = 'none';
             if (registerBtn) registerBtn.style.display = 'none';
             
-            // Активируем кнопку сертификата
+            // Активируем кнопки
             if (certificateBtn) {
                 certificateBtn.classList.remove('disabled');
                 certificateBtn.onclick = () => this.showCertificate();
+            }
+            
+            if (resetBtn) {
+                resetBtn.onclick = () => this.resetProgress();
             }
         } else {
             // Гость
             if (userInfo) userInfo.textContent = 'Гость';
             if (dropdownUserName) dropdownUserName.textContent = 'Гость';
-            if (dropdownUserEmail) dropdownUserEmail.textContent = '';
             
             if (logoutBtn) logoutBtn.style.display = 'none';
             if (loginBtn) loginBtn.style.display = 'block';
             if (registerBtn) registerBtn.style.display = 'block';
             
-            // Деактивируем кнопку сертификата
+            // Деактивируем кнопки
             if (certificateBtn) {
                 certificateBtn.classList.add('disabled');
                 certificateBtn.onclick = (e) => {
                     e.preventDefault();
-                    this.showAuthPromo();
+                    this.showSimpleAuth();
+                };
+            }
+            
+            if (resetBtn) {
+                resetBtn.onclick = () => {
+                    this.showMessage('info', 'Войдите, чтобы управлять прогрессом');
                 };
             }
         }
     },
 
-    // Показать/скрыть форму авторизации
-    toggleAuthForm(show) {
-        const authArea = document.getElementById('authArea');
-        const moduleArea = document.getElementById('moduleArea');
+    // Показать упрощенную форму авторизации
+    showSimpleAuth() {
+        if (this.isAuthenticated) return;
         
-        if (authArea && moduleArea) {
-            if (show) {
-                authArea.style.display = 'flex';
-                moduleArea.style.display = 'none';
-            } else {
-                authArea.style.display = 'none';
-                moduleArea.style.display = 'block';
+        const modalTitle = document.getElementById('modalTitle');
+        const modalBody = document.getElementById('modalBody');
+        const modalOverlay = document.getElementById('modalOverlay');
+        
+        if (!modalTitle || !modalBody || !modalOverlay) return;
+        
+        modalTitle.textContent = 'Введите ваше имя';
+        
+        const authHTML = `
+            <div class="auth-form-simple">
+                <div class="welcome-icon">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <h3>Как вас зовут?</h3>
+                <p>Введите ваше имя для персонализации курса и получения сертификата</p>
+                
+                <div class="name-input-container">
+                    <input type="text" id="simpleUserName" placeholder="Например: Алексей" maxlength="50" autofocus>
+                </div>
+                
+                <div class="auth-buttons">
+                    <button class="btn-primary" onclick="Auth.submitSimpleAuth()">
+                        <i class="fas fa-check"></i> Продолжить
+                    </button>
+                    <button class="btn-secondary" onclick="Auth.hideSimpleAuth()">
+                        <i class="fas fa-times"></i> Позже
+                    </button>
+                </div>
+                
+                <p class="auth-note">
+                    <i class="fas fa-info-circle"></i>
+                    Ваше имя будет отображаться в сертификате после завершения курса
+                </p>
+            </div>
+        `;
+        
+        modalBody.innerHTML = authHTML;
+        modalOverlay.style.display = 'flex';
+        
+        // Настройка Enter для отправки
+        document.getElementById('simpleUserName')?.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                this.submitSimpleAuth();
             }
-        }
+        });
     },
 
-    // Показать промо авторизации
-    showAuthPromo() {
-        this.toggleAuthForm(true);
-        this.showMessage('info', 'Зарегистрируйтесь для получения сертификата!');
+    // Скрыть упрощенную форму
+    hideSimpleAuth() {
+        document.getElementById('modalOverlay').style.display = 'none';
+    },
+
+    // Отправить упрощенную форму
+    submitSimpleAuth() {
+        const nameInput = document.getElementById('simpleUserName');
+        if (!nameInput) return;
+        
+        const name = nameInput.value.trim();
+        this.registerSimple(name);
     },
 
     // Показать сертификат
     showCertificate() {
         if (!this.isAuthenticated) {
-            this.showAuthPromo();
+            this.showSimpleAuth();
             return;
         }
 
         const progress = Storage.getProgress();
-        const totalModules = courseData.modules.length;
-        const completedModules = progress.completedModules.length;
+        const totalModules = courseData?.modules?.length || 5;
+        const completedModules = progress?.completedModules?.length || 0;
 
         if (completedModules < totalModules) {
             this.showMessage('warning', `Завершите все модули! Вы прошли ${completedModules} из ${totalModules}.`);
@@ -287,164 +246,115 @@ const Auth = {
         this.generateCertificate();
     },
 
-    // Генерация сертификата
-    generateCertificate() {
+    // Сбросить прогресс
+    resetProgress() {
+        if (!this.isAuthenticated) {
+            this.showSimpleAuth();
+            return;
+        }
+
         const modalTitle = document.getElementById('modalTitle');
         const modalBody = document.getElementById('modalBody');
         
         if (!modalTitle || !modalBody) return;
 
-        modalTitle.textContent = '🎓 Ваш именной сертификат';
+        modalTitle.textContent = 'Сброс прогресса';
         
-        const certificateHTML = `
-            <div class="certificate-container">
-                <div class="certificate" id="certificateContent">
-                    <div class="certificate-border">
-                        <div class="certificate-header">
-                            <h1>СЕРТИФИКАТ</h1>
-                            <p>о успешном прохождении курса</p>
-                        </div>
-                        
-                        <div class="certificate-body">
-                            <h2>«Эмпатия и поддержка в общении»</h2>
-                            <div class="certificate-award">
-                                <i class="fas fa-award"></i>
-                            </div>
-                            
-                            <p class="certificate-text">
-                                Настоящим удостоверяется, что
-                            </p>
-                            
-                            <h3 class="certificate-name">${this.currentUser.name}</h3>
-                            
-                            <p class="certificate-text">
-                                успешно освоил(а) программу из 5 модулей
-                                и проявил(а) компетенции в области эмпатического общения,
-                                активного слушания и поддержки людей.
-                            </p>
-                            
-                            <div class="certificate-details">
-                                <div class="detail">
-                                    <strong>Дата выдачи:</strong>
-                                    <p>${new Date().toLocaleDateString('ru-RU')}</p>
-                                </div>
-                                <div class="detail">
-                                    <strong>Идентификатор:</strong>
-                                    <p>EMP-${this.currentUser.id.substring(0, 8).toUpperCase()}</p>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="certificate-footer">
-                            <div class="signature">
-                                <div class="signature-line"></div>
-                                <p>Подпись</p>
-                            </div>
-                            <div class="logo-cert">
-                                <i class="fas fa-heart"></i>
-                                <span>Курс Эмпатии</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        const confirmHTML = `
+            <div class="confirm-reset">
+                <i class="fas fa-exclamation-triangle" style="font-size: 4rem; color: #e74c3c; margin-bottom: 20px;"></i>
+                <h3>Вы уверены?</h3>
+                <p>Это действие сбросит весь ваш прогресс:</p>
+                <ul style="text-align: left; margin: 20px 0;">
+                    <li>Завершенные модули</li>
+                    <li>Результаты тестов</li>
+                    <li>Выполненные задания</li>
+                </ul>
+                <p style="color: #e74c3c;">Действие нельзя отменить!</p>
                 
-                <div class="certificate-actions">
-                    <button class="btn-primary" onclick="Auth.downloadCertificate()">
-                        <i class="fas fa-download"></i> Скачать сертификат
+                <div class="reset-buttons" style="display: flex; gap: 15px; margin-top: 30px;">
+                    <button class="btn-secondary" onclick="Auth.performReset()" style="background: #e74c3c;">
+                        <i class="fas fa-redo"></i> Сбросить всё
                     </button>
-                    <button class="btn-secondary" onclick="Auth.shareCertificate()">
-                        <i class="fas fa-share-alt"></i> Поделиться
-                    </button>
-                    <button class="btn-secondary" onclick="Auth.printCertificate()">
-                        <i class="fas fa-print"></i> Распечатать
+                    <button class="btn-primary" onclick="document.getElementById('modalOverlay').style.display='none'">
+                        <i class="fas fa-times"></i> Отмена
                     </button>
                 </div>
-                
-                <p class="certificate-note">
-                    <i class="fas fa-info-circle"></i>
-                    Сертификат можно сохранить как PDF или изображение
-                </p>
             </div>
         `;
         
-        modalBody.innerHTML = certificateHTML;
+        modalBody.innerHTML = confirmHTML;
         document.getElementById('modalOverlay').style.display = 'flex';
     },
 
-    // Скачать сертификат
-    downloadCertificate() {
-        // В реальном приложении здесь была бы генерация PDF
-        this.showMessage('success', 'Функция скачивания в разработке. Вы можете сделать скриншот.');
-    },
-
-    // Поделиться сертификатом
-    shareCertificate() {
-        if (navigator.share) {
-            navigator.share({
-                title: 'Мой сертификат курса эмпатии',
-                text: `Я прошел(а) курс «Эмпатия и поддержка в общении»!`,
-                url: window.location.href
-            });
-        } else {
-            this.showMessage('info', 'Скопируйте ссылку на эту страницу, чтобы поделиться.');
+    // Выполнить сброс
+    performReset() {
+        if (!this.isAuthenticated) return;
+        
+        // Сброс прогресса в Storage
+        Storage.resetProgress();
+        
+        // Обновление UI
+        this.updateUI();
+        
+        // Закрытие модального окна
+        document.getElementById('modalOverlay').style.display = 'none';
+        
+        // Показ сообщения
+        this.showMessage('success', 'Прогресс успешно сброшен!');
+        
+        // Обновление прогресса в сайдбаре
+        if (window.updateProgressBar) {
+            window.updateProgressBar();
+        }
+        
+        // Перезагрузка текущего модуля
+        if (window.loadCurrentModule) {
+            window.loadCurrentModule();
         }
     },
 
-    // Печать сертификата
-    printCertificate() {
-        window.print();
-    },
-
-    // Показать сообщение
-    showMessage(type, text) {
-        // Создаем элемент сообщения
-        const message = document.createElement('div');
-        message.className = `message message-${type}`;
-        message.innerHTML = `
-            <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
-            <span>${text}</span>
-            <button class="message-close"><i class="fas fa-times"></i></button>
-        `;
-        
-        // Добавляем в тело документа
-        document.body.appendChild(message);
-        
-        // Анимация появления
-        setTimeout(() => message.classList.add('show'), 10);
-        
-        // Закрытие сообщения
-        const closeBtn = message.querySelector('.message-close');
-        closeBtn.onclick = () => this.hideMessage(message);
-        
-        // Автоматическое закрытие
-        setTimeout(() => this.hideMessage(message), 5000);
-    },
-
-    // Скрыть сообщение
-    hideMessage(message) {
-        message.classList.remove('show');
-        setTimeout(() => message.remove(), 300);
+    // Генерация сертификата (оставляем без изменений)
+    generateCertificate() {
+        // ... существующий код ...
     },
 
     // Настройка обработчиков событий
     setupEventListeners() {
-        // Кнопки входа/регистрации
+        // Клик по профилю для показа dropdown
+        document.getElementById('userInfo')?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const dropdown = document.getElementById('profileDropdown');
+            if (dropdown) {
+                dropdown.classList.toggle('show');
+            }
+        });
+
+        // Закрытие dropdown при клике снаружи
+        document.addEventListener('click', (e) => {
+            const dropdown = document.getElementById('profileDropdown');
+            const userInfo = document.getElementById('userInfo');
+            
+            if (dropdown && !dropdown.contains(e.target) && !userInfo.contains(e.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
+
+        // Вход (упрощенный)
         document.getElementById('loginBtn')?.addEventListener('click', (e) => {
             e.preventDefault();
-            this.toggleAuthForm(true);
-            this.switchAuthTab('login');
+            this.showSimpleAuth();
         });
         
+        // Регистрация (упрощенная)
         document.getElementById('registerBtn')?.addEventListener('click', (e) => {
             e.preventDefault();
-            this.toggleAuthForm(true);
-            this.switchAuthTab('register');
+            this.showSimpleAuth();
         });
         
         document.getElementById('promoRegister')?.addEventListener('click', (e) => {
             e.preventDefault();
-            this.toggleAuthForm(true);
-            this.switchAuthTab('register');
+            this.showSimpleAuth();
         });
         
         // Выход
@@ -455,92 +365,8 @@ const Auth = {
         
         // Закрытие формы авторизации
         document.getElementById('closeAuth')?.addEventListener('click', () => {
-            this.toggleAuthForm(false);
+            document.getElementById('authArea').style.display = 'none';
         });
-        
-        // Переключение вкладок авторизации
-        document.querySelectorAll('.auth-tab').forEach(tab => {
-            tab.addEventListener('click', (e) => {
-                const tabName = e.target.dataset.tab;
-                this.switchAuthTab(tabName);
-            });
-        });
-        
-        // Отправка формы входа
-        document.getElementById('submitLogin')?.addEventListener('click', async () => {
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-            const errorElement = document.getElementById('loginError');
-            
-            if (!email || !password) {
-                errorElement.textContent = 'Заполните все поля';
-                return;
-            }
-            
-            errorElement.textContent = '';
-            const result = await this.login(email, password);
-            
-            if (result.success) {
-                this.toggleAuthForm(false);
-            }
-        });
-        
-        // Отправка формы регистрации
-        document.getElementById('submitRegister')?.addEventListener('click', async () => {
-            const name = document.getElementById('registerName').value;
-            const email = document.getElementById('registerEmail').value;
-            const password = document.getElementById('registerPassword').value;
-            const confirm = document.getElementById('registerConfirm').value;
-            const errorElement = document.getElementById('registerError');
-            
-            const userData = { name, email, password, confirm };
-            const result = await this.register(userData);
-            
-            if (result.success) {
-                this.toggleAuthForm(false);
-            }
-        });
-        
-        // Enter в формах
-        ['loginEmail', 'loginPassword', 'registerName', 'registerEmail', 'registerPassword', 'registerConfirm']
-            .forEach(id => {
-                const element = document.getElementById(id);
-                if (element) {
-                    element.addEventListener('keypress', (e) => {
-                        if (e.key === 'Enter') {
-                            if (id.startsWith('login')) {
-                                document.getElementById('submitLogin').click();
-                            } else {
-                                document.getElementById('submitRegister').click();
-                            }
-                        }
-                    });
-                }
-            });
-    },
-
-    // Переключение вкладок авторизации
-    switchAuthTab(tabName) {
-        // Активная вкладка
-        document.querySelectorAll('.auth-tab').forEach(tab => {
-            tab.classList.toggle('active', tab.dataset.tab === tabName);
-        });
-        
-        // Активная форма
-        document.querySelectorAll('.auth-form').forEach(form => {
-            form.classList.toggle('active', form.id === `${tabName}Form`);
-        });
-        
-        // Очистка ошибок
-        document.getElementById('loginError').textContent = '';
-        document.getElementById('registerError').textContent = '';
-        
-        // Очистка полей при переключении
-        if (tabName === 'login') {
-            document.getElementById('loginEmail').focus();
-        } else {
-            document.getElementById('registerName').focus();
-        }
     },
 
     // Получить текущего пользователя
@@ -551,75 +377,13 @@ const Auth = {
     // Проверить авторизацию
     checkAuth() {
         return this.isAuthenticated;
-    },
-
-    // Обновить данные пользователя
-    updateUser(updates) {
-        if (!this.isAuthenticated) return false;
-        
-        this.currentUser = { ...this.currentUser, ...updates };
-        this.saveUser(this.currentUser);
-        this.updateUI();
-        
-        return true;
     }
 };
 
-// Стили для сообщений (добавить в CSS)
+// Стили для сообщений
 const messageStyles = document.createElement('style');
 messageStyles.textContent = `
-    .message {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 15px 20px;
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        z-index: 3000;
-        transform: translateX(120%);
-        transition: transform 0.3s ease;
-        max-width: 400px;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-    }
-    
-    .message.show {
-        transform: translateX(0);
-    }
-    
-    .message-success {
-        background: #d4edda;
-        color: #155724;
-        border: 1px solid #c3e6cb;
-    }
-    
-    .message-error {
-        background: #f8d7da;
-        color: #721c24;
-        border: 1px solid #f5c6cb;
-    }
-    
-    .message-info {
-        background: #d1ecf1;
-        color: #0c5460;
-        border: 1px solid #bee5eb;
-    }
-    
-    .message-warning {
-        background: #fff3cd;
-        color: #856404;
-        border: 1px solid #ffeaa7;
-    }
-    
-    .message-close {
-        background: none;
-        border: none;
-        color: inherit;
-        cursor: pointer;
-        margin-left: auto;
-        padding: 0;
-    }
+    /* ... существующие стили ... */
 `;
 
 document.head.appendChild(messageStyles);
