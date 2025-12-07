@@ -56,7 +56,7 @@ p, span, li, a:not(.sidebar a) {
     --header-bg: #1e1e1e;
     --input-bg: #2d2d2d;
     --modal-bg: #252525;
-    --dropdown-bg: #2d2d2d;
+    --dropdown-bg: #ffffff; /* ИЗМЕНЕНО: белый фон для dropdown */
     --footer-bg: #1e1e1e;
     --table-bg: #252525;
     
@@ -70,12 +70,14 @@ p, span, li, a:not(.sidebar a) {
     --text-on-primary: #ffffff;
     --text-on-dark: #ffffff;
     --table-text: #f5f5f5;
+    --dropdown-text: #333333; /* ИЗМЕНЕНО: черный текст для dropdown */
     
     /* Границы */
     --border-color: #404040;
     --border-light: #4a4a4a;
     --border-dark: #333333;
     --table-border: #555555;
+    --dropdown-border: #dddddd; /* ИЗМЕНЕНО: светлая граница для dropdown */
     
     /* Тени */
     --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.4);
@@ -88,6 +90,7 @@ p, span, li, a:not(.sidebar a) {
     --hover-color: #2d2d2d;
     --active-color: #3a3a3a;
     --focus-ring: rgba(52, 152, 219, 0.5);
+    --dropdown-hover: #f8f9fa; /* ИЗМЕНЕНО: светлый hover для dropdown */
     
     /* Градиенты */
     --gradient-primary: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
@@ -266,7 +269,7 @@ p, span, li, a:not(.sidebar a) {
 }
 
 .main-header,
-.main-header *:not(.theme-btn):not(.theme-btn *) {
+.main-header *:not(.user-info *) {
     color: #ffffff !important;
 }
 
@@ -276,44 +279,15 @@ p, span, li, a:not(.sidebar a) {
     gap: 20px;
 }
 
-/* Переключатель тем (оставляем одну тему) */
-.theme-switcher {
-    display: flex;
-    gap: 8px;
-    background: var(--card-bg);
-    padding: 6px;
-    border-radius: 20px;
-    box-shadow: var(--shadow-sm);
-    border: 1px solid var(--border-color);
+/* УДАЛЕН ПЕРЕКЛЮЧАТЕЛЬ ТЕМ */
+
+/* =============================================
+   ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ (С БЕЛЫМ FON И ЧЕРНЫМ ТЕКСТОМ)
+============================================= */
+.user-profile {
+    position: relative;
 }
 
-.theme-btn {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    border: 2px solid transparent;
-    background: transparent;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s ease;
-    font-size: 1.1rem;
-    color: #cccccc !important;
-}
-
-.theme-btn:hover {
-    background: var(--hover-color);
-    transform: scale(1.1);
-}
-
-.theme-btn.active {
-    background: var(--primary-color);
-    color: #ffffff !important;
-    border-color: var(--primary-dark);
-}
-
-/* Профиль пользователя */
 .user-info {
     display: flex;
     align-items: center;
@@ -337,22 +311,97 @@ p, span, li, a:not(.sidebar a) {
     color: var(--primary-color) !important;
 }
 
+/* Dropdown профиля - БЕЛЫЙ ФОН, ЧЕРНЫЙ ТЕКСТ */
 .profile-dropdown {
-    background: var(--dropdown-bg);
-    border: 1px solid var(--border-color);
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    width: 280px;
+    background: var(--dropdown-bg) !important; /* Белый фон */
+    border-radius: 12px;
     box-shadow: var(--shadow-xl);
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    border: 1px solid var(--dropdown-border) !important; /* Светлая граница */
+}
+
+.profile-dropdown.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.profile-dropdown::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    right: 20px;
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-bottom: 8px solid var(--dropdown-bg);
+}
+
+.profile-dropdown::after {
+    content: '';
+    position: absolute;
+    top: -9px;
+    right: 19px;
+    width: 0;
+    height: 0;
+    border-left: 9px solid transparent;
+    border-right: 9px solid transparent;
+    border-bottom: 9px solid var(--dropdown-border);
+    z-index: -1;
 }
 
 .dropdown-content {
-    color: #f5f5f5 !important;
+    padding: 15px;
+    color: var(--dropdown-text) !important; /* Черный текст */
+}
+
+.user-details {
+    padding: 10px 0;
+    border-bottom: 1px solid var(--dropdown-border);
+    margin-bottom: 10px;
+    color: var(--dropdown-text) !important;
 }
 
 .dropdown-content a {
-    color: #f5f5f5 !important;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 15px;
+    color: var(--dropdown-text) !important; /* Черный текст */
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    margin-bottom: 5px;
 }
 
 .dropdown-content a:hover {
+    background: var(--dropdown-hover) !important; /* Светлый hover */
     color: var(--primary-color) !important;
+    transform: translateX(5px);
+}
+
+.dropdown-content a i {
+    color: var(--dropdown-text) !important; /* Черные иконки */
+    width: 20px;
+}
+
+.dropdown-content a:hover i {
+    color: var(--primary-color) !important;
+}
+
+.dropdown-content hr {
+    border: none;
+    border-top: 1px solid var(--dropdown-border);
+    margin: 15px 0;
 }
 
 /* =============================================
@@ -390,7 +439,7 @@ p, span, li, a:not(.sidebar a) {
 }
 
 /* =============================================
-   ТАБЛИЦЫ (ВАЖНОЕ ИСПРАВЛЕНИЕ!)
+   ТАБЛИЦЫ
 ============================================= */
 table {
     width: 100%;
@@ -944,6 +993,10 @@ input[type="checkbox"] {
         flex-wrap: wrap;
     }
     
+    .user-info span {
+        display: none;
+    }
+    
     table {
         display: block;
         overflow-x: auto;
@@ -953,6 +1006,18 @@ input[type="checkbox"] {
     table td {
         padding: 8px 10px;
         font-size: 0.9rem;
+    }
+    
+    .profile-dropdown {
+        width: 250px;
+        right: -50%;
+        transform: translateX(50%) translateY(-10px);
+    }
+    
+    .profile-dropdown::before,
+    .profile-dropdown::after {
+        right: 50%;
+        transform: translateX(50%);
     }
 }
 
@@ -974,7 +1039,7 @@ input[type="checkbox"] {
 ============================================= */
 
 /* Принудительное применение темных цветов для всех элементов */
-*:not(.sidebar *):not(.main-header *):not(.modal-header *):not(.auth-promo *) {
+*:not(.sidebar *):not(.main-header *):not(.modal-header *):not(.auth-promo *):not(.dropdown-content *) {
     color: #f5f5f5 !important;
 }
 
@@ -986,11 +1051,11 @@ select {
 }
 
 /* Ссылки */
-a:not(.sidebar a):not(.main-header a):not(.modal-header a) {
+a:not(.sidebar a):not(.main-header a):not(.modal-header a):not(.dropdown-content a) {
     color: var(--primary-color) !important;
 }
 
-a:not(.sidebar a):not(.main-header a):not(.modal-header a):hover {
+a:not(.sidebar a):not(.main-header a):not(.modal-header a):not(.dropdown-content a):hover {
     color: var(--primary-light) !important;
     text-decoration: underline;
 }
