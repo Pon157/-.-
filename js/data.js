@@ -15,7 +15,7 @@ const courseData = {
                         theory: {
                             title: "Теория",
                             content: `<div class="theory-block">
-                                <img src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Эмпатия и понимание" style="width:100%; border-radius:10px; margin-bottom:20px;">
+                                <img src="https://i.postimg.cc/sxtSrx36/a13e72c64db506f39343dcfb5753f2d0-(1).jpg">
                                 <p><strong>Расширенная теория:</strong> Эмпатия часто путается с сочувствием (симпатией) или жалостью, но это фундаментально разные процессы.</p>
                                 <ul>
                                     <li><strong>Жалость:</strong> Позиция «сверху вниз». Вы смотрите на человека в беде и думаете: «Бедняжка, хорошо, что это не со мной». Это дистанцирует.</li>
