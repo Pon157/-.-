@@ -580,3 +580,282 @@ window.resetProgress = resetProgress;
 window.showCertificate = showCertificate;
 
 console.log("✅ Курс эмпатии загружен и готов к работе!");
+
+// Добавьте эти функции в ваш существующий script.js
+
+// Инициализация темы
+function initTheme() {
+    const savedTheme = Storage.getTheme();
+    setTheme(savedTheme);
+    
+    // Настройка переключателей тем
+    document.querySelectorAll('.theme-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const theme = btn.dataset.theme;
+            setTheme(theme);
+            Storage.saveTheme(theme);
+        });
+        
+        // Активный переключатель
+        if (btn.dataset.theme === savedTheme) {
+            btn.classList.add('active');
+        }
+    });
+}
+
+// Установка темы
+function setTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    
+    // Обновление активных кнопок
+    document.querySelectorAll('.theme-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.theme === theme);
+    });
+    
+    console.log('Тема установлена:', theme);
+}
+
+// Обновление инициализации
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("Курс эмпатии загружается...");
+    
+    // Инициализация систем
+    initTheme();
+    Auth.init();
+    initProgress();
+    
+    // Загрузка данных
+    renderModulesList();
+    updateProgressUI();
+    setupEventListeners();
+    
+    // Открытие сохраненного модуля
+    if (userProgress.currentModule && userProgress.currentSubmodule) {
+        setTimeout(() => {
+            openModule(userProgress.currentModule, userProgress.currentSubmodule);
+        }, 100);
+    }
+});
+
+// Обновленная функция сохранения прогресса
+function saveProgress() {
+    Storage.saveProgress(userProgress);
+    updateProgressUI();
+}
+
+// Обновленная функция обновления UI прогресса
+function updateProgressUI() {
+    const totalSubmodules = courseData.modules.reduce((sum, module) => {
+        return sum + (module.submodules ? module.submodules.length : 0);
+    }, 0);
+    
+    const completed = userProgress.completedSubmodules.length;
+    const percent = totalSubmodules > 0 ? Math.round((completed / totalSubmodules) * 100) : 0;
+    
+    const progressFill = document.getElementById('progressFill');
+    const progressText = document.getElementById('progressText');
+    
+    if (progressFill) progressFill.style.width = percent + '%';
+    if (progressText) progressText.textContent = `Прогресс: ${percent}%`;
+    
+    // Управление кнопкой сертификата через Auth
+    const certificateBtn = document.getElementById('certificateBtn');
+    if (certificateBtn) {
+        if (percent === 100 && Auth.checkAuth()) {
+            certificateBtn.classList.remove('disabled');
+            certificateBtn.onclick = () => Auth.showCertificate();
+        } else {
+            certificateBtn.classList.add('disabled');
+            certificateBtn.onclick = (e) => {
+                e.preventDefault();
+                if (percent === 100) {
+                    Auth.showAuthPromo();
+                } else {
+                    alert(`Завершите все модули! Прогресс: ${percent}%`);
+                }
+            };
+        }
+    }
+}
+
+// Обновленная функция сброса прогресса
+function resetProgress() {
+    if (confirm("Вы уверены, что хотите сбросить весь прогресс? Все данные будут удалены.")) {
+        userProgress = Storage.getDefaultProgress();
+        
+        // Сброс в данных курса
+        courseData.modules.forEach(module => {
+            module.completed = false;
+        });
+        
+        Storage.saveProgress(userProgress);
+        renderModulesList();
+        updateProgressUI();
+        
+        // Показать приветственный экран
+        showWelcomeScreen();
+        
+        alert("Прогресс сброшен. Начните курс заново.");
+    }
+}
+
+// Обновленная функция отображения сертификата
+function showCertificate() {
+    Auth.showCertificate();
+}
+
+// Добавьте эти стили для сертификата в ваш CSS
+const certificateStyles = `
+    .certificate-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    
+    .certificate {
+        background: linear-gradient(135deg, #fff8e1 0%, #fff 50%, #fff8e1 100%);
+        border: 20px solid #ffd54f;
+        border-radius: 10px;
+        padding: 40px;
+        position: relative;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    
+    .certificate-border {
+        border: 2px solid #ffb300;
+        padding: 30px;
+        position: relative;
+    }
+    
+    .certificate-header {
+        text-align: center;
+        margin-bottom: 30px;
+        border-bottom: 3px double #ffb300;
+        padding-bottom: 20px;
+    }
+    
+    .certificate-header h1 {
+        color: #d84315;
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+        letter-spacing: 3px;
+    }
+    
+    .certificate-body {
+        text-align: center;
+        padding: 30px 0;
+    }
+    
+    .certificate-body h2 {
+        color: #2c3e50;
+        margin-bottom: 30px;
+        font-size: 1.8rem;
+    }
+    
+    .certificate-award {
+        font-size: 4rem;
+        color: gold;
+        margin: 20px 0;
+        text-shadow: 0 0 10px rgba(255,215,0,0.5);
+    }
+    
+    .certificate-name {
+        color: #1565c0;
+        font-size: 2.5rem;
+        margin: 20px 0;
+        padding: 10px;
+        border-top: 2px solid #1565c0;
+        border-bottom: 2px solid #1565c0;
+        display: inline-block;
+    }
+    
+    .certificate-text {
+        color: #555;
+        font-size: 1.1rem;
+        line-height: 1.6;
+        margin: 15px 0;
+    }
+    
+    .certificate-details {
+        display: flex;
+        justify-content: space-around;
+        margin: 30px 0;
+        padding: 20px;
+        background: #f9f9f9;
+        border-radius: 10px;
+    }
+    
+    .detail {
+        text-align: center;
+    }
+    
+    .detail strong {
+        display: block;
+        color: #2c3e50;
+        margin-bottom: 5px;
+    }
+    
+    .certificate-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-top: 40px;
+        padding-top: 20px;
+        border-top: 1px solid #ddd;
+    }
+    
+    .signature {
+        text-align: center;
+    }
+    
+    .signature-line {
+        width: 200px;
+        height: 1px;
+        background: #000;
+        margin: 0 auto 10px;
+    }
+    
+    .logo-cert {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #6a89cc;
+        font-weight: bold;
+    }
+    
+    .logo-cert i {
+        font-size: 1.5rem;
+    }
+    
+    .certificate-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        margin: 30px 0;
+    }
+    
+    .certificate-note {
+        text-align: center;
+        color: #7f8c8d;
+        font-style: italic;
+        margin-top: 20px;
+    }
+    
+    @media print {
+        .certificate-actions,
+        .certificate-note,
+        .modal-footer {
+            display: none !important;
+        }
+        
+        .certificate {
+            border: none;
+            box-shadow: none;
+        }
+    }
+`;
+
+// Добавление стилей сертификата
+const styleElement = document.createElement('style');
+styleElement.textContent = certificateStyles;
+document.head.appendChild(styleElement);
+
