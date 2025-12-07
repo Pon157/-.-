@@ -911,3 +911,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Экспорт для использования в других файлах
 window.Auth = Auth;
+
+// Инициализация при загрузке
+document.addEventListener('DOMContentLoaded', () => {
+    // Инициализируем Auth только если он еще не инициализирован
+    if (!window.Auth || !window.Auth.isAuthenticated) {
+        Auth.init();
+    }
+});
+
+// Экспорт для использования в других файлах
+window.Auth = Auth;
