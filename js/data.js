@@ -30,7 +30,7 @@ const courseData = {
         <img 
             src="https://i.postimg.cc/4yzjyMhQ/6d8b84cbd3fe11f0adb37e72a190c2a8.jpg" 
             alt="Эмпатия и понимание"
-            style="width:10%; max-width:10%; height:auto; border-radius:10px; margin-bottom:20px;"
+            style="width:50%; max-width:50%; height:auto; border-radius:10px; margin-bottom:20px;"
         >
     </picture>
 
