@@ -15,7 +15,7 @@ const courseData = {
                         theory: {
                             title: "Теория",
                             content: `<div class="theory-block"
-content: `<div class="theory-block">
+                            content: `<div class="theory-block">
     <picture>
         <!-- Для мобильных -->
         <source 
@@ -34,8 +34,7 @@ content: `<div class="theory-block">
             style="width:10%; max-width:10%; height:auto; border-radius:10px; margin-bottom:20px;"
         >
     </picture>
-    <p>Ваш текст...</p>
-</div>`
+
                                 <p>                     </p>
                                 <p><strong>Расширенная теория:</strong> Эмпатия часто путается с сочувствием (симпатией) или жалостью, но это фундаментально разные процессы.</p>
                                 <ul>
