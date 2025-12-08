@@ -24,11 +24,11 @@ const courseData = {
         <!-- Для планшетов -->
         <source 
             media="(max-width: 1024px)" 
-            srcset="https://i.postimg.cc/Bv9ZVWBP/6d8b84cbd3fe11f0adb37e72a190c2a8-1.jpg"
+            srcset="https://i.postimg.cc/6qgLs5Q1/6d8b84cbd3fe11f0adb37e72a190c2a8-(1).jpg"
         >
         <!-- Для десктопов и фолбэк -->
         <img 
-            src="https://i.postimg.cc/Bv9ZVWBP/6d8b84cbd3fe11f0adb37e72a190c2a8-1.jpg" 
+            src="https://i.postimg.cc/6qgLs5Q1/6d8b84cbd3fe11f0adb37e72a190c2a8-(1).jpg" 
             alt="Эмпатия и понимание"
             style="width:100%; max-width:100%; height:auto; border-radius:10px; margin-bottom:20px;"
         >
