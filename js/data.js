@@ -15,7 +15,6 @@ const courseData = {
                         theory: {
                             title: "Теория",
                             content: `<div class="theory-block"
-                            content: `<div class="theory-block">
     <picture>
         <!-- Для мобильных -->
         <source 
