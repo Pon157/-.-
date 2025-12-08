@@ -19,7 +19,7 @@ const courseData = {
         <!-- Для мобильных -->
         <source 
             media="(max-width: 600px)" 
-            srcset="https://i.postimg.cc/6qgLs5Q1/6d8b84cbd3fe11f0adb37e72a190c2a8-(1).jpg"
+            srcset="https://i.postimg.cc/QNwvfBPt/6d8b84cbd3fe11f0adb37e72a190c2a8-(2).jpg"
         >
         <!-- Для планшетов -->
         <source 
