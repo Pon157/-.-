@@ -124,6 +124,7 @@ const courseData = {
         <img 
             srcset="https://i.postimg.cc/hGsw7wMv/ac06b750d3ff11f08fd6b2f688e16018-(1).jpg" 
             alt="Эмпатия и понимание"
+            style="width:50%; max-width:50%; height:auto; border-radius:10px; margin-bottom:20px;"
         >
     </picture>
                                 <p><strong>Расширенная теория:</strong> Психологи выделяют три уровня эмпатии, которые задействуют разные участки мозга:</p>
