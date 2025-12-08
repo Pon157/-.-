@@ -20,6 +20,7 @@ const courseData = {
         <source 
             media="(max-width: 600px)" 
             srcset="https://i.postimg.cc/6qgLs5Q1/6d8b84cbd3fe11f0adb37e72a190c2a8-(1).jpg"
+            style="width:30%; max-width:30%; height:auto; border-radius:10px; margin-bottom:20px;"
         >
         <!-- Для планшетов -->
         <source 
@@ -115,6 +116,7 @@ const courseData = {
         <source 
             media="(max-width: 600px)" 
             srcset="https://i.postimg.cc/0jyJy6jM/ac06b750d3ff11f08fd6b2f688e16018-(3).jpg"
+            style="width:30%; max-width:30%; height:auto; border-radius:10px; margin-bottom:20px;"
         >
         <!-- Для планшетов -->
         <source 
