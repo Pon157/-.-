@@ -20,19 +20,19 @@ const courseData = {
         <source 
             media="(max-width: 600px)" 
             srcset="https://i.postimg.cc/6qgLs5Q1/6d8b84cbd3fe11f0adb37e72a190c2a8-(1).jpg"
-            style="width:30%; max-width:30%; height:auto; border-radius:10px; margin-bottom:20px;"
+            style="width:40%; max-width:40%; height:auto; border-radius:10px; margin-bottom:20px;"
         >
         <!-- Для планшетов -->
         <source 
             media="(max-width: 1024px)" 
             srcset="https://i.postimg.cc/4yzjyMhQ/6d8b84cbd3fe11f0adb37e72a190c2a8.jpg"
-            style="width:40%; max-width:40%; height:auto; border-radius:10px; margin-bottom:20px;"
+            style="width:50%; max-width:50%; height:auto; border-radius:10px; margin-bottom:20px;"
         >
         <!-- Для десктопов и фолбэк -->
         <img 
             src="https://i.postimg.cc/4yzjyMhQ/6d8b84cbd3fe11f0adb37e72a190c2a8.jpg" 
             alt="Эмпатия и понимание"
-            style="width:50%; max-width:50%; height:auto; border-radius:10px; margin-bottom:20px;"
+            style="width:60%; max-width:60%; height:auto; border-radius:10px; margin-bottom:20px;"
         >
     </picture>
 
