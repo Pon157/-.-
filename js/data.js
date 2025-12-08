@@ -108,7 +108,24 @@ const courseData = {
                         theory: {
                             title: "Теория",
                             content: `<div class="theory-block">
-                                <img src="https://images.unsplash.com/photo-1559757148-5c350d0d3c56?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Мозг и эмпатия" style="width:100%; border-radius:10px; margin-bottom:20px;">
+    <picture>
+        <!-- Для мобильных -->
+        <source 
+            media="(max-width: 600px)" 
+            srcset="https://i.postimg.cc/0jyJy6jM/ac06b750d3ff11f08fd6b2f688e16018-(3).jpg"
+        >
+        <!-- Для планшетов -->
+        <source 
+            media="(max-width: 1024px)" 
+            srcset="https://i.postimg.cc/hGsw7wMv/ac06b750d3ff11f08fd6b2f688e16018-(1).jpg"
+        >
+        <!-- Для десктопов и фолбэк -->
+        <img 
+            src="https://i.postimg.cc/hGsw7wMv/ac06b750d3ff11f08fd6b2f688e16018-(1).jpg" 
+            alt="Эмпатия и понимание"
+            style="width:100%; max-width:100%; height:auto; border-radius:10px; margin-bottom:20px;"
+        >
+    </picture>
                                 <p><strong>Расширенная теория:</strong> Психологи выделяют три уровня эмпатии, которые задействуют разные участки мозга:</p>
                                 <ul>
                                     <li><strong>Когнитивная эмпатия («Я понимаю»):</strong> Вы интеллектуально понимаете точку зрения другого человека. Это навык переговорщиков. Риск: Можно понять, как манипулировать человеком, не сопереживая ему.</li>
