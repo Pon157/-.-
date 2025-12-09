@@ -125,25 +125,40 @@ const courseData = {
                             title: "Теория",
                             content: `<div class="theory-block">
     <picture>
-        <!-- Для мобильных -->
-        <source 
-            media="(max-width: 600px)" 
-            srcset="https://i.postimg.cc/0jyJy6jM/ac06b750d3ff11f08fd6b2f688e16018-(3).jpg"
-            style="width:30%; max-width:30%; height:auto; border-radius:10px; margin-bottom:20px;"
-        >
-        <!-- Для планшетов -->
-        <source 
-            media="(max-width: 1024px)" 
-            srcset="https://i.postimg.cc/hGsw7wMv/ac06b750d3ff11f08fd6b2f688e16018-(1).jpg"
-            style="width:40%; max-width:40%; height:auto; border-radius:10px; margin-bottom:20px;"
-        >
-        <!-- Для десктопов и фолбэк -->
-        <img 
-            srcset="https://i.postimg.cc/hGsw7wMv/ac06b750d3ff11f08fd6b2f688e16018-(1).jpg" 
-            alt="Эмпатия и понимание"
-            style="width:50%; max-width:50%; height:auto; border-radius:10px; margin-bottom:20px;"
-        >
-    </picture>
+    <!-- Для мобильных -->
+    <source 
+        media="(max-width: 1000px)" 
+        srcset="https://i.postimg.cc/0jyJy6jM/ac06b750d3ff11f08fd6b2f688e16018-(3).jpg"
+    >
+    <!-- Для десктопов и фолбэк -->
+    <img 
+        src="https://i.postimg.cc/hGsw7wMv/ac06b750d3ff11f08fd6b2f688e16018-(1).jpg" 
+        alt="Эмпатия и понимание"
+        class="responsive-image"
+    >
+</picture>
+
+<style>
+    .responsive-image {
+        width: 50%;
+        max-width: 50%;
+        height: auto;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        display: block;
+    }
+    
+    /* Для мобильных устройств */
+    @media (max-width: 1000px) {
+        .responsive-image {
+            width: 80% !important;
+            max-width: 80% !important;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    }
+</style>
+
                                 <p><strong>Расширенная теория:</strong> Психологи выделяют три уровня эмпатии, которые задействуют разные участки мозга:</p>
                                 <ul>
                                     <li><strong>Когнитивная эмпатия («Я понимаю»):</strong> Вы интеллектуально понимаете точку зрения другого человека. Это навык переговорщиков. Риск: Можно понять, как манипулировать человеком, не сопереживая ему.</li>
