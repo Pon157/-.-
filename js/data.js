@@ -491,7 +491,6 @@ const courseData = {
         }
     }
 </style>
-                                <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Токсичная позитивность" style="width:100%; border-radius:10px; margin-bottom:20px;">
                                 <p><strong>Расширенная теория:</strong> Самые благие намерения часто наносят вред.</p>
                                 <ul>
                                     <li><strong>Токсичная позитивность:</strong> Это навязывание счастья и отрицание негатива. Фразы типа «Всё будет хорошо», «Улыбнись», «Ищи плюсы» говорят человеку: «Твои текущие чувства неправильные, скрой их». Это вызывает стыд и изоляцию.</li>
@@ -555,7 +554,40 @@ const courseData = {
                         theory: {
                             title: "Теория",
                             content: `<div class="theory-block">
-                                <img src="https://images.unsplash.com/photo-1515168833906-d2a3b82b5d70?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Безопасное пространство" style="width:100%; border-radius:10px; margin-bottom:20px;">
+<picture>
+    <!-- Для мобильных -->
+    <source 
+        media="(max-width: 1000px)" 
+        srcset="https://i.postimg.cc/h4xKhZ00/production-images-936ef6e8-aa91.png"
+    >
+    <!-- Для десктопов и фолбэк -->
+    <img 
+        src="https://i.postimg.cc/XYWqV6Sg/production-images-936ef6e8-aa91-4742-ba60-1015cc7c97cf.png" 
+        alt="Эмпатия и понимание"
+        class="responsive-image"
+    >
+</picture>
+
+<style>
+    .responsive-image {
+        width: 30%;
+        max-width: 30%;
+        height: auto;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        display: block;
+    }
+    
+    /* Для мобильных устройств */
+    @media (max-width: 1000px) {
+        .responsive-image {
+            width: 80% !important;
+            max-width: 80% !important;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    }
+</style>
                                 <p><strong>Расширенная теория:</strong> Безопасное пространство (Holding space) — это готовность быть с человеком, не осуждая его, не пытаясь его исправить и не влияя на исход ситуации.</p>
                                 <ul>
                                     <li><strong>Отсутствие оценки:</strong> Мы убираем внутреннего критика. Если человек говорит «Я ненавижу свою мать», мы не говорим «Так нельзя», мы принимаем это как факт его чувств сейчас.</li>
