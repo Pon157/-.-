@@ -31,8 +31,8 @@ const courseData = {
 
 <style>
     .responsive-image {
-        width: 50%;
-        max-width: 50%;
+        width: 10%;
+        max-width: 10%;
         height: auto;
         border-radius: 10px;
         margin-bottom: 20px;
@@ -140,8 +140,8 @@ const courseData = {
 
 <style>
     .responsive-image {
-        width: 50%;
-        max-width: 50%;
+        width: 10%;
+        max-width: 10%;
         height: auto;
         border-radius: 10px;
         margin-bottom: 20px;
@@ -229,8 +229,8 @@ const courseData = {
 
 <style>
     .responsive-image {
-        width: 50%;
-        max-width: 50%;
+        width: 10%;
+        max-width: 10%;
         height: auto;
         border-radius: 10px;
         margin-bottom: 20px;
@@ -374,8 +374,8 @@ const courseData = {
 
 <style>
     .responsive-image {
-        width: 50%;
-        max-width: 50%;
+        width: 10%;
+        max-width: 10%;
         height: auto;
         border-radius: 10px;
         margin-bottom: 20px;
@@ -392,7 +392,6 @@ const courseData = {
         }
     }
 </style>
-                                <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Переживание травмы" style="width:100%; border-radius:10px; margin-bottom:20px;">
                                 <p><strong>Расширенная теория:</strong> Травма — это не само ужасное событие, а реакция нашей нервной системы на него.</p>
                                 <ul>
                                     <li><strong>Механизм:</strong> Когда ресурсов психики не хватает, чтобы переварить шок, опыт «застревает». Человек может жить в прошлом, реагируя на триггеры здесь и сейчас так, будто опасность все еще рядом.</li>
@@ -458,6 +457,40 @@ const courseData = {
                         theory: {
                             title: "Теория",
                             content: `<div class="theory-block">
+<picture>
+    <!-- Для мобильных -->
+    <source 
+        media="(max-width: 1000px)" 
+        srcset="https://i.postimg.cc/0jyJy6jM/ac06b750d3ff11f08fd6b2f688e16018-(3).jpg"
+    >
+    <!-- Для десктопов и фолбэк -->
+    <img 
+        src="https://i.postimg.cc/tJry3wv2/production-images-aa115eb7-6edf-4e9b-88c5-557eac318796.png" 
+        alt="Эмпатия и понимание"
+        class="responsive-image"
+    >
+</picture>
+
+<style>
+    .responsive-image {
+        width: 10%;
+        max-width: 10%;
+        height: auto;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        display: block;
+    }
+    
+    /* Для мобильных устройств */
+    @media (max-width: 1000px) {
+        .responsive-image {
+            width: 80% !important;
+            max-width: 80% !important;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    }
+</style>
                                 <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Токсичная позитивность" style="width:100%; border-radius:10px; margin-bottom:20px;">
                                 <p><strong>Расширенная теория:</strong> Самые благие намерения часто наносят вред.</p>
                                 <ul>
