@@ -20,17 +20,35 @@ const courseData = {
     <source 
         media="(max-width: 1000px)" 
         srcset="https://i.postimg.cc/QNwvfBPt/6d8b84cbd3fe11f0adb37e72a190c2a8-(2).jpg"
-        sizes="80vw"
     >
     <!-- Для десктопов и фолбэк -->
     <img 
         src="https://i.postimg.cc/4yzjyMhQ/6d8b84cbd3fe11f0adb37e72a190c2a8.jpg" 
         alt="Эмпатия и понимание"
-        style="width:50%; max-width:50%; height:auto; border-radius:10px; margin-bottom:20px;"
-        sizes="(max-width: 1000px) 80vw, 50vw"
+        class="responsive-image"
     >
 </picture>
 
+<style>
+    .responsive-image {
+        width: 50%;
+        max-width: 50%;
+        height: auto;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        display: block;
+    }
+    
+    /* Для мобильных устройств */
+    @media (max-width: 1000px) {
+        .responsive-image {
+            width: 80% !important;
+            max-width: 80% !important;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    }
+</style>
                                 <p>                     </p>
                                 <p><strong>Расширенная теория:</strong> Эмпатия часто путается с сочувствием (симпатией) или жалостью, но это фундаментально разные процессы.</p>
                                 <ul>
