@@ -555,7 +555,7 @@ const courseData = {
                             title: "Теория",
                             content: `<div class="theory-block">
 <picture>
-    <!-- Для мобильных --> 
+    <!-- Для мобильных -->
         media="(max-width: 1000px)" 
         srcset="https://i.postimg.cc/h4xKhZ00/production-images-936ef6e8-aa91.png"
     >
