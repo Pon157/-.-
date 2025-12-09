@@ -247,8 +247,6 @@ const courseData = {
         }
     }
 </style>
-                            content: `<div class="theory-block">
-                                <img src="https://images.unsplash.com/photo-1543269865-cbf427effbad?ixlib=rb-4.0.3&auto=format&fit=crop&w-800&q=80" alt="Невербальное общение" style="width:100%; border-radius:10px; margin-bottom:20px;">
                                 <p><strong>Расширенная теория:</strong> По данным исследований (Мейерабиан и др.), слова передают лишь около 7% информации об эмоциях. Эмпатия считывается через:</p>
                                 <ul>
                                     <li><strong>Проксемику:</strong> Дистанция. Наклон корпуса в сторону собеседника (сигнал интереса) против откинутой назад позы (сигнал оценки/отстраненности).</li>
