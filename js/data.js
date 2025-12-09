@@ -15,26 +15,21 @@ const courseData = {
                         theory: {
                             title: "Теория",
                             content: `<div class="theory-block"
-    <picture>
-        <!-- Для мобильных -->
-        <source 
-            media="(max-width: 1000px)" 
-            srcset="https://i.postimg.cc/QNwvfBPt/6d8b84cbd3fe11f0adb37e72a190c2a8-(2).jpg"
-            style="width:80%; max-width:80%; height:auto; border-radius:10px; margin-bottom:20px;"
-        >
-        <!-- Для планшетов -->
-        <source 
-            media="(max-width: 1024px)" 
-            srcset="https://i.postimg.cc/4yzjyMhQ/6d8b84cbd3fe11f0adb37e72a190c2a8.jpg"
-            style="width:50%; max-width:50%; height:auto; border-radius:10px; margin-bottom:20px;"
-        >
-        <!-- Для десктопов и фолбэк -->
-        <img 
-            src="https://i.postimg.cc/4yzjyMhQ/6d8b84cbd3fe11f0adb37e72a190c2a8.jpg" 
-            alt="Эмпатия и понимание"
-            style="width:50%; max-width:50%; height:auto; border-radius:10px; margin-bottom:20px;"
-        >
-    </picture>
+<picture>
+    <!-- Для мобильных -->
+    <source 
+        media="(max-width: 1000px)" 
+        srcset="https://i.postimg.cc/QNwvfBPt/6d8b84cbd3fe11f0adb37e72a190c2a8-(2).jpg"
+        sizes="80vw"
+    >
+    <!-- Для десктопов и фолбэк -->
+    <img 
+        src="https://i.postimg.cc/4yzjyMhQ/6d8b84cbd3fe11f0adb37e72a190c2a8.jpg" 
+        alt="Эмпатия и понимание"
+        style="width:50%; max-width:50%; height:auto; border-radius:10px; margin-bottom:20px;"
+        sizes="(max-width: 1000px) 80vw, 50vw"
+    >
+</picture>
 
                                 <p>                     </p>
                                 <p><strong>Расширенная теория:</strong> Эмпатия часто путается с сочувствием (симпатией) или жалостью, но это фундаментально разные процессы.</p>
