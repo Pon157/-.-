@@ -213,6 +213,41 @@ const courseData = {
                         theory: {
                             title: "Теория",
                             content: `<div class="theory-block">
+<picture>
+    <!-- Для мобильных -->
+    <source 
+        media="(max-width: 1000px)" 
+        srcset="https://i.postimg.cc/BvrZj5Wd/1ab6a8a8-cfbf-48b5-b695-95beab50.jpg"
+    >
+    <!-- Для десктопов и фолбэк -->
+    <img 
+        src="https://i.postimg.cc/SxVzYvD4/1ab6a8a8-cfbf-48b5-b695-95beab503c1e.jpg" 
+        alt="Эмпатия и понимание"
+        class="responsive-image"
+    >
+</picture>
+
+<style>
+    .responsive-image {
+        width: 50%;
+        max-width: 50%;
+        height: auto;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        display: block;
+    }
+    
+    /* Для мобильных устройств */
+    @media (max-width: 1000px) {
+        .responsive-image {
+            width: 80% !important;
+            max-width: 80% !important;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    }
+</style>
+                            content: `<div class="theory-block">
                                 <img src="https://images.unsplash.com/photo-1543269865-cbf427effbad?ixlib=rb-4.0.3&auto=format&fit=crop&w-800&q=80" alt="Невербальное общение" style="width:100%; border-radius:10px; margin-bottom:20px;">
                                 <p><strong>Расширенная теория:</strong> По данным исследований (Мейерабиан и др.), слова передают лишь около 7% информации об эмоциях. Эмпатия считывается через:</p>
                                 <ul>
