@@ -31,8 +31,8 @@ const courseData = {
 
 <style>
     .responsive-image {
-        width: 10%;
-        max-width: 10%;
+        width: 30%;
+        max-width: 30%;
         height: auto;
         border-radius: 10px;
         margin-bottom: 20px;
@@ -140,8 +140,8 @@ const courseData = {
 
 <style>
     .responsive-image {
-        width: 10%;
-        max-width: 10%;
+        width: 30%;
+        max-width: 30%;
         height: auto;
         border-radius: 10px;
         margin-bottom: 20px;
@@ -229,8 +229,8 @@ const courseData = {
 
 <style>
     .responsive-image {
-        width: 10%;
-        max-width: 10%;
+        width: 30%;
+        max-width: 30%;
         height: auto;
         border-radius: 10px;
         margin-bottom: 20px;
@@ -374,8 +374,8 @@ const courseData = {
 
 <style>
     .responsive-image {
-        width: 10%;
-        max-width: 10%;
+        width: 30%;
+        max-width: 30%;
         height: auto;
         border-radius: 10px;
         margin-bottom: 20px;
@@ -461,7 +461,7 @@ const courseData = {
     <!-- Для мобильных -->
     <source 
         media="(max-width: 1000px)" 
-        srcset="https://i.postimg.cc/0jyJy6jM/ac06b750d3ff11f08fd6b2f688e16018-(3).jpg"
+        srcset="https://i.postimg.cc/tRDVvgLW/production-images-aa115eb7-6edf.png"
     >
     <!-- Для десктопов и фолбэк -->
     <img 
@@ -473,8 +473,8 @@ const courseData = {
 
 <style>
     .responsive-image {
-        width: 10%;
-        max-width: 10%;
+        width: 30%;
+        max-width: 30%;
         height: auto;
         border-radius: 10px;
         margin-bottom: 20px;
