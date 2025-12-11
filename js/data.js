@@ -1060,208 +1060,211 @@ const courseData = {
             }
         },
         {
-            id: 4,
-            title: "Модуль 4. Поддержка без давления",
-            description: "Помощь без спасения",
-            completed: false,
-            submodules: [
-                {
-                    id: "4.1",
-                    title: "Треугольник Карпмана: Помощь vs Спасательство",
-                    tabs: {
-                        theory: {
-                            title: "Теория",
-                            content: `<div class="theory-block">
-                                <img src="https://images.unsplash.com/photo-1551836026-d5c2c5af78e4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Помощь и поддержка" style="width:100%; border-radius:10px; margin-bottom:20px;">
-                                <p><strong>Расширенная теория:</strong></p>
-                                <ul>
-                                    <li><strong>Помощь (Партнерство):</strong> Вы даете удочку. Вы верите, что у человека есть силы справиться, вы лишь ассистируете. Ответственность остается на человеке.</li>
-                                    <li><strong>Спасательство (Треугольник Карпмана):</strong> Вы делаете за человека, даже когда он не просил. Вы считаете его беспомощным. Это тешит ваше эго («Я герой»), но делает другого зависимым. В итоге Спасатель часто становится Жертвой («Я для них всё, а они неблагодарные») или Преследователем.</li>
-                                </ul>
-                                <div class="check-question">
-                                    <h4>Вопросы для проверки:</h4>
-                                    <p>1. В чем ключевое отличие спасателя от помощника?<br>
-                                    2. К чему в итоге приводит непрошеное спасательство?<br>
-                                    3. Как понять, что вы попали в роль Спасателя? (Маркер: вы работаете больше, чем сам клиент).</p>
-<div>
-    <p><strong>Разница между помощью и спасением — принципиально разные подходы:</strong></p>
-    <table style="width:100%; border-collapse: collapse; margin: 20px 0; font-family: Arial, sans-serif;">
-        <tr style="background: #2c3e50; color: white;">
-            <th style="padding: 12px; border: 1px solid #ddd; text-align: left; width: 50%;">Помощь (здоровая)</th>
-            <th style="padding: 12px; border: 1px solid #ddd; text-align: left; width: 50%;">Спасение (нездоровое)</th>
-        </tr>
-        
-        <tr style="background: #f8f9fa;">
-            <td style="padding: 12px; border: 1px solid #ddd;">
-                <strong>Поддержка самостоятельности</strong><br>
-                Помогает человеку самому найти решение
-            </td>
-            <td style="padding: 12px; border: 1px solid #ddd;">
-                <strong>Лишение выбора и контроля</strong><br>
-                Берет ответственность на себя
-            </td>
-        </tr>
-        
-        <tr>
-            <td style="padding: 12px; border: 1px solid #ddd;">
-                <strong>Ключевые фразы:</strong><br>
-                • "Хочешь, я помогу?"<br>
-                • "Как я могу поддержать тебя?"<br>
-                • "Что для тебя было бы полезно?"<br>
-                • "Я верю, что ты справишься"<br>
-                • "Давай подумаем вместе"
-            </td>
-            <td style="padding: 12px; border: 1px solid #ddd;">
-                <strong>Ключевые фразы:</strong><br>
-                • "Я сделаю это за тебя"<br>
-                • "Я знаю, что для тебя лучше"<br>
-                • "Дай я всё устрою"<br>
-                • "Ты не сможешь без меня"<br>
-                • "Я всё беру на себя"
-            </td>
-        </tr>
-        
-        <tr style="background: #f8f9fa;">
-            <td style="padding: 12px; border: 1px solid #ddd;">
-                <strong>Уважение границ</strong><br>
-                • Ждет приглашения помочь<br>
-                • Принимает отказ от помощи<br>
-                • Спрашивает разрешения
-            </td>
-            <td style="padding: 12px; border: 1px solid #ddd;">
-                <strong>Нарушение границ</strong><br>
-                • Навязывает помощь<br>
-                • Игнорирует отказ<br>
-                • Действует без спроса
-            </td>
-        </tr>
-        
-        <tr>
-            <td style="padding: 12px; border: 1px solid #ddd;">
-                <strong>Верит в способности человека</strong><br>
-                • Видит потенциал<br>
-                • Поощряет рост<br>
-                • Развивает уверенность
-            </td>
-            <td style="padding: 12px; border: 1px solid #ddd;">
-                <strong>Считает человека беспомощным</strong><br>
-                • Поддерживает зависимость<br>
-                • Создает беспомощность<br>
-                • Развивает неуверенность
-            </td>
-        </tr>
-        
-        <tr style="background: #f8f9fa;">
-            <td style="padding: 12px; border: 1px solid #ddd;">
-                <strong>Долгосрочный эффект:</strong><br>
-                • Укрепление самооценки<br>
-                • Развитие навыков<br>
-                • Здоровая независимость<br>
-                • Взаимное уважение
-            </td>
-            <td style="padding: 12px; border: 1px solid #ddd;">
-                <strong>Долгосрочный эффект:</strong><br>
-                • Снижение самооценки<br>
-                • Зависимость от других<br>
-                • Обида и сопротивление<br>
-                • Эмоциональное выгорание "спасателя"
-            </td>
-        </tr>
-        
-        <tr>
-            <td style="padding: 12px; border: 1px solid #ddd;">
-                <strong>Мотивация:</strong><br>
-                • Искренняя забота<br>
-                • Желание поддержать<br>
-                • Уважение к автономии<br>
-                • Вера в человека
-            </td>
-            <td style="padding: 12px; border: 1px solid #ddd;">
-                <strong>Мотивация:</strong><br>
-                • Потребность в контроле<br>
-                • Страх отвержения<br>
-                • Повышение собственной значимости<br>
-                • Неумение сказать "нет"
-            </td>
-        </tr>
-        
-        <tr style="background: #f8f9fa;">
-            <td style="padding: 12px; border: 1px solid #ddd;">
-                <strong>Эмоциональная позиция:</strong><br>
-                • "Я рядом, если нужно"<br>
-                • "Ты справишься, я верю"<br>
-                • "Ты имеешь право на свой выбор"<br>
-                • "Я помогу, но не сделаю за тебя"
-            </td>
-            <td style="padding: 12px; border: 1px solid #ddd;">
-                <strong>Эмоциональная позиция:</strong><br>
-                • "Без меня ты пропадешь"<br>
-                • "Только я знаю, как правильно"<br>
-                • "Ты обязан принять мою помощь"<br>
-                • "Я лучше знаю, что тебе нужно"
-            </td>
-        </tr>
-        
-        <tr>
-            <td style="padding: 12px; border: 1px solid #ddd;">
-                <strong>Когда уместна помощь:</strong><br>
-                • Человек просит о поддержке<br>
-                • Ситуация временно сложная<br>
-                • Есть конкретная просьба<br>
-                • Сохраняется автономия
-            td style="padding: 12px; border: 1px solid #ddd;">
-                <strong>Когда происходит спасение:</strong><br>
-                    • Помощь не просили<br>
-                    • Систематическое "спасательство"<br>
-                    • Игнорируются способности человека<br>
-                    • Создается созависимость
-                    </td>
-                </tr>
-            </table>
-        </div>
-    `,
-    quote: {
-        title: "Цитата",
-        content: `<div class="quote">«Дайте человеку удочку, а не рыбу» </div>
-        <p class="author">— Китайская пословица</p>`
-    },
-    assignment: {
-        title: "Задание",
-        content: `<div class="assignment">
-            <h4>Определите, где помощь, а где спасение</h4>
-            <p>Прочитайте ситуации и определите, где проявляется здоровая помощь, а где — нездоровое спасение:</p>
-            <p>1. «Дай, я сам поговорю с твоим начальником о повышении.»</p>
-            <p>2. «Хочешь, вместе подготовимся к разговору с начальником?»</p>
-            <p>3. «Я знаю лучше, что тебе делать. Слушай меня.»</p>
-            <textarea id="answer4_1" placeholder="Напишите ваш анализ здесь..."></textarea>
-            <button class="btn-primary" onclick="checkAssignment('4.1')">Проверить задание</button>
-            <div id="feedback4_1" class="feedback"></div>
-        </div>`
-                            check: function(answer) {
-                                const helpKeywords = ["помощь", "выбор", "самостоятельность", "вместе", "поддержка"];
-                                const rescueKeywords = ["спасение", "замен", "контроль", "сам сделаю", "должен слушать"];
-                                
-                                let helpCount = 0;
-                                let rescueCount = 0;
-                                
-                                helpKeywords.forEach(word => {
-                                    if (answer.toLowerCase().includes(word)) helpCount++;
-                                });
-                                
-                                rescueKeywords.forEach(word => {
-                                    if (answer.toLowerCase().includes(word)) rescueCount++;
-                                });
-                                
-                                if (helpCount >= 2 || rescueCount >= 2) {
-                                    return {correct: true, message: "Хорошо! Вы различаете помощь и спасение. Помощь дает выбор, спасение — лишает его."};
-                                } else {
-                                    return {correct: false, message: "Попробуйте четче разделить: помощь = поддержка самостоятельности, спасение = лишение выбора."};
-                                }
-                            }
-                        }
+id: 4,
+title: "Модуль 4. Поддержка без давления",
+description: "Помощь без спасения",
+completed: false,
+submodules: [
+    {
+        id: "4.1",
+        title: "Треугольник Карпмана: Помощь vs Спасательство",
+        tabs: {
+            theory: {
+                title: "Теория",
+                content: `<div class="theory-block">
+                    <img src="https://images.unsplash.com/photo-1551836026-d5c2c5af78e4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Помощь и поддержка" style="width:100%; border-radius:10px; margin-bottom:20px;">
+                    <p><strong>Расширенная теория:</strong></p>
+                    <ul>
+                        <li><strong>Помощь (Партнерство):</strong> Вы даете удочку. Вы верите, что у человека есть силы справиться, вы лишь ассистируете. Ответственность остается на человеке.</li>
+                        <li><strong>Спасательство (Треугольник Карпмана):</strong> Вы делаете за человека, даже когда он не просил. Вы считаете его беспомощным. Это тешит ваше эго («Я герой»), но делает другого зависимым. В итоге Спасатель часто становится Жертвой («Я для них всё, а они неблагодарные») или Преследователем.</li>
+                    </ul>
+                    <div class="check-question">
+                        <h4>Вопросы для проверки:</h4>
+                        <p>1. В чем ключевое отличие спасателя от помощника?<br>
+                        2. К чему в итоге приводит непрошеное спасательство?<br>
+                        3. Как понять, что вы попали в роль Спасателя? (Маркер: вы работаете больше, чем сам клиент).</p>
+                    </div>
+                    <div>
+                        <p><strong>Разница между помощью и спасением — принципиально разные подходы:</strong></p>
+                        <table style="width:100%; border-collapse: collapse; margin: 20px 0; font-family: Arial, sans-serif;">
+                            <tr style="background: #2c3e50; color: white;">
+                                <th style="padding: 12px; border: 1px solid #ddd; text-align: left; width: 50%;">Помощь (здоровая)</th>
+                                <th style="padding: 12px; border: 1px solid #ddd; text-align: left; width: 50%;">Спасение (нездоровое)</th>
+                            </tr>
+                            
+                            <tr style="background: #f8f9fa;">
+                                <td style="padding: 12px; border: 1px solid #ddd;">
+                                    <strong>Поддержка самостоятельности</strong><br>
+                                    Помогает человеку самому найти решение
+                                </td>
+                                <td style="padding: 12px; border: 1px solid #ddd;">
+                                    <strong>Лишение выбора и контроля</strong><br>
+                                    Берет ответственность на себя
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td style="padding: 12px; border: 1px solid #ddd;">
+                                    <strong>Ключевые фразы:</strong><br>
+                                    • "Хочешь, я помогу?"<br>
+                                    • "Как я могу поддержать тебя?"<br>
+                                    • "Что для тебя было бы полезно?"<br>
+                                    • "Я верю, что ты справишься"<br>
+                                    • "Давай подумаем вместе"
+                                </td>
+                                <td style="padding: 12px; border: 1px solid #ddd;">
+                                    <strong>Ключевые фразы:</strong><br>
+                                    • "Я сделаю это за тебя"<br>
+                                    • "Я знаю, что для тебя лучше"<br>
+                                    • "Дай я всё устрою"<br>
+                                    • "Ты не сможешь без меня"<br>
+                                    • "Я всё беру на себя"
+                                </td>
+                            </tr>
+                            
+                            <tr style="background: #f8f9fa;">
+                                <td style="padding: 12px; border: 1px solid #ddd;">
+                                    <strong>Уважение границ</strong><br>
+                                    • Ждет приглашения помочь<br>
+                                    • Принимает отказ от помощи<br>
+                                    • Спрашивает разрешения
+                                </td>
+                                <td style="padding: 12px; border: 1px solid #ddd;">
+                                    <strong>Нарушение границ</strong><br>
+                                    • Навязывает помощь<br>
+                                    • Игнорирует отказ<br>
+                                    • Действует без спроса
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td style="padding: 12px; border: 1px solid #ddd;">
+                                    <strong>Верит в способности человека</strong><br>
+                                    • Видит потенциал<br>
+                                    • Поощряет рост<br>
+                                    • Развивает уверенность
+                                </td>
+                                <td style="padding: 12px; border: 1px solid #ddd;">
+                                    <strong>Считает человека беспомощным</strong><br>
+                                    • Поддерживает зависимость<br>
+                                    • Создает беспомощность<br>
+                                    • Развивает неуверенность
+                                </td>
+                            </tr>
+                            
+                            <tr style="background: #f8f9fa;">
+                                <td style="padding: 12px; border: 1px solid #ddd;">
+                                    <strong>Долгосрочный эффект:</strong><br>
+                                    • Укрепление самооценки<br>
+                                    • Развитие навыков<br>
+                                    • Здоровая независимость<br>
+                                    • Взаимное уважение
+                                </td>
+                                <td style="padding: 12px; border: 1px solid #ddd;">
+                                    <strong>Долгосрочный эффект:</strong><br>
+                                    • Снижение самооценки<br>
+                                    • Зависимость от других<br>
+                                    • Обида и сопротивление<br>
+                                    • Эмоциональное выгорание "спасателя"
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td style="padding: 12px; border: 1px solid #ddd;">
+                                    <strong>Мотивация:</strong><br>
+                                    • Искренняя забота<br>
+                                    • Желание поддержать<br>
+                                    • Уважение к автономии<br>
+                                    • Вера в человека
+                                </td>
+                                <td style="padding: 12px; border: 1px solid #ddd;">
+                                    <strong>Мотивация:</strong><br>
+                                    • Потребность в контроле<br>
+                                    • Страх отвержения<br>
+                                    • Повышение собственной значимости<br>
+                                    • Неумение сказать "нет"
+                                </td>
+                            </tr>
+                            
+                            <tr style="background: #f8f9fa;">
+                                <td style="padding: 12px; border: 1px solid #ddd;">
+                                    <strong>Эмоциональная позиция:</strong><br>
+                                    • "Я рядом, если нужно"<br>
+                                    • "Ты справишься, я верю"<br>
+                                    • "Ты имеешь право на свой выбор"<br>
+                                    • "Я помогу, но не сделаю за тебя"
+                                </td>
+                                <td style="padding: 12px; border: 1px solid #ddd;">
+                                    <strong>Эмоциональная позиция:</strong><br>
+                                    • "Без меня ты пропадешь"<br>
+                                    • "Только я знаю, как правильно"<br>
+                                    • "Ты обязан принять мою помощь"<br>
+                                    • "Я лучше знаю, что тебе нужно"
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td style="padding: 12px; border: 1px solid #ddd;">
+                                    <strong>Когда уместна помощь:</strong><br>
+                                    • Человек просит о поддержке<br>
+                                    • Ситуация временно сложная<br>
+                                    • Есть конкретная просьба<br>
+                                    • Сохраняется автономия
+                                </td>
+                                <td style="padding: 12px; border: 1px solid #ddd;">
+                                    <strong>Когда происходит спасение:</strong><br>
+                                    • Помощь не просили<br>
+                                    • Систематическое "спасательство"<br>
+                                    • Игнорируются способности человека<br>
+                                    • Создается созависимость
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>`
+            },
+            quote: {
+                title: "Цитата",
+                content: `<div class="quote">«Дайте человеку удочку, а не рыбу»</div>
+                <p class="author">— Китайская пословица</p>`
+            },
+            assignment: {
+                title: "Задание",
+                content: `<div class="assignment">
+                    <h4>Определите, где помощь, а где спасение</h4>
+                    <p>Прочитайте ситуации и определите, где проявляется здоровая помощь, а где — нездоровое спасение:</p>
+                    <p>1. «Дай, я сам поговорю с твоим начальником о повышении.»</p>
+                    <p>2. «Хочешь, вместе подготовимся к разговору с начальником?»</p>
+                    <p>3. «Я знаю лучше, что тебе делать. Слушай меня.»</p>
+                    <textarea id="answer4_1" placeholder="Напишите ваш анализ здесь..."></textarea>
+                    <button class="btn-primary" onclick="checkAssignment('4.1')">Проверить задание</button>
+                    <div id="feedback4_1" class="feedback"></div>
+                </div>`,
+                check: function(answer) {
+                    const helpKeywords = ["помощь", "выбор", "самостоятельность", "вместе", "поддержка"];
+                    const rescueKeywords = ["спасение", "замен", "контроль", "сам сделаю", "должен слушать"];
+                    
+                    let helpCount = 0;
+                    let rescueCount = 0;
+                    
+                    helpKeywords.forEach(word => {
+                        if (answer.toLowerCase().includes(word)) helpCount++;
+                    });
+                    
+                    rescueKeywords.forEach(word => {
+                        if (answer.toLowerCase().includes(word)) rescueCount++;
+                    });
+                    
+                    if (helpCount >= 2 || rescueCount >= 2) {
+                        return {correct: true, message: "Хорошо! Вы различаете помощь и спасение. Помощь дает выбор, спасение — лишает его."};
+                    } else {
+                        return {correct: false, message: "Попробуйте четче разделить: помощь = поддержка самостоятельности, спасение = лишение выбора."};
                     }
-                },
-                {
+                }
+            }
+        }
+    }
+}
                     id: "4.2",
                     title: "Формулировка экологичных предложений",
                     tabs: {
