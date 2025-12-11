@@ -910,7 +910,40 @@ const courseData = {
                         theory: {
                             title: "Теория",
                             content: `<div class="theory-block">
-                                <img src="https://images.unsplash.com/photo-1587502536575-6dfba0a6e017?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Невербальное общение" style="width:100%; border-radius:10px; margin-bottom:20px;">
+<picture>
+    <!-- Для мобильных -->
+    <source 
+        media="(max-width: 1000px)" 
+        srcset="https://i.postimg.cc/Hsm0GZhM/production-images-3dd3d439-2006-(1).png"
+    >
+    <!-- Для десктопов и фолбэк -->
+    <img 
+        src="https://i.postimg.cc/Kc6q1DsD/production-images-3dd3d439-2006.png" 
+        alt="Эмпатия и понимание"
+        class="responsive-image"
+    >
+</picture>
+
+<style>
+    .responsive-image {
+        width: 30%;
+        max-width: 30%;
+        height: auto;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        display: block;
+    }
+    
+    /* Для мобильных устройств */
+    @media (max-width: 1000px) {
+        .responsive-image {
+            width: 80% !important;
+            max-width: 80% !important;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    }
+</style>
                                 <p><strong>Расширенная теория:</strong></p>
                                 <ul>
                                     <li><strong>Сила паузы:</strong> В паузах происходит осознание. Если человек замолчал, не спешите заполнять эфир. Дайте ему 3–5 секунд. Часто после паузы следует самое важное признание.</li>
