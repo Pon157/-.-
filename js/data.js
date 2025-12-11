@@ -811,7 +811,7 @@ const courseData = {
                         theory: {
                             title: "Теория",
                             content: `<div class="theory-block">
-    <picture>
+<picture>
     <!-- Для мобильных -->
     <source 
         media="(max-width: 1000px)" 
