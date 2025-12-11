@@ -1083,31 +1083,143 @@ const courseData = {
                                     <p>1. В чем ключевое отличие спасателя от помощника?<br>
                                     2. К чему в итоге приводит непрошеное спасательство?<br>
                                     3. Как понять, что вы попали в роль Спасателя? (Маркер: вы работаете больше, чем сам клиент).</p>
-                                </div>
-                                <p><strong>Разница между помощью и спасением — принципиально разные подходы:</strong></p>
-                                <table style="width:100%; border-collapse: collapse; margin: 20px 0;">
-                                    <tr style="background: #f8f9fa;">
-                                        <th style="padding: 10px; border: 1px solid #ddd;">Помощь (здоровая)</th>
-                                        <th style="padding: 10px; border: 1px solid #ddd;">Спасение (нездоровое)</th>
-                                    </tr>
-                                    <tr>
-                                        <td style="padding: 10px; border: 1px solid #ddd;">Поддержка самостоятельности</td>
-                                        <td style="padding: 10px; border: 1px solid #ddd;">Лишение выбора и контроля</td>
-                                    </tr>
-                                    <tr style="background: #f8f9fa;">
-                                        <td style="padding: 10px; border: 1px solid #ddd;">«Хочешь, я помогу?»</td>
-                                        <td style="padding: 10px; border: 1px solid #ddd;">«Я сделаю это за тебя»</td>
-                                    </tr>
-                                    <tr>
-                                        <td style="padding: 10px; border: 1px solid #ddd;">Уважение границ</td>
-                                        <td style="padding: 10px; border: 1px solid #ddd;">Нарушение границ</td>
-                                    </tr>
-                                    <tr style="background: #f8f9fa;">
-                                        <td style="padding: 10px; border: 1px solid #ddd;">Верит в способности человека</td>
-                                        <td style="padding: 10px; border: 1px solid #ddd;">Считает человека беспомощным</td>
-                                    </tr>
-                                </table>
-                            </div>`
+<div>
+    <p><strong>Разница между помощью и спасением — принципиально разные подходы:</strong></p>
+    <table style="width:100%; border-collapse: collapse; margin: 20px 0; font-family: Arial, sans-serif;">
+        <tr style="background: #2c3e50; color: white;">
+            <th style="padding: 12px; border: 1px solid #ddd; text-align: left; width: 50%;">Помощь (здоровая)</th>
+            <th style="padding: 12px; border: 1px solid #ddd; text-align: left; width: 50%;">Спасение (нездоровое)</th>
+        </tr>
+        
+        <tr style="background: #f8f9fa;">
+            <td style="padding: 12px; border: 1px solid #ddd;">
+                <strong>Поддержка самостоятельности</strong><br>
+                Помогает человеку самому найти решение
+            </td>
+            <td style="padding: 12px; border: 1px solid #ddd;">
+                <strong>Лишение выбора и контроля</strong><br>
+                Берет ответственность на себя
+            </td>
+        </tr>
+        
+        <tr>
+            <td style="padding: 12px; border: 1px solid #ddd;">
+                <strong>Ключевые фразы:</strong><br>
+                • "Хочешь, я помогу?"<br>
+                • "Как я могу поддержать тебя?"<br>
+                • "Что для тебя было бы полезно?"<br>
+                • "Я верю, что ты справишься"<br>
+                • "Давай подумаем вместе"
+            </td>
+            <td style="padding: 12px; border: 1px solid #ddd;">
+                <strong>Ключевые фразы:</strong><br>
+                • "Я сделаю это за тебя"<br>
+                • "Я знаю, что для тебя лучше"<br>
+                • "Дай я всё устрою"<br>
+                • "Ты не сможешь без меня"<br>
+                • "Я всё беру на себя"
+            </td>
+        </tr>
+        
+        <tr style="background: #f8f9fa;">
+            <td style="padding: 12px; border: 1px solid #ddd;">
+                <strong>Уважение границ</strong><br>
+                • Ждет приглашения помочь<br>
+                • Принимает отказ от помощи<br>
+                • Спрашивает разрешения
+            </td>
+            <td style="padding: 12px; border: 1px solid #ddd;">
+                <strong>Нарушение границ</strong><br>
+                • Навязывает помощь<br>
+                • Игнорирует отказ<br>
+                • Действует без спроса
+            </td>
+        </tr>
+        
+        <tr>
+            <td style="padding: 12px; border: 1px solid #ddd;">
+                <strong>Верит в способности человека</strong><br>
+                • Видит потенциал<br>
+                • Поощряет рост<br>
+                • Развивает уверенность
+            </td>
+            <td style="padding: 12px; border: 1px solid #ddd;">
+                <strong>Считает человека беспомощным</strong><br>
+                • Поддерживает зависимость<br>
+                • Создает беспомощность<br>
+                • Развивает неуверенность
+            </td>
+        </tr>
+        
+        <tr style="background: #f8f9fa;">
+            <td style="padding: 12px; border: 1px solid #ddd;">
+                <strong>Долгосрочный эффект:</strong><br>
+                • Укрепление самооценки<br>
+                • Развитие навыков<br>
+                • Здоровая независимость<br>
+                • Взаимное уважение
+            </td>
+            <td style="padding: 12px; border: 1px solid #ddd;">
+                <strong>Долгосрочный эффект:</strong><br>
+                • Снижение самооценки<br>
+                • Зависимость от других<br>
+                • Обида и сопротивление<br>
+                • Эмоциональное выгорание "спасателя"
+            </td>
+        </tr>
+        
+        <tr>
+            <td style="padding: 12px; border: 1px solid #ddd;">
+                <strong>Мотивация:</strong><br>
+                • Искренняя забота<br>
+                • Желание поддержать<br>
+                • Уважение к автономии<br>
+                • Вера в человека
+            </td>
+            <td style="padding: 12px; border: 1px solid #ddd;">
+                <strong>Мотивация:</strong><br>
+                • Потребность в контроле<br>
+                • Страх отвержения<br>
+                • Повышение собственной значимости<br>
+                • Неумение сказать "нет"
+            </td>
+        </tr>
+        
+        <tr style="background: #f8f9fa;">
+            <td style="padding: 12px; border: 1px solid #ddd;">
+                <strong>Эмоциональная позиция:</strong><br>
+                • "Я рядом, если нужно"<br>
+                • "Ты справишься, я верю"<br>
+                • "Ты имеешь право на свой выбор"<br>
+                • "Я помогу, но не сделаю за тебя"
+            </td>
+            <td style="padding: 12px; border: 1px solid #ddd;">
+                <strong>Эмоциональная позиция:</strong><br>
+                • "Без меня ты пропадешь"<br>
+                • "Только я знаю, как правильно"<br>
+                • "Ты обязан принять мою помощь"<br>
+                • "Я лучше знаю, что тебе нужно"
+            </td>
+        </tr>
+        
+        <tr>
+            <td style="padding: 12px; border: 1px solid #ddd;">
+                <strong>Когда уместна помощь:</strong><br>
+                • Человек просит о поддержке<br>
+                • Ситуация временно сложная<br>
+                • Есть конкретная просьба<br>
+                • Сохраняется автономия
+            </td>
+            <td style="padding: 12px; border: 1px solid #ddd;">
+                <strong>Когда происходит спасение:</strong><br>
+                • Помощь не просили<br>
+                • Систематическое "спасательство"<br>
+                • Игнорируются способности человека<br>
+                • Создается созависимость
+            </td>
+        </tr>
+    </table>
+</div>
                         },
                         quote: {
                             title: "Цитата",
