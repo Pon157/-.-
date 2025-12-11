@@ -1222,7 +1222,7 @@ const courseData = {
     `,
     quote: {
         title: "Цитата",
-        content: `<div class="quote">«Дайте человеку удочку, а не рыбу»</div>
+        content: `<div class="quote">«Дайте человеку удочку, а не рыбу» </div>
         <p class="author">— Китайская пословица</p>`
     },
     assignment: {
