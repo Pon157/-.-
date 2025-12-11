@@ -748,7 +748,7 @@ const courseData = {
         }
     }
 </style>
-                                <img src="https://images.unsplash.com/photo-1589656966895-2f33e7653819?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Активное слушание" style="width:100%; border-radius:10px; margin-bottom:20px;">
+
                                 <p><strong>Расширенная теория:</strong> Отражение — это возвращение собеседнику сути его слов, чтобы он услышал себя со стороны и понял, что вы его поняли.</p>
                                 <ul>
                                     <li><strong>Эхо-техника:</strong> Повторение последних слов (с вопросительной интонацией).<br><em>Клиент: «Я так устал от этой неопределенности».<br>Вы: «От неопределенности?..»</em></li>
@@ -811,7 +811,40 @@ const courseData = {
                         theory: {
                             title: "Теория",
                             content: `<div class="theory-block">
-                                <img src="https://images.unsplash.com/photo-1519834785169-98be25ec3f84?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Задавание вопросов" style="width:100%; border-radius:10px; margin-bottom:20px;">
+    <picture>
+    <!-- Для мобильных -->
+    <source 
+        media="(max-width: 1000px)" 
+        srcset="https://i.postimg.cc/nznd3SZr/production-images-4326d45d-4c80-(1).png"
+    >
+    <!-- Для десктопов и фолбэк -->
+    <img 
+        src="https://i.postimg.cc/yxVwSYWt/production-images-4326d45d-4c80.png" 
+        alt="Эмпатия и понимание"
+        class="responsive-image"
+    >
+</picture>
+
+<style>
+    .responsive-image {
+        width: 30%;
+        max-width: 30%;
+        height: auto;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        display: block;
+    }
+    
+    /* Для мобильных устройств */
+    @media (max-width: 1000px) {
+        .responsive-image {
+            width: 80% !important;
+            max-width: 80% !important;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    }
+</style>
                                 <p><strong>Расширенная теория:</strong></p>
                                 <ul>
                                     <li><strong>Открытые вопросы:</strong> Начинаются с «Что», «Как», «Каким образом». Они приглашают к рассказу.</li>
