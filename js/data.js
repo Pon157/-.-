@@ -714,6 +714,40 @@ const courseData = {
                         theory: {
                             title: "Теория",
                             content: `<div class="theory-block">
+<picture>
+    <!-- Для мобильных -->
+    <source 
+        media="(max-width: 1000px)" 
+        srcset="https://i.postimg.cc/T2zbGLLn/production-images-2476882b-49bb-(1).png"
+    >
+    <!-- Для десктопов и фолбэк -->
+    <img 
+        src="https://i.postimg.cc/zBdy93mw/production-images-2476882b-49bb.png" 
+        alt="Эмпатия и понимание"
+        class="responsive-image"
+    >
+</picture>
+
+<style>
+    .responsive-image {
+        width: 30%;
+        max-width: 30%;
+        height: auto;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        display: block;
+    }
+    
+    /* Для мобильных устройств */
+    @media (max-width: 1000px) {
+        .responsive-image {
+            width: 80% !important;
+            max-width: 80% !important;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    }
+</style>
                                 <img src="https://images.unsplash.com/photo-1589656966895-2f33e7653819?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Активное слушание" style="width:100%; border-radius:10px; margin-bottom:20px;">
                                 <p><strong>Расширенная теория:</strong> Отражение — это возвращение собеседнику сути его слов, чтобы он услышал себя со стороны и понял, что вы его поняли.</p>
                                 <ul>
