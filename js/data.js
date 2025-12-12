@@ -1106,6 +1106,66 @@ const courseData = {
                                         <td style="padding: 10px; border: 1px solid #ddd;">Верит в способности человека</td>
                                         <td style="padding: 10px; border: 1px solid #ddd;">Считает человека беспомощным</td>
                                     </tr>
+                                    <tr style="background: #f8f9fa;">
+    <td style="padding: 10px; border: 1px solid #ddd;">Дает инструменты и знания для решения проблемы</td>
+    <td style="padding: 10px; border: 1px solid #ddd;">Решает проблему самостоятельно, оставляя другого в неведении</td>
+</tr>
+<tr>
+    <td style="padding: 10px; border: 1px solid #ddd;">«Давай подумаем вместе, как ты можешь это исправить»</td>
+    <td style="padding: 10px; border: 1px solid #ddd;">«Не волнуйся, я уже всё уладил»</td>
+</tr>
+<tr style="background: #f8f9fa;">
+    <td style="padding: 10px; border: 1px solid #ddd;">Создает условия для роста и обучения</td>
+    <td style="padding: 10px; border: 1px solid #ddd;">Создает зависимость и привычку полагаться на других</td>
+</tr>
+<tr>
+    <td style="padding: 10px; border: 1px solid #ddd;">«Я рядом, если будут сложности»</td>
+    <td style="padding: 10px; border: 1px solid #ddd;">«Дай лучше я, а то ты не справишься»</td>
+</tr>
+<tr style="background: #f8f9fa;">
+    <td style="padding: 10px; border: 1px solid #ddd;">Спрашивает: «Чем именно я могу быть полезен?»</td>
+    <td style="padding: 10px; border: 1px solid #ddd;">Действует исходя из своих предположений о нуждах другого</td>
+</tr>
+<tr>
+    <td style="padding: 10px; border: 1px solid #ddd;">Принимает отказ от помощи без обиды</td>
+    <td style="padding: 10px; border: 1px solid #ddd;">Настаивает и обижается, если помощь отвергают («Я же хотел как лучше!»)</td>
+</tr>
+<tr style="background: #f8f9fa;">
+    <td style="padding: 10px; border: 1px solid #ddd;">Помощь оказывается по запросу или с согласия</td>
+    <td style="padding: 10px; border: 1px solid #ddd;">Вмешивается непрошено, оправдываясь чрезвычайными обстоятельствами</td>
+</tr>
+<tr>
+    <td style="padding: 10px; border: 1px solid #ddd;">Позволяет человеку прожить последствия своего выбора (там, где это безопасно)</td>
+    <td style="padding: 10px; border: 1px solid #ddd;">Постоянно защищает от любых негативных последствий</td>
+</tr>
+<tr style="background: #f8f9fa;">
+    <td style="padding: 10px; border: 1px solid #ddd;">Эмоциональная поддержка: «Я понимаю, что это сложно для тебя»</td>
+    <td style="padding: 10px; border: 1px solid #ddd;">Эмоциональное поглощение: «Я не могу спать, пока у тебя эта проблема»</td>
+</tr>
+<tr>
+    <td style="padding: 10px; border: 1px solid #ddd;">Фокус на процессе и усилиях человека</td>
+    <td style="padding: 10px; border: 1px solid #ddd;">Фокус только на быстром результате любой ценой</td>
+</tr>
+<tr style="background: #f8f9fa;">
+    <td style="padding: 10px; border: 1px solid #ddd;">Ответственность за решение остается у того, кому помогают</td>
+    <td style="padding: 10px; border: 1px solid #ddd;">«Спасатель» берет ответственность за процесс и результат на себя</td>
+</tr>
+<tr>
+    <td style="padding: 10px; border: 1px solid #ddd;">«Каков твой план действий?»</td>
+    <td style="padding: 10px; border: 1px solid #ddd;">«Вот тебе план, просто следуй ему»</td>
+</tr>
+<tr style="background: #f8f9fa;">
+    <td style="padding: 10px; border: 1px solid #ddd;">Усиливает уверенность человека в себе</td>
+    <td style="padding: 10px; border: 1px solid #ddd;">Подрывает веру человека в свои силы</td>
+</tr>
+<tr>
+    <td style="padding: 10px; border: 1px solid #ddd;">Баланс: помогает, но не в ущерб своим нуждам и ресурсам</td>
+    <td style="padding: 10px; border: 1px solid #ddd;">Жертвенность: помогает, истощая себя</td>
+</tr>
+<tr style="background: #f8f9fa;">
+    <td style="padding: 10px; border: 1px solid #ddd;">Признает право другого на ошибку</td>
+    <td style="padding: 10px; border: 1px solid #ddd;">Воспринимает ошибки другого как свою личную неудачу</td>
+</tr>
                                 </table>
                             </div>`
                         },
