@@ -327,7 +327,7 @@ const courseData = {
         display: block;
     }
     
-    /* Для мобильных устройств */
+    /* Для мобильных устройств -->
     @media (max-width: 1000px) {
         .responsive-image {
             width: 80% !important;
@@ -465,7 +465,7 @@ const courseData = {
                             "Эмпатия — это жалость к человеку",
                             "Эмпатия — это понимание чувств другого с его позиции",
                             "Эмпатия — это желание быстро решить проблему другого",
-                            "Эмпатия — это выражение собственного мнения о ситуации"
+                            "Эмпатия — это выражение собственного мнение о ситуации"
                         ],
                         correct: 1
                     },
@@ -549,7 +549,7 @@ const courseData = {
         display: block;
     }
     
-    /* Для мобильных устройств -->
+    /* Для мобильных устройств */
     @media (max-width: 1000px) {
         .responsive-image {
             width: 80% !important;
@@ -721,7 +721,7 @@ const courseData = {
         display: block;
     }
     
-    /* Для мобильных устройств */
+    /* Для мобильных устройств -->
     @media (max-width: 1000px) {
         .responsive-image {
             width: 80% !important;
@@ -889,7 +889,7 @@ const courseData = {
         display: block;
     }
     
-    /* Для мобильных устройств */
+    /* Для мобильных устройств -->
     @media (max-width: 1000px) {
         .responsive-image {
             width: 80% !important;
@@ -1522,7 +1522,7 @@ const courseData = {
         display: block;
     }
     
-    /* Для мобильных устройств */
+    /* Для мобильных устройств -->
     @media (max-width: 1000px) {
         .responsive-image {
             width: 80% !important;
@@ -1700,7 +1700,7 @@ const courseData = {
             ],
             test: {
                 title: "Контрольная работа 3",
-                description: "Тест по технике активного слушания",
+                description: "Тест по технике активного слушание",
                 questions: [
                     {
                         type: "multiple-choice",
@@ -1811,7 +1811,7 @@ const courseData = {
         display: block;
     }
     
-    /* Для мобильных устройств */
+    /* Для мобильных устройств -->
     @media (max-width: 1000px) {
         .responsive-image {
             width: 80% !important;
@@ -1833,86 +1833,86 @@ const courseData = {
                                 </div>
                                 
                                 <p><strong>Разница между помощью и спасением — принципиально разные подходы:</strong></p>
-                                <table style="width:100%; border-collapse: collapse; margin: 20px 0;">
-                                    <tr style="background: #f8f9fa;">
-                                        <th style="padding: 10px; border: 1px solid #ddd;">Помощь (здоровая)</th>
-                                        <th style="padding: 10px; border: 1px solid #ddd;">Спасение (нездоровое)</th>
+                                <table class="help-rescue-table">
+                                    <tr>
+                                        <th>Помощь (здоровая)</th>
+                                        <th>Спасение (нездоровое)</th>
                                     </tr>
                                     <tr>
-                                        <td style="padding: 10px; border: 1px solid #ddd;">Поддержка самостоятельности</td>
-                                        <td style="padding: 10px; border: 1px solid #ddd;">Лишение выбора и контроля</td>
-                                    </tr>
-                                    <tr style="background: #f8f9fa;">
-                                        <td style="padding: 10px; border: 1px solid #ddd;">«Хочешь, я помогу?»</td>
-                                        <td style="padding: 10px; border: 1px solid #ddd;">«Я сделаю это за тебя»</td>
+                                        <td>Поддержка самостоятельности</td>
+                                        <td>Лишение выбора и контроля</td>
                                     </tr>
                                     <tr>
-                                        <td style="padding: 10px; border: 1px solid #ddd;">Уважение границ</td>
-                                        <td style="padding: 10px; border: 1px solid #ddd;">Нарушение границ</td>
-                                    </tr>
-                                    <tr style="background: #f8f9fa;">
-                                        <td style="padding: 10px; border: 1px solid #ddd;">Верит в способности человека</td>
-                                        <td style="padding: 10px; border: 1px solid #ddd;">Считает человека беспомощным</td>
+                                        <td>«Хочешь, я помогу?»</td>
+                                        <td>«Я сделаю это за тебя»</td>
                                     </tr>
                                     <tr>
-                                        <td style="padding: 10px; border: 1px solid #ddd;">Дает инструменты и знания для решения проблемы</td>
-                                        <td style="padding: 10px; border: 1px solid #ddd;">Решает проблему самостоятельно, оставляя другого в неведении</td>
-                                    </tr>
-                                    <tr style="background: #f8f9fa;">
-                                        <td style="padding: 10px; border: 1px solid #ddd;">«Давай подумаем вместе, как ты можешь это исправить»</td>
-                                        <td style="padding: 10px; border: 1px solid #ddd;">«Не волнуйся, я уже всё уладил»</td>
+                                        <td>Уважение границ</td>
+                                        <td>Нарушение границ</td>
                                     </tr>
                                     <tr>
-                                        <td style="padding: 10px; border: 1px solid #ddd;">Создает условия для роста и обучения</td>
-                                        <td style="padding: 10px; border: 1px solid #ddd;">Создает зависимость и привычку полагаться на других</td>
-                                    </tr>
-                                    <tr style="background: #f8f9fa;">
-                                        <td style="padding: 10px; border: 1px solid #ddd;">«Я рядом, если будут сложности»</td>
-                                        <td style="padding: 10px; border: 1px solid #ddd;">«Дай лучше я, а то ты не справишься»</td>
+                                        <td>Верит в способности человека</td>
+                                        <td>Считает человека беспомощным</td>
                                     </tr>
                                     <tr>
-                                        <td style="padding: 10px; border: 1px solid #ddd;">Спрашивает: «Чем именно я могу быть полезен?»</td>
-                                        <td style="padding: 10px; border: 1px solid #ddd;">Действует исходя из своих предположений о нуждах другого</td>
-                                    </tr>
-                                    <tr style="background: #f8f9fa;">
-                                        <td style="padding: 10px; border: 1px solid #ddd;">Принимает отказ от помощи без обиды</td>
-                                        <td style="padding: 10px; border: 1px solid #ddd;">Настаивает и обижается, если помощь отвергают («Я же хотел как лучше!»)</td>
+                                        <td>Дает инструменты и знания для решения проблемы</td>
+                                        <td>Решает проблему самостоятельно, оставляя другого в неведении</td>
                                     </tr>
                                     <tr>
-                                        <td style="padding: 10px; border: 1px solid #ddd;">Помощь оказывается по запросу или с согласия</td>
-                                        <td style="padding: 10px; border: 1px solid #ddd;">Вмешивается непрошено, оправдываясь чрезвычайными обстоятельствами</td>
-                                    </tr>
-                                    <tr style="background: #f8f9fa;">
-                                        <td style="padding: 10px; border: 1px solid #ddd;">Позволяет человеку прожить последствия своего выбора (там, где это безопасно)</td>
-                                        <td style="padding: 10px; border: 1px solid #ddd;">Постоянно защищает от любых негативных последствий</td>
+                                        <td>«Давай подумаем вместе, как ты можешь это исправить»</td>
+                                        <td>«Не волнуйся, я уже всё уладил»</td>
                                     </tr>
                                     <tr>
-                                        <td style="padding: 10px; border: 1px solid #ddd;">Эмоциональная поддержка: «Я понимаю, что это сложно для тебя»</td>
-                                        <td style="padding: 10px; border: 1px solid #ddd;">Эмоциональное поглощение: «Я не могу спать, пока у тебя эта проблема»</td>
-                                    </tr>
-                                    <tr style="background: #f8f9fa;">
-                                        <td style="padding: 10px; border: 1px solid #ddd;">Фокус на процессе и усилиях человека</td>
-                                        <td style="padding: 10px; border: 1px solid #ddd;">Фокус только на быстром результате любой ценой</td>
+                                        <td>Создает условия для роста и обучения</td>
+                                        <td>Создает зависимость и привычку полагаться на других</td>
                                     </tr>
                                     <tr>
-                                        <td style="padding: 10px; border: 1px solid #ddd;">Ответственность за решение остается у того, кому помогают</td>
-                                        <td style="padding: 10px; border: 1px solid #ddd;">«Спасатель» берет ответственность за процесс и результат на себя</td>
-                                    </tr>
-                                    <tr style="background: #f8f9fa;">
-                                        <td style="padding: 10px; border: 1px solid #ddd;">«Каков твой план действий?»</td>
-                                        <td style="padding: 10px; border: 1px solid #ddd;">«Вот тебе план, просто следуй ему»</td>
+                                        <td>«Я рядом, если будут сложности»</td>
+                                        <td>«Дай лучше я, а то ты не справишься»</td>
                                     </tr>
                                     <tr>
-                                        <td style="padding: 10px; border: 1px solid #ddd;">Усиливает уверенность человека в себе</td>
-                                        <td style="padding: 10px; border: 1px solid #ddd;">Подрывает веру человека в свои силы</td>
-                                    </tr>
-                                    <tr style="background: #f8f9fa;">
-                                        <td style="padding: 10px; border: 1px solid #ddd;">Баланс: помогает, но не в ущерб своим нуждам и ресурсам</td>
-                                        <td style="padding: 10px; border: 1px solid #ddd;">Жертвенность: помогает, истощая себя</td>
+                                        <td>Спрашивает: «Чем именно я могу быть полезен?»</td>
+                                        <td>Действует исходя из своих предположений о нуждах другого</td>
                                     </tr>
                                     <tr>
-                                        <td style="padding: 10px; border: 1px solid #ddd;">Признает право другого на ошибку</td>
-                                        <td style="padding: 10px; border: 1px solid #ddd;">Воспринимает ошибки другого как свою личную неудачу</td>
+                                        <td>Принимает отказ от помощи без обиды</td>
+                                        <td>Настаивает и обижается, если помощь отвергают («Я же хотел как лучше!»)</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Помощь оказывается по запросу или с согласия</td>
+                                        <td>Вмешивается непрошено, оправдываясь чрезвычайными обстоятельствами</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Позволяет человеку прожить последствия своего выбора (там, где это безопасно)</td>
+                                        <td>Постоянно защищает от любых негативных последствий</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Эмоциональная поддержка: «Я понимаю, что это сложно для тебя»</td>
+                                        <td>Эмоциональное поглощение: «Я не могу спать, пока у тебя эта проблема»</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Фокус на процессе и усилиях человека</td>
+                                        <td>Фокус только на быстром результате любой ценой</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Ответственность за решение остается у того, кому помогают</td>
+                                        <td>«Спасатель» берет ответственность за процесс и результат на себя</td>
+                                    </tr>
+                                    <tr>
+                                        <td>«Каков твой план действий?»</td>
+                                        <td>«Вот тебе план, просто следуй ему»</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Усиливает уверенность человека в себе</td>
+                                        <td>Подрывает веру человека в свои силы</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Баланс: помогает, но не в ущерб своим нуждам и ресурсам</td>
+                                        <td>Жертвенность: помогает, истощая себя</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Признает право другого на ошибку</td>
+                                        <td>Воспринимает ошибки другого как свою личную неудачу</td>
                                     </tr>
                                 </table>
                                 
@@ -2469,7 +2469,7 @@ const courseData = {
                     },
                     {
                         type: "true-false",
-                        question: "В треугольнике Карпмана роли всегда固定льны и не меняются.",
+                        question: "В треугольнике Карпмана роли всегда фиксированы и не меняются.",
                         correct: false
                     },
                     {
@@ -2541,7 +2541,7 @@ const courseData = {
         display: block;
     }
     
-    /* Для мобильных устройств */
+    /* Для мобильных устройств -->
     @media (max-width: 1000px) {
         .responsive-image {
             width: 80% !important;
@@ -2580,8 +2580,8 @@ const courseData = {
                                 <ol>
                                     <li><strong>Медовый месяц:</strong> Энтузиазм, много энергии, желание помочь всем</li>
                                     <li><strong>Нехватка топлива:</strong> Усталость, проблемы со сном, снижение эффективности</li>
-                                    <strong>Хронические симптомы:</strong> Раздражительность, цинизм, частые болезни</li>
-                                    <li><strong>Кризис:</strong> Апатия, отчаяние, мысли о уходе из помогающей профессии</li>
+                                    <li><strong>Хронические симптомы:</strong> Раздражительность, цинизм, частые болезни</li>
+                                    <li><strong>Кризис:</strong> Апатия, отчаяние, мысли об уходе из помогающей профессии</li>
                                     <li><strong>Привыкание к пустоте:</strong> Эмоциональное онемение, работа на автомате</li>
                                 </ol>
                                 
@@ -2753,7 +2753,7 @@ const courseData = {
         display: block;
     }
     
-    <!-- Для мобильных устройств -->
+    /* Для мобильных устройств -->
     @media (max-width: 1000px) {
         .responsive-image {
             width: 80% !important;
@@ -2862,7 +2862,7 @@ const courseData = {
                                 <ol>
                                     <li>Определите, что вас наполняет (составьте список)</li>
                                     <li>Распределите практики по времени: ежедневные, еженедельные, ежемесячные</li>
-                                    <li>Создайте ритуалы: утренние, вечерние, переходные между работой и домом</li>
+                                    <li>Создайте ритуалы: утренние, вечерние, переходные между работой и домой</li>
                                     <li>Настройте окружение: поддерживающие люди, комфортное рабочее место</li>
                                     <li>Будьте гибкими: система должна адаптироваться к изменениям</li>
                                     <li>Отслеживайте эффективность: что работает, а что нет?</li>
@@ -2958,7 +2958,7 @@ const courseData = {
         display: block;
     }
     
-    <!-- Для мобильных устройств -->
+    /* Для мобильных устройств */
     @media (max-width: 1000px) {
         .responsive-image {
             width: 80% !important;
@@ -3240,116 +3240,256 @@ const courseData = {
     }
 };
 
-// Добавляем CSS для новых элементов
-const additionalStyles = `
+// Добавляем CSS для темной темы
+const darkThemeStyles = `
 <style>
-    .definition-box {
-        background-color: #f0f7ff;
-        border-left: 4px solid #4a90e2;
-        padding: 15px;
-        margin: 20px 0;
-        border-radius: 0 8px 8px 0;
+    /* Основные стили для темной темы */
+    .theory-block,
+    .source,
+    .quote,
+    .assignment,
+    .additional-task,
+    .practical-tip,
+    .definition-box,
+    .check-question {
+        background-color: #1a1a1a !important;
+        color: #e0e0e0 !important;
+        border-color: #333 !important;
     }
     
-    .definition-box h4 {
-        margin-top: 0;
-        color: #2c3e50;
+    .theory-block p,
+    .theory-block li,
+    .theory-block strong,
+    .source p,
+    .quote,
+    .assignment p,
+    .additional-task p,
+    .practical-tip p,
+    .definition-box p,
+    .check-question p {
+        color: #e0e0e0 !important;
     }
     
-    .definition-box .term {
-        background-color: #e3f2fd;
-        padding: 2px 6px;
-        border-radius: 4px;
-        font-weight: bold;
-        color: #1565c0;
+    .theory-block h4,
+    .assignment h4,
+    .additional-task h5,
+    .practical-tip h4,
+    .definition-box h4,
+    .check-question h4 {
+        color: #ffffff !important;
     }
     
-    .practical-tip {
-        background-color: #fff8e1;
-        border: 1px solid #ffd54f;
-        padding: 15px;
-        margin: 20px 0;
-        border-radius: 8px;
-    }
-    
-    .practical-tip h4 {
-        margin-top: 0;
-        color: #ff8f00;
-    }
-    
-    .additional-task {
-        background-color: #f9f9f9;
-        padding: 15px;
-        margin: 20px 0;
-        border-radius: 8px;
-        border-left: 3px solid #81c784;
-    }
-    
-    .additional-task h5 {
-        margin-top: 0;
-        color: #2e7d32;
-    }
-    
+    /* Стили для таблиц в темной теме */
     table {
-        width: 100%;
-        border-collapse: collapse;
-        margin: 20px 0;
-        font-size: 14px;
+        background-color: #1a1a1a !important;
+        border-color: #333 !important;
     }
     
     table th {
-        background-color: #f5f5f5;
-        padding: 12px;
-        text-align: left;
-        border: 1px solid #ddd;
-        font-weight: bold;
+        background-color: #2a2a2a !important;
+        color: #ffffff !important;
+        border-color: #444 !important;
     }
     
     table td {
-        padding: 10px;
-        border: 1px solid #ddd;
-        vertical-align: top;
+        background-color: #1a1a1a !important;
+        color: #e0e0e0 !important;
+        border-color: #333 !important;
     }
     
     table tr:nth-child(even) {
-        background-color: #f9f9f9;
+        background-color: #222 !important;
     }
     
     table tr:hover {
-        background-color: #f5f5f5;
+        background-color: #2a2a2a !important;
+    }
+    
+    /* Стили для textarea */
+    textarea {
+        background-color: #2a2a2a !important;
+        color: #ffffff !important;
+        border: 1px solid #444 !important;
+        padding: 10px !important;
+        border-radius: 4px !important;
+        width: 100% !important;
+        min-height: 100px !important;
+        margin: 10px 0 !important;
+        font-family: inherit !important;
+    }
+    
+    textarea::placeholder {
+        color: #888 !important;
+    }
+    
+    /* Стили для кнопок */
+    .btn-primary {
+        background-color: #4a90e2 !important;
+        color: white !important;
+        border: none !important;
+        padding: 10px 20px !important;
+        border-radius: 4px !important;
+        cursor: pointer !important;
+        font-weight: bold !important;
+        transition: background-color 0.3s !important;
+    }
+    
+    .btn-primary:hover {
+        background-color: #357abd !important;
     }
     
     .btn-secondary {
-        background-color: #6c757d;
-        color: white;
-        border: none;
-        padding: 8px 16px;
-        border-radius: 4px;
-        cursor: pointer;
-        margin-top: 10px;
+        background-color: #666 !important;
+        color: white !important;
+        border: none !important;
+        padding: 8px 16px !important;
+        border-radius: 4px !important;
+        cursor: pointer !important;
+        margin-top: 10px !important;
+        transition: background-color 0.3s !important;
     }
     
     .btn-secondary:hover {
-        background-color: #5a6268;
+        background-color: #555 !important;
     }
     
+    /* Стили для определений */
+    .definition-box {
+        background-color: #2a2a2a !important;
+        border-left: 4px solid #4a90e2 !important;
+        padding: 15px !important;
+        margin: 20px 0 !important;
+        border-radius: 0 8px 8px 0 !important;
+    }
+    
+    .definition-box .term {
+        background-color: #3a3a3a !important;
+        color: #4a90e2 !important;
+        padding: 2px 6px !important;
+        border-radius: 4px !important;
+        font-weight: bold !important;
+    }
+    
+    /* Стили для практических советов */
+    .practical-tip {
+        background-color: #2a2a2a !important;
+        border: 1px solid #4a90e2 !important;
+        padding: 15px !important;
+        margin: 20px 0 !important;
+        border-radius: 8px !important;
+    }
+    
+    .practical-tip h4 {
+        color: #4a90e2 !important;
+    }
+    
+    /* Стили для дополнительных заданий */
+    .additional-task {
+        background-color: #2a2a2a !important;
+        padding: 15px !important;
+        margin: 20px 0 !important;
+        border-radius: 8px !important;
+        border-left: 3px solid #81c784 !important;
+    }
+    
+    .additional-task h5 {
+        color: #81c784 !important;
+        margin-top: 0 !important;
+    }
+    
+    /* Стили для цитат */
+    .quote {
+        background-color: #2a2a2a !important;
+        padding: 20px !important;
+        margin: 20px 0 !important;
+        border-radius: 8px !important;
+        font-style: italic !important;
+        font-size: 1.1em !important;
+        text-align: center !important;
+        border-left: 4px solid #ff9800 !important;
+    }
+    
+    .author {
+        text-align: right !important;
+        color: #aaa !important;
+        font-style: normal !important;
+        margin-top: 10px !important;
+    }
+    
+    /* Стили для источников */
+    .source {
+        background-color: #2a2a2a !important;
+        padding: 15px !important;
+        margin: 20px 0 !important;
+        border-radius: 8px !important;
+        border-left: 4px solid #9c27b0 !important;
+    }
+    
+    /* Стили для вопросов проверки */
+    .check-question {
+        background-color: #2a2a2a !important;
+        padding: 15px !important;
+        margin: 20px 0 !important;
+        border-radius: 8px !important;
+        border-left: 4px solid #ff9800 !important;
+    }
+    
+    /* Адаптивность для мобильных */
     @media (max-width: 768px) {
         table {
-            font-size: 12px;
+            font-size: 12px !important;
         }
         
         table th, table td {
-            padding: 8px;
+            padding: 8px !important;
         }
+        
+        .responsive-image {
+            width: 90% !important;
+            max-width: 90% !important;
+        }
+    }
+    
+    /* Улучшенная читаемость ссылок */
+    a {
+        color: #4a90e2 !important;
+        text-decoration: none !important;
+    }
+    
+    a:hover {
+        text-decoration: underline !important;
+    }
+    
+    /* Стили для списков */
+    ul, ol {
+        color: #e0e0e0 !important;
+    }
+    
+    li {
+        margin-bottom: 8px !important;
+    }
+    
+    /* Улучшенные стили для заголовков внутри блоков */
+    .theory-block h3,
+    .theory-block h4,
+    .theory-block h5 {
+        color: #ffffff !important;
+        margin-top: 20px !important;
+        margin-bottom: 10px !important;
+    }
+    
+    /* Стили для изображений */
+    .responsive-image {
+        border: 2px solid #333 !important;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.3) !important;
     }
 </style>
 `;
 
-// Функции для проверки дополнительных заданий (заглушки)
+// Добавляем стили в документ
+document.head.insertAdjacentHTML('beforeend', darkThemeStyles);
+
+// Функции для проверки дополнительных заданий
 function checkExtraAssignment(submoduleId) {
-    // В реальной реализации здесь была бы логика проверки дополнительных заданий
     alert("Дополнительное задание отправлено на проверку! В полной версии курса здесь была бы автоматическая проверка.");
 }
-
-// Добавляем стили в документ
-document.head.insertAdjacentHTML('beforeend', additionalStyles);
