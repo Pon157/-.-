@@ -1357,7 +1357,40 @@ const courseData = {
                         theory: {
                             title: "Теория",
                             content: `<div class="theory-block">
-                                <img src="https://images.unsplash.com/photo-1554196038-950a8ab51827?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Баланс и границы" style="width:100%; border-radius:10px; margin-bottom:20px;">
+<picture>
+    <!-- Для мобильных -->
+    <source 
+        media="(max-width: 1000px)" 
+        srcset="https://i.postimg.cc/25gbC5Tv/9bbfb80f-9429-4d20-896c-dbd6c199-(1).jpg"
+    >
+    <!-- Для десктопов и фолбэк -->
+    <img 
+        src="https://i.postimg.cc/43yVJqGk/9bbfb80f-9429-4d20-896c-dbd6c199.jpg" 
+        alt="Эмпатия и понимание"
+        class="responsive-image"
+    >
+</picture>
+
+<style>
+    .responsive-image {
+        width: 30%;
+        max-width: 30%;
+        height: auto;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        display: block;
+    }
+    
+    /* Для мобильных устройств */
+    @media (max-width: 1000px) {
+        .responsive-image {
+            width: 80% !important;
+            max-width: 80% !important;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    }
+</style>
                                 <p><strong>Расширенная теория:</strong> Гиперопека — враг автономии.</p>
                                 <ul>
                                     <li><strong>Зона ближайшего развития:</strong> Поддерживать нужно там, где человек почти может сам, но ему чуть-чуть трудно. Делать то, что он может сам — значит инвалидизировать его.</li>
