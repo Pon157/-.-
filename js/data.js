@@ -811,7 +811,7 @@ const courseData = {
                         theory: {
                             title: "Теория",
                             content: `<div class="theory-block">
-<picture>
+    <picture>
     <!-- Для мобильных -->
     <source 
         media="(max-width: 1000px)" 
@@ -910,40 +910,7 @@ const courseData = {
                         theory: {
                             title: "Теория",
                             content: `<div class="theory-block">
-<picture>
-    <!-- Для мобильных -->
-    <source 
-        media="(max-width: 1000px)" 
-        srcset="https://i.postimg.cc/Hsm0GZhM/production-images-3dd3d439-2006-(1).png"
-    >
-    <!-- Для десктопов и фолбэк -->
-    <img 
-        src="https://i.postimg.cc/Kc6q1DsD/production-images-3dd3d439-2006.png" 
-        alt="Эмпатия и понимание"
-        class="responsive-image"
-    >
-</picture>
-
-<style>
-    .responsive-image {
-        width: 30%;
-        max-width: 30%;
-        height: auto;
-        border-radius: 10px;
-        margin-bottom: 20px;
-        display: block;
-    }
-    
-    /* Для мобильных устройств */
-    @media (max-width: 1000px) {
-        .responsive-image {
-            width: 80% !important;
-            max-width: 80% !important;
-            margin-left: auto;
-            margin-right: auto;
-        }
-    }
-</style>
+                                <img src="https://images.unsplash.com/photo-1587502536575-6dfba0a6e017?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Невербальное общение" style="width:100%; border-radius:10px; margin-bottom:20px;">
                                 <p><strong>Расширенная теория:</strong></p>
                                 <ul>
                                     <li><strong>Сила паузы:</strong> В паузах происходит осознание. Если человек замолчал, не спешите заполнять эфир. Дайте ему 3–5 секунд. Часто после паузы следует самое важное признание.</li>
@@ -1059,402 +1026,288 @@ const courseData = {
                 }
             }
         },
-{
-    id: 4,
-    title: "Модуль 4. Поддержка без давления",
-    description: "Помощь без спасения",
-    completed: false,
-    submodules: [
         {
-            id: "4.1",
-            title: "Треугольник Карпмана: Помощь vs Спасательство",
-            tabs: {
-                theory: {
-                    title: "Теория",
-                    content: `<div class="theory-block">
-                        <img src="https://images.unsplash.com/photo-1551836026-d5c2c5af78e4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Помощь и поддержка" style="width:100%; border-radius:10px; margin-bottom:20px;">
-                        <p><strong>Расширенная теория:</strong></p>
-                        <ul>
-                            <li><strong>Помощь (Партнерство):</strong> Вы даете удочку. Вы верите, что у человека есть силы справиться, вы лишь ассистируете. Ответственность остается на человеке.</li>
-                            <li><strong>Спасательство (Треугольник Карпмана):</strong> Вы делаете за человека, даже когда он не просил. Вы считаете его беспомощным. Это тешит ваше эго («Я герой»), но делает другого зависимым. В итоге Спасатель часто становится Жертвой («Я для них всё, а они неблагодарные») или Преследователем.</li>
-                        </ul>
-                        <div class="check-question">
-                            <h4>Вопросы для проверки:</h4>
-                            <p>1. В чем ключевое отличие спасателя от помощника?<br>
-                            2. К чему в итоге приводит непрошеное спасательство?<br>
-                            3. Как понять, что вы попали в роль Спасателя? (Маркер: вы работаете больше, чем сам клиент).</p>
-                        </div>
-                        <div>
-                            <p><strong>Разница между помощью и спасением — принципиально разные подходы:</strong></p>
-                            <table style="width:100%; border-collapse: collapse; margin: 20px 0; font-family: Arial, sans-serif;">
-                                <tr style="background: #2c3e50; color: white;">
-                                    <th style="padding: 12px; border: 1px solid #ddd; text-align: left; width: 50%;">Помощь (здоровая)</th>
-                                    <th style="padding: 12px; border: 1px solid #ddd; text-align: left; width: 50%;">Спасение (нездоровое)</th>
-                                </tr>
+            id: 4,
+            title: "Модуль 4. Поддержка без давления",
+            description: "Помощь без спасения",
+            completed: false,
+            submodules: [
+                {
+                    id: "4.1",
+                    title: "Треугольник Карпмана: Помощь vs Спасательство",
+                    tabs: {
+                        theory: {
+                            title: "Теория",
+                            content: `<div class="theory-block">
+                                <img src="https://images.unsplash.com/photo-1551836026-d5c2c5af78e4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Помощь и поддержка" style="width:100%; border-radius:10px; margin-bottom:20px;">
+                                <p><strong>Расширенная теория:</strong></p>
+                                <ul>
+                                    <li><strong>Помощь (Партнерство):</strong> Вы даете удочку. Вы верите, что у человека есть силы справиться, вы лишь ассистируете. Ответственность остается на человеке.</li>
+                                    <li><strong>Спасательство (Треугольник Карпмана):</strong> Вы делаете за человека, даже когда он не просил. Вы считаете его беспомощным. Это тешит ваше эго («Я герой»), но делает другого зависимым. В итоге Спасатель часто становится Жертвой («Я для них всё, а они неблагодарные») или Преследователем.</li>
+                                </ul>
+                                <div class="check-question">
+                                    <h4>Вопросы для проверки:</h4>
+                                    <p>1. В чем ключевое отличие спасателя от помощника?<br>
+                                    2. К чему в итоге приводит непрошеное спасательство?<br>
+                                    3. Как понять, что вы попали в роль Спасателя? (Маркер: вы работаете больше, чем сам клиент).</p>
+                                </div>
+                                <p><strong>Разница между помощью и спасением — принципиально разные подходы:</strong></p>
+                                <table style="width:100%; border-collapse: collapse; margin: 20px 0;">
+                                    <tr style="background: #f8f9fa;">
+                                        <th style="padding: 10px; border: 1px solid #ddd;">Помощь (здоровая)</th>
+                                        <th style="padding: 10px; border: 1px solid #ddd;">Спасение (нездоровое)</th>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 10px; border: 1px solid #ddd;">Поддержка самостоятельности</td>
+                                        <td style="padding: 10px; border: 1px solid #ddd;">Лишение выбора и контроля</td>
+                                    </tr>
+                                    <tr style="background: #f8f9fa;">
+                                        <td style="padding: 10px; border: 1px solid #ddd;">«Хочешь, я помогу?»</td>
+                                        <td style="padding: 10px; border: 1px solid #ddd;">«Я сделаю это за тебя»</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 10px; border: 1px solid #ddd;">Уважение границ</td>
+                                        <td style="padding: 10px; border: 1px solid #ddd;">Нарушение границ</td>
+                                    </tr>
+                                    <tr style="background: #f8f9fa;">
+                                        <td style="padding: 10px; border: 1px solid #ddd;">Верит в способности человека</td>
+                                        <td style="padding: 10px; border: 1px solid #ddd;">Считает человека беспомощным</td>
+                                    </tr>
+                                </table>
+                            </div>`
+                        },
+                        quote: {
+                            title: "Цитата",
+                            content: `<div class="quote">«Дайте человеку удочку, а не рыбу»</div>
+                            <p class="author">— Китайская пословица</p>`
+                        },
+                        assignment: {
+                            title: "Задание",
+                            content: `<div class="assignment">
+                                <h4>Определите, где помощь, а где спасение</h4>
+                                <p>Прочитайте ситуации и определите, где проявляется здоровая помощь, а где — нездоровое спасение:</p>
+                                <p>1. «Дай, я сам поговорю с твоим начальником о повышении.»</p>
+                                <p>2. «Хочешь, вместе подготовимся к разговору с начальником?»</p>
+                                <p>3. «Я знаю лучше, что тебе делать. Слушай меня.»</p>
+                                <textarea id="answer4_1" placeholder="Напишите ваш анализ здесь..."></textarea>
+                                <button class="btn-primary" onclick="checkAssignment('4.1')">Проверить задание</button>
+                                <div id="feedback4_1" class="feedback"></div>
+                            </div>`,
+                            check: function(answer) {
+                                const helpKeywords = ["помощь", "выбор", "самостоятельность", "вместе", "поддержка"];
+                                const rescueKeywords = ["спасение", "замен", "контроль", "сам сделаю", "должен слушать"];
                                 
-                                <tr style="background: #f8f9fa;">
-                                    <td style="padding: 12px; border: 1px solid #ddd;">
-                                        <strong>Поддержка самостоятельности</strong><br>
-                                        Помогает человеку самому найти решение
-                                    </td>
-                                    <td style="padding: 12px; border: 1px solid #ddd;">
-                                        <strong>Лишение выбора и контроля</strong><br>
-                                        Берет ответственность на себя
-                                    </td>
-                                </tr>
+                                let helpCount = 0;
+                                let rescueCount = 0;
                                 
-                                <tr>
-                                    <td style="padding: 12px; border: 1px solid #ddd;">
-                                        <strong>Ключевые фразы:</strong><br>
-                                        • "Хочешь, я помогу?"<br>
-                                        • "Как я могу поддержать тебя?"<br>
-                                        • "Что для тебя было бы полезно?"<br>
-                                        • "Я верю, что ты справишься"<br>
-                                        • "Давай подумаем вместе"
-                                    </td>
-                                    <td style="padding: 12px; border: 1px solid #ddd;">
-                                        <strong>Ключевые фразы:</strong><br>
-                                        • "Я сделаю это за тебя"<br>
-                                        • "Я знаю, что для тебя лучше"<br>
-                                        • "Дай я всё устрою"<br>
-                                        • "Ты не сможешь без меня"<br>
-                                        • "Я всё беру на себя"
-                                    </td>
-                                </tr>
+                                helpKeywords.forEach(word => {
+                                    if (answer.toLowerCase().includes(word)) helpCount++;
+                                });
                                 
-                                <tr style="background: #f8f9fa;">
-                                    <td style="padding: 12px; border: 1px solid #ddd;">
-                                        <strong>Уважение границ</strong><br>
-                                        • Ждет приглашения помочь<br>
-                                        • Принимает отказ от помощи<br>
-                                        • Спрашивает разрешения
-                                    </td>
-                                    <td style="padding: 12px; border: 1px solid #ddd;">
-                                        <strong>Нарушение границ</strong><br>
-                                        • Навязывает помощь<br>
-                                        • Игнорирует отказ<br>
-                                        • Действует без спроса
-                                    </td>
-                                </tr>
+                                rescueKeywords.forEach(word => {
+                                    if (answer.toLowerCase().includes(word)) rescueCount++;
+                                });
                                 
-                                <tr>
-                                    <td style="padding: 12px; border: 1px solid #ddd;">
-                                        <strong>Верит в способности человека</strong><br>
-                                        • Видит потенциал<br>
-                                        • Поощряет рост<br>
-                                        • Развивает уверенность
-                                    </td>
-                                    <td style="padding: 12px; border: 1px solid #ddd;">
-                                        <strong>Считает человека беспомощным</strong><br>
-                                        • Поддерживает зависимость<br>
-                                        • Создает беспомощность<br>
-                                        • Развивает неуверенность
-                                    </td>
-                                </tr>
-                                
-                                <tr style="background: #f8f9fa;">
-                                    <td style="padding: 12px; border: 1px solid #ddd;">
-                                        <strong>Долгосрочный эффект:</strong><br>
-                                        • Укрепление самооценки<br>
-                                        • Развитие навыков<br>
-                                        • Здоровая независимость<br>
-                                        • Взаимное уважение
-                                    </td>
-                                    <td style="padding: 12px; border: 1px solid #ddd;">
-                                        <strong>Долгосрочный эффект:</strong><br>
-                                        • Снижение самооценки<br>
-                                        • Зависимость от других<br>
-                                        • Обида и сопротивление<br>
-                                        • Эмоциональное выгорание "спасателя"
-                                    </td>
-                                </tr>
-                                
-                                <tr>
-                                    <td style="padding: 12px; border: 1px solid #ddd;">
-                                        <strong>Мотивация:</strong><br>
-                                        • Искренняя забота<br>
-                                        • Желание поддержать<br>
-                                        • Уважение к автономии<br>
-                                        • Вера в человека
-                                    </td>
-                                    <td style="padding: 12px; border: 1px solid #ddd;">
-                                        <strong>Мотивация:</strong><br>
-                                        • Потребность в контроле<br>
-                                        • Страх отвержения<br>
-                                        • Повышение собственной значимости<br>
-                                        • Неумение сказать "нет"
-                                    </td>
-                                </tr>
-                                
-                                <tr style="background: #f8f9fa;">
-                                    <td style="padding: 12px; border: 1px solid #ddd;">
-                                        <strong>Эмоциональная позиция:</strong><br>
-                                        • "Я рядом, если нужно"<br>
-                                        • "Ты справишься, я верю"<br>
-                                        • "Ты имеешь право на свой выбор"<br>
-                                        • "Я помогу, но не сделаю за тебя"
-                                    </td>
-                                    <td style="padding: 12px; border: 1px solid #ddd;">
-                                        <strong>Эмоциональная позиция:</strong><br>
-                                        • "Без меня ты пропадешь"<br>
-                                        • "Только я знаю, как правильно"<br>
-                                        • "Ты обязан принять мою помощь"<br>
-                                        • "Я лучше знаю, что тебе нужно"
-                                    </td>
-                                </tr>
-                                
-                                <tr>
-                                    <td style="padding: 12px; border: 1px solid #ddd;">
-                                        <strong>Когда уместна помощь:</strong><br>
-                                        • Человек просит о поддержке<br>
-                                        • Ситуация временно сложная<br>
-                                        • Есть конкретная просьба<br>
-                                        • Сохраняется автономия
-                                    </td>
-                                    <td style="padding: 12px; border: 1px solid #ddd;">
-                                        <strong>Когда происходит спасение:</strong><br>
-                                        • Помощь не просили<br>
-                                        • Систематическое "спасательство"<br>
-                                        • Игнорируются способности человека<br>
-                                        • Создается созависимость
-                                    </td>
-                                </tr>
-                            </table>
-                        </div>
-                    </div>`
-                },
-                quote: {
-                    title: "Цитата",
-                    content: `<div class="quote">«Дайте человеку удочку, а не рыбу»</div>
-                    <p class="author">— Китайская пословица</p>`
-                },
-                assignment: {
-                    title: "Задание",
-                    content: `<div class="assignment">
-                        <h4>Определите, где помощь, а где спасение</h4>
-                        <p>Прочитайте ситуации и определите, где проявляется здоровая помощь, а где — нездоровое спасение:</p>
-                        <p>1. «Дай, я сам поговорю с твоим начальником о повышении.»</p>
-                        <p>2. «Хочешь, вместе подготовимся к разговору с начальником?»</p>
-                        <p>3. «Я знаю лучше, что тебе делать. Слушай меня.»</p>
-                        <textarea id="answer4_1" placeholder="Напишите ваш анализ здесь..."></textarea>
-                        <button class="btn-primary" onclick="checkAssignment('4.1')">Проверить задание</button>
-                        <div id="feedback4_1" class="feedback"></div>
-                    </div>`,
-                    check: function(answer) {
-                        const helpKeywords = ["помощь", "выбор", "самостоятельность", "вместе", "поддержка"];
-                        const rescueKeywords = ["спасение", "замен", "контроль", "сам сделаю", "должен слушать"];
-                        
-                        let helpCount = 0;
-                        let rescueCount = 0;
-                        
-                        helpKeywords.forEach(word => {
-                            if (answer.toLowerCase().includes(word)) helpCount++;
-                        });
-                        
-                        rescueKeywords.forEach(word => {
-                            if (answer.toLowerCase().includes(word)) rescueCount++;
-                        });
-                        
-                        if (helpCount >= 2 || rescueCount >= 2) {
-                            return {correct: true, message: "Хорошо! Вы различаете помощь и спасение. Помощь дает выбор, спасение — лишает его."};
-                        } else {
-                            return {correct: false, message: "Попробуйте четче разделить: помощь = поддержка самостоятельности, спасение = лишение выбора."};
+                                if (helpCount >= 2 || rescueCount >= 2) {
+                                    return {correct: true, message: "Хорошо! Вы различаете помощь и спасение. Помощь дает выбор, спасение — лишает его."};
+                                } else {
+                                    return {correct: false, message: "Попробуйте четче разделить: помощь = поддержка самостоятельности, спасение = лишение выбора."};
+                                }
+                            }
                         }
+                    }
+                },
+                {
+                    id: "4.2",
+                    title: "Формулировка экологичных предложений",
+                    tabs: {
+                        theory: {
+                            title: "Теория",
+                            content: `<div class="theory-block">
+                                <img src="https://images.unsplash.com/photo-1516321497487-e288fb19713f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Экологичное общение" style="width:100%; border-radius:10px; margin-bottom:20px;">
+                                <p><strong>Расширенная теория:</strong> Экологичность общения — это уважение к субъектности (воле) другого.</p>
+                                <ul>
+                                    <li><strong>Вопрос-разрешение:</strong> Прежде чем поддержать или дать совет, спросите: «Тебе сейчас нужно решение или просто выговориться?».</li>
+                                    <li><strong>Я-сообщения:</strong> Вместо директивного «Тебе надо поспать», используйте мягкое предложение: «Я переживаю за твое состояние, может быть, стоит отдохнуть?».</li>
+                                    <li><strong>Принцип выбора:</strong> Всегда оставляйте человеку право отказаться от помощи без чувства вины.</li>
+                                </ul>
+                                <div class="check-question">
+                                    <h4>Вопросы для проверки:</h4>
+                                    <p>1. Почему важно спрашивать, какой вид поддержки нужен?<br>
+                                    2. Как предложить помощь так, чтобы человеку было легко отказаться?<br>
+                                    3. Переформулируйте директиву «Иди к врачу» в экологичное предложение.</p>
+                                </div>
+                                <p><strong>Как правильно предлагать помощь:</strong></p>
+                                <ul>
+                                    <li><strong>Вопросительная форма:</strong> «Хочешь, я помогу с...?» вместо «Я сделаю...»</li>
+                                    <li><strong>Конкретные предложения:</strong> «Могу помочь с поиском терапевта» вместо «Я все улажу»</li>
+                                    <li><strong>Уважение отказа:</strong> «Хорошо, если передумаешь — я рядом»</li>
+                                    <li><strong>Совместное планирование:</strong> «Давай подумаем, какие есть варианты»</li>
+                                    <li><strong>Избегайте:</strong> Ультиматумов, манипуляций, чувства вины.</li>
+                                </ul>
+                            </div>`
+                        },
+                        source: {
+                            title: "Источник",
+                            content: `<div class="source">
+                                <p><strong>Психология помогающего поведения</strong></p>
+                                <p>Исследования показывают, что помощь, предлагаемая с уважением к автономии, более эффективна и способствует реальным изменениям, чем спасение.</p>
+                            </div>`
+                        },
+                        assignment: {
+                            title: "Задание",
+                            content: `<div class="assignment">
+                                <h4>Переформулируйте фразы спасения в фразы помощи</h4>
+                                <p>1. «Не волнуйся, я сам поговорю с твоим начальником»</p>
+                                <p>2. «Я знаю, что для тебя лучше, сделай так, как я говорю»</p>
+                                <p>3. «Дай я все сделаю за тебя, ты все равно не справишься»</p>
+                                <textarea id="answer4_2" placeholder="Напишите ваши варианты здесь..."></textarea>
+                                <button class="btn-primary" onclick="checkAssignment('4.2')">Проверить задание</button>
+                                <div id="feedback4_2" class="feedback"></div>
+                            </div>`,
+                            check: function(answer) {
+                                const helpIndicators = ["хочешь", "может быть", "предлагаю", "давай подумаем", "если хочешь", "как ты считаешь"];
+                                const rescueIndicators = ["я сделаю", "ты должен", "надо", "обязательно", "лучше знаю"];
+                                
+                                let helpCount = 0;
+                                let rescueCount = 0;
+                                
+                                helpIndicators.forEach(phrase => {
+                                    if (answer.toLowerCase().includes(phrase)) helpCount++;
+                                });
+                                
+                                rescueIndicators.forEach(phrase => {
+                                    if (answer.toLowerCase().includes(phrase)) rescueCount++;
+                                });
+                                
+                                if (helpCount >= 2 && rescueCount === 0) {
+                                    return {correct: true, message: "Прекрасно! Вы правильно переформулировали спасение в помощь, сохраняя выбор за человеком."};
+                                } else if (helpCount >= 1) {
+                                    return {correct: true, message: "Хорошо, но есть еще место для улучшения. Используйте больше вопросительных форм и предложений выбора."};
+                                } else {
+                                    return {correct: false, message: "Ответ все еще содержит элементы спасения. Попробуйте начать с 'Хочешь...' или 'Может быть...'."};
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    id: "4.3",
+                    title: "Баланс между заботой и автономией",
+                    tabs: {
+                        theory: {
+                            title: "Теория",
+                            content: `<div class="theory-block">
+                                <img src="https://images.unsplash.com/photo-1554196038-950a8ab51827?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Баланс и границы" style="width:100%; border-radius:10px; margin-bottom:20px;">
+                                <p><strong>Расширенная теория:</strong> Гиперопека — враг автономии.</p>
+                                <ul>
+                                    <li><strong>Зона ближайшего развития:</strong> Поддерживать нужно там, где человек почти может сам, но ему чуть-чуть трудно. Делать то, что он может сам — значит инвалидизировать его.</li>
+                                    <li><strong>Уважение к «Нет»:</strong> Если человек отказывается от помощи, это проявление его силы, а не глупости. Принять отказ — высшая форма уважения.</li>
+                                </ul>
+                                <div class="check-question">
+                                    <h4>Вопросы для проверки:</h4>
+                                    <p>1. Что такое инвалидизация через помощь?<br>
+                                    2. Почему принятие отказа — это тоже форма поддержки?<br>
+                                    3. Как определить границы, где помощь становится вредной?</p>
+                                </div>
+                                <p><strong>Здоровые границы в поддержке:</strong></p>
+                                <ul>
+                                    <li><strong>Ваши ресурсы важны:</strong> Вы не можете помочь всем всегда.</li>
+                                    <li><strong>«Нет» — это нормально:</strong> Отказ от помощи ≠ отказ от человека.</li>
+                                    <li><strong>Распределение ответственности:</strong> Вы не отвечаете за счастье другого.</li>
+                                    <li><strong>Своевременность:</strong> Помощь уместна, когда человек готов ее принять.</li>
+                                    <li><strong>Профессиональные границы:</strong> Знать, когда направить к специалисту.</li>
+                                </ul>
+                            </div>`
+                        },
+                        quote: {
+                            title: "Цитата",
+                            content: `<div class="quote">«Можно вытащить человека из воды, но нельзя заставить его плавать»</div>
+                            <p class="author">— Неизвестный автор</p>`
+                        },
+                        assignment: {
+                            title: "Задание",
+                            content: `<div class="assignment">
+                                <h4>Ситуация установления границ</h4>
+                                <p>Ваш друг постоянно звонит вам среди ночи в слезах, и это длится уже месяц. Вы чувствуете выгорание. Как вы установите границы, сохраняя заботу?</p>
+                                <textarea id="answer4_3" placeholder="Напишите ваш вариант здесь..."></textarea>
+                                <button class="btn-primary" onclick="checkAssignment('4.3')">Проверить задание</button>
+                                <div id="feedback4_3" class="feedback"></div>
+                            </div>`,
+                            check: function(answer) {
+                                const boundaryIndicators = ["границ", "не могу", "до", "после", "время", "ресурс", "устал", "выгора"];
+                                const careIndicators = ["забочусь", "помочь", "поддержать", "предлагаю", "альтернатив", "специалист"];
+                                
+                                let boundaryCount = 0;
+                                let careCount = 0;
+                                
+                                boundaryIndicators.forEach(word => {
+                                    if (answer.toLowerCase().includes(word)) boundaryCount++;
+                                });
+                                
+                                careIndicators.forEach(word => {
+                                    if (answer.toLowerCase().includes(word)) careCount++;
+                                });
+                                
+                                if (boundaryCount >= 2 && careCount >= 1) {
+                                    return {correct: true, message: "Отлично! Вы установили границы, не теряя заботы о друге."};
+                                } else if (boundaryCount >= 1) {
+                                    return {correct: true, message: "Хорошо, но попробуйте сочетать установление границ с предложением альтернативной помощи."};
+                                } else {
+                                    return {correct: false, message: "Попробуйте четко обозначить свои границы (время, ресурсы), но предложить альтернативную поддержку."};
+                                }
+                            }
+                        }
+                    }
+                }
+            ],
+            test: {
+                title: "Контрольная работа 4",
+                description: "Тест по поддержке без давления",
+                questions: [
+                    {
+                        type: "multiple-choice",
+                        question: "Какая фраза предлагает помощь, а не спасение?",
+                        options: [
+                            "«Я все сделаю за тебя»",
+                            "«Хочешь, помогу составить план?»",
+                            "«Ты должен сделать это немедленно»",
+                            "«Я знаю, что для тебя лучше»"
+                        ],
+                        correct: 1
+                    },
+                    {
+                        type: "multiple-choice", 
+                        question: "Почему важно уважать отказ от помощи?",
+                        options: [
+                            "Чтобы быстрее закончить разговор",
+                            "Чтобы сохранить контроль и выбор за человеком",
+                            "Чтобы показать свое превосходство",
+                            "Чтобы не тратить свое время"
+                        ],
+                        correct: 1
+                    }
+                ],
+                practical: {
+                    task: "Ваш друг в депрессии уже месяц не может убраться в квартире. Напишите диалог, где вы предлагаете помощь, но не берете на себя ответственность за его жизнь.",
+                    check: function(answer) {
+                        const hasOffer = answer.toLowerCase().includes("помочь") || 
+                                       answer.toLowerCase().includes("предлагаю") ||
+                                       answer.toLowerCase().includes("хочешь");
+                        
+                        const hasChoice = answer.includes("?") || 
+                                        answer.toLowerCase().includes("если хочешь") ||
+                                        answer.toLowerCase().includes("как ты думаешь");
+                        
+                        const noRescue = !answer.toLowerCase().includes("я сделаю за тебя") &&
+                                       !answer.toLowerCase().includes("обязательно") &&
+                                       !answer.toLowerCase().includes("должен");
+                        
+                        return hasOffer && hasChoice && noRescue;
                     }
                 }
             }
         },
-        {
-            id: "4.2",
-            title: "Формулировка экологичных предложений",
-            tabs: {
-                theory: {
-                    title: "Теория",
-                    content: `<div class="theory-block">
-                        <img src="https://images.unsplash.com/photo-1516321497487-e288fb19713f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Экологичное общение" style="width:100%; border-radius:10px; margin-bottom:20px;">
-                        <p><strong>Расширенная теория:</strong> Экологичность общения — это уважение к субъектности (воле) другого.</p>
-                        <ul>
-                            <li><strong>Вопрос-разрешение:</strong> Прежде чем поддержать или дать совет, спросите: «Тебе сейчас нужно решение или просто выговориться?».</li>
-                            <li><strong>Я-сообщения:</strong> Вместо директивного «Тебе надо поспать», используйте мягкое предложение: «Я переживаю за твое состояние, может быть, стоит отдохнуть?».</li>
-                            <li><strong>Принцип выбора:</strong> Всегда оставляйте человеку право отказаться от помощи без чувства вины.</li>
-                        </ul>
-                        <div class="check-question">
-                            <h4>Вопросы для проверки:</h4>
-                            <p>1. Почему важно спрашивать, какой вид поддержки нужен?<br>
-                            2. Как предложить помощь так, чтобы человеку было легко отказаться?<br>
-                            3. Переформулируйте директиву «Иди к врачу» в экологичное предложение.</p>
-                        </div>
-                        <p><strong>Как правильно предлагать помощь:</strong></p>
-                        <ul>
-                            <li><strong>Вопросительная форма:</strong> «Хочешь, я помогу с...?» вместо «Я сделаю...»</li>
-                            <li><strong>Конкретные предложения:</strong> «Могу помочь с поиском терапевта» вместо «Я все улажу»</li>
-                            <li><strong>Уважение отказа:</strong> «Хорошо, если передумаешь — я рядом»</li>
-                            <li><strong>Совместное планирование:</strong> «Давай подумаем, какие есть варианты»</li>
-                            <li><strong>Избегайте:</strong> Ультиматумов, манипуляций, чувства вины.</li>
-                        </ul>
-                    </div>`
-                },
-                source: {
-                    title: "Источник",
-                    content: `<div class="source">
-                        <p><strong>Психология помогающего поведения</strong></p>
-                        <p>Исследования показывают, что помощь, предлагаемая с уважением к автономии, более эффективна и способствует реальным изменениям, чем спасение.</p>
-                    </div>`
-                },
-                assignment: {
-                    title: "Задание",
-                    content: `<div class="assignment">
-                        <h4>Переформулируйте фразы спасения в фразы помощи</h4>
-                        <p>1. «Не волнуйся, я сам поговорю с твоим начальником»</p>
-                        <p>2. «Я знаю, что для тебя лучше, сделай так, как я говорю»</p>
-                        <p>3. «Дай я все сделаю за тебя, ты все равно не справишься»</p>
-                        <textarea id="answer4_2" placeholder="Напишите ваши варианты здесь..."></textarea>
-                        <button class="btn-primary" onclick="checkAssignment('4.2')">Проверить задание</button>
-                        <div id="feedback4_2" class="feedback"></div>
-                    </div>`,
-                    check: function(answer) {
-                        const helpIndicators = ["хочешь", "может быть", "предлагаю", "давай подумаем", "если хочешь", "как ты считаешь"];
-                        const rescueIndicators = ["я сделаю", "ты должен", "надо", "обязательно", "лучше знаю"];
-                        
-                        let helpCount = 0;
-                        let rescueCount = 0;
-                        
-                        helpIndicators.forEach(phrase => {
-                            if (answer.toLowerCase().includes(phrase)) helpCount++;
-                        });
-                        
-                        rescueIndicators.forEach(phrase => {
-                            if (answer.toLowerCase().includes(phrase)) rescueCount++;
-                        });
-                        
-                        if (helpCount >= 2 && rescueCount === 0) {
-                            return {correct: true, message: "Прекрасно! Вы правильно переформулировали спасение в помощь, сохраняя выбор за человеком."};
-                        } else if (helpCount >= 1) {
-                            return {correct: true, message: "Хорошо, но есть еще место для улучшения. Используйте больше вопросительных форм и предложений выбора."};
-                        } else {
-                            return {correct: false, message: "Ответ все еще содержит элементы спасения. Попробуйте начать с 'Хочешь...' или 'Может быть...'."};
-                        }
-                    }
-                }
-            }
-        },
-        {
-            id: "4.3",
-            title: "Баланс между заботой и автономией",
-            tabs: {
-                theory: {
-                    title: "Теория",
-                    content: `<div class="theory-block">
-                        <img src="https://images.unsplash.com/photo-1554196038-950a8ab51827?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Баланс и границы" style="width:100%; border-radius:10px; margin-bottom:20px;">
-                        <p><strong>Расширенная теория:</strong> Гиперопека — враг автономии.</p>
-                        <ul>
-                            <li><strong>Зона ближайшего развития:</strong> Поддерживать нужно там, где человек почти может сам, но ему чуть-чуть трудно. Делать то, что он может сам — значит инвалидизировать его.</li>
-                            <li><strong>Уважение к «Нет»:</strong> Если человек отказывается от помощи, это проявление его силы, а не глупости. Принять отказ — высшая форма уважения.</li>
-                        </ul>
-                        <div class="check-question">
-                            <h4>Вопросы для проверки:</h4>
-                            <p>1. Что такое инвалидизация через помощь?<br>
-                            2. Почему принятие отказа — это тоже форма поддержки?<br>
-                            3. Как определить границы, где помощь становится вредной?</p>
-                        </div>
-                        <p><strong>Здоровые границы в поддержке:</strong></p>
-                        <ul>
-                            <li><strong>Ваши ресурсы важны:</strong> Вы не можете помочь всем всегда.</li>
-                            <li><strong>«Нет» — это нормально:</strong> Отказ от помощи ≠ отказ от человека.</li>
-                            <li><strong>Распределение ответственности:</strong> Вы не отвечаете за счастье другого.</li>
-                            <li><strong>Своевременность:</strong> Помощь уместна, когда человек готов ее принять.</li>
-                            <li><strong>Профессиональные границы:</strong> Знать, когда направить к специалисту.</li>
-                        </ul>
-                    </div>`
-                },
-                quote: {
-                    title: "Цитата",
-                    content: `<div class="quote">«Можно вытащить человека из воды, но нельзя заставить его плавать»</div>
-                    <p class="author">— Неизвестный автор</p>`
-                },
-                assignment: {
-                    title: "Задание",
-                    content: `<div class="assignment">
-                        <h4>Ситуация установления границ</h4>
-                        <p>Ваш друг постоянно звонит вам среди ночи в слезах, и это длится уже месяц. Вы чувствуете выгорание. Как вы установите границы, сохраняя заботу?</p>
-                        <textarea id="answer4_3" placeholder="Напишите ваш вариант здесь..."></textarea>
-                        <button class="btn-primary" onclick="checkAssignment('4.3')">Проверить задание</button>
-                        <div id="feedback4_3" class="feedback"></div>
-                    </div>`,
-                    check: function(answer) {
-                        const boundaryIndicators = ["границ", "не могу", "до", "после", "время", "ресурс", "устал", "выгора"];
-                        const careIndicators = ["забочусь", "помочь", "поддержать", "предлагаю", "альтернатив", "специалист"];
-                        
-                        let boundaryCount = 0;
-                        let careCount = 0;
-                        
-                        boundaryIndicators.forEach(word => {
-                            if (answer.toLowerCase().includes(word)) boundaryCount++;
-                        });
-                        
-                        careIndicators.forEach(word => {
-                            if (answer.toLowerCase().includes(word)) careCount++;
-                        });
-                        
-                        if (boundaryCount >= 2 && careCount >= 1) {
-                            return {correct: true, message: "Отлично! Вы установили границы, не теряя заботы о друге."};
-                        } else if (boundaryCount >= 1) {
-                            return {correct: true, message: "Хорошо, но попробуйте сочетать установление границ с предложением альтернативной помощи."};
-                        } else {
-                            return {correct: false, message: "Попробуйте четко обозначить свои границы (время, ресурсы), но предложить альтернативную поддержку."};
-                        }
-                    }
-                }
-            }
-        }
-    ],
-    test: {
-        title: "Контрольная работа 4",
-        description: "Тест по поддержке без давления",
-        questions: [
-            {
-                type: "multiple-choice",
-                question: "Какая фраза предлагает помощь, а не спасение?",
-                options: [
-                    "«Я все сделаю за тебя»",
-                    "«Хочешь, помогу составить план?»",
-                    "«Ты должен сделать это немедленно»",
-                    "«Я знаю, что для тебя лучше»"
-                ],
-                correct: 1
-            },
-            {
-                type: "multiple-choice", 
-                question: "Почему важно уважать отказ от помощи?",
-                options: [
-                    "Чтобы быстрее закончить разговор",
-                    "Чтобы сохранить контроль и выбор за человеком",
-                    "Чтобы показать свое превосходство",
-                    "Чтобы не тратить свое время"
-                ],
-                correct: 1
-            }
-        ],
-        practical: {
-            task: "Ваш друг в депрессии уже месяц не может убраться в квартире. Напишите диалог, где вы предлагаете помощь, но не берете на себя ответственность за его жизнь.",
-            check: function(answer) {
-                const hasOffer = answer.toLowerCase().includes("помочь") || 
-                               answer.toLowerCase().includes("предлагаю") ||
-                               answer.toLowerCase().includes("хочешь");
-                
-                const hasChoice = answer.includes("?") || 
-                                answer.toLowerCase().includes("если хочешь") ||
-                                answer.toLowerCase().includes("как ты думаешь");
-                
-                const noRescue = !answer.toLowerCase().includes("я сделаю за тебя") &&
-                               !answer.toLowerCase().includes("обязательно") &&
-                               !answer.toLowerCase().includes("должен");
-                
-                return hasOffer && hasChoice && noRescue;
-            }
-        }
-    }
-}
         {
             id: 5,
             title: "Модуль 5. Самоподдержка и границы",
@@ -1526,7 +1379,7 @@ const courseData = {
                     }
                 },
                 {
-                id: "5.2",
+                    id: "5.2",
                     title: "Цикл стресса и методы восстановления",
                     tabs: {
                         theory: {
