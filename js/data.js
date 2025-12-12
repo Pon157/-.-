@@ -1107,7 +1107,64 @@ const courseData = {
                                         <td style="padding: 10px; border: 1px solid #ddd;">Считает человека беспомощным</td>
                                     </tr>
                                 </table>
-                            </div>`
+                            <div style="margin: 30px 0;">
+                            <p><strong>Последствия разных подходов для отношений и личности:</strong></p>
+                            <table style="width:100%; border-collapse: collapse; margin: 20px 0;">
+                                <tr style="background: #f8f9fa;">
+                                    <th style="padding: 10px; border: 1px solid #ddd;">Помощь (здоровая) → Результаты</th>
+                                    <th style="padding: 10px; border: 1px solid #ddd;">Спасение (нездоровое) → Результаты</th>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 10px; border: 1px solid #ddd;">
+                                    <strong>Для того, кому помогают:</strong><br>
+                                    • Рост уверенности в себе<br>
+                                    • Развитие навыков и компетенций<br>
+                                    • Чувство благодарности без долга<br>
+                                    • Сохранение достоинства
+                                </td>
+                                    <td style="padding: 10px; border: 1px solid #ddd;">
+                                    <strong>Для того, кого "спасают":</strong><br>
+                                    • Выученная беспомощность<br>
+                                    • Скрытая обида или раздражение<br>
+                                    • Потеря веры в свои силы<br>
+                                    • Чувство долга или вины
+                                </td>
+                            </tr>
+                                    <tr style="background: #f8f9fa;">
+                                    <td style="padding: 10px; border: 1px solid #ddd;">
+                                    <strong>Для того, кто помогает:</strong><br>
+                                    • Чувство удовлетворения<br>
+                                    • Здоровые границы в отношениях<br>
+                                    • Энергия для собственной жизни<br>
+                                    • Уважение со стороны других
+                                </td>
+                                    <td style="padding: 10px; border: 1px solid #ddd;">
+                                    <strong>Для "спасателя":</strong><br>
+                                    • Эмоциональное выгорание<br>
+                                    • Накопление невысказанных претензий<br>
+                                    • Потеря себя в проблемах других<br>
+                                    • Чувство усталости и истощения
+                                </td>
+                            </tr>
+                            <tr>
+                                    <td style="padding: 10px; border: 1px solid #ddd;">
+                                    <strong>Для отношений в целом:</strong><br>
+                                    • Равноправие и взаимное уважение<br>
+                                    • Доверие и открытость<br>
+                                    • Устойчивость и развитие<br>
+                                    • Свобода быть собой
+                                </td>
+                                    <td style="padding: 10px; border: 1px solid #ddd;">
+                                    <strong>Для отношений в целом:</strong><br>
+                                    • Созависимая динамика<br>
+                                    • Скрытое напряжение<br>
+                                    • Роль "жертва-спасатель-преследователь"<br>
+                                    • Застой и нездоровая привязанность
+                                </td>
+                             </tr>
+                        </table>
+                    </div>
+
                         },
                         quote: {
                             title: "Цитата",
