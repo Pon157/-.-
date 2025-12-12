@@ -1513,7 +1513,40 @@ const courseData = {
                         theory: {
                             title: "Теория",
                             content: `<div class="theory-block">
-                                <img src="https://images.unsplash.com/photo-1518611012118-696072aa579a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Выгорание и усталость" style="width:100%; border-radius:10px; margin-bottom:20px;">
+<picture>
+    <!-- Для мобильных -->
+    <source 
+        media="(max-width: 1000px)" 
+        srcset="https://i.postimg.cc/25gbC5Tv/9bbfb80f-9429-4d20-896c-dbd6c199-(1).jpg"
+    >
+    <!-- Для десктопов и фолбэк -->
+    <img 
+        src="https://i.postimg.cc/jdBGQ08g/2009f6fb-650c-403c-8953-d29cb84d.jpg" 
+        alt="Эмпатия и понимание"
+        class="responsive-image"
+    >
+</picture>
+
+<style>
+    .responsive-image {
+        width: 30%;
+        max-width: 30%;
+        height: auto;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        display: block;
+    }
+    
+    /* Для мобильных устройств */
+    @media (max-width: 1000px) {
+        .responsive-image {
+            width: 80% !important;
+            max-width: 80% !important;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    }
+</style>
                                 <p><strong>Расширенная теория:</strong></p>
                                 <ul>
                                     <li><strong>Усталость от сострадания (Compassion Fatigue):</strong> Состояние физического и эмоционального истощения, специфичное для тех, кто много помогает. Симптомы: цинизм, раздражительность, апатия, ночные кошмары.</li>
@@ -1577,7 +1610,40 @@ const courseData = {
                         theory: {
                             title: "Теория",
                             content: `<div class="theory-block">
-                                <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Восстановление и отдых" style="width:100%; border-radius:10px; margin-bottom:20px;">
+<picture>
+    <!-- Для мобильных -->
+    <source 
+        media="(max-width: 1000px)" 
+        srcset="https://i.postimg.cc/1tH8wKsN/5-2-(1).png"
+    >
+    <!-- Для десктопов и фолбэк -->
+    <img 
+        src="https://i.postimg.cc/SQf6fWDT/5-2.png"
+        alt="Эмпатия и понимание"
+        class="responsive-image"
+    >
+</picture>
+
+<style>
+    .responsive-image {
+        width: 30%;
+        max-width: 30%;
+        height: auto;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        display: block;
+    }
+    
+    /* Для мобильных устройств */
+    @media (max-width: 1000px) {
+        .responsive-image {
+            width: 80% !important;
+            max-width: 80% !important;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    }
+</style>
                                 <p><strong>Расширенная теория:</strong> Стресс — это физиологический цикл. Просто «успокоиться головой» недостаточно, нужно вывести гормоны стресса из тела (теория Э. и А. Нагоски).</p>
                                 <ul>
                                     <li><strong>Завершение цикла:</strong> Физическая активность, глубокое дыхание (выдох длиннее вдоха), смех, плач, творчество, объятия (20 секунд).</li>
@@ -1639,7 +1705,40 @@ const courseData = {
                         theory: {
                             title: "Теория",
                             content: `<div class="theory-block">
-                                <img src="https://images.unsplash.com/photo-1533738363-b7f9aef128ce?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Личные границы" style="width:100%; border-radius:10px; margin-bottom:20px;">
+<picture>
+    <!-- Для мобильных -->
+    <source 
+        media="(max-width: 1000px)" 
+        srcset="https://i.postimg.cc/7bvrLpd1/c5931846-f37a-4cc7-8dfa-94e66f31-(1).jpg"
+    >
+    <!-- Для десктопов и фолбэк -->
+    <img 
+        src="https://i.postimg.cc/c1zsjz9s/c5931846-f37a-4cc7-8dfa-94e66f31.jpg" 
+        alt="Эмпатия и понимание"
+        class="responsive-image"
+    >
+</picture>
+
+<style>
+    .responsive-image {
+        width: 30%;
+        max-width: 30%;
+        height: auto;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        display: block;
+    }
+    
+    /* Для мобильных устройств */
+    @media (max-width: 1000px) {
+        .responsive-image {
+            width: 80% !important;
+            max-width: 80% !important;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    }
+</style>
                                 <p><strong>Расширенная теория:</strong> Брене Браун вывела формулу: «Самые эмпатичные люди — это люди с самыми жесткими границами».</p>
                                 <ul>
                                     <li><strong>Парадокс:</strong> Нельзя быть эмпатичным 24/7. Если вы не защищаете свой ресурс, вы начинаете ненавидеть тех, кому помогаете.</li>
