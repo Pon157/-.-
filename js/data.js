@@ -1517,7 +1517,7 @@ const courseData = {
     <!-- Для мобильных -->
     <source 
         media="(max-width: 1000px)" 
-        srcset="https://i.postimg.cc/25gbC5Tv/9bbfb80f-9429-4d20-896c-dbd6c199-(1).jpg"
+        srcset="https://i.postimg.cc/qRmFN9hx/2009f6fb-650c-403c-8953-d29cb84d-(1).jpg"
     >
     <!-- Для десктопов и фолбэк -->
     <img 
