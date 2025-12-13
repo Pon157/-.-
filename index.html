@@ -39,7 +39,7 @@
     </div>
 
     <!-- Основная структура -->
-    <div id="app">
+    <div id="app" style="display: none;">
         <!-- Шапка с настройками - КОМПАКТНАЯ ВЕРСИЯ -->
         <header class="main-header">
             <div class="header-left">
@@ -50,6 +50,11 @@
             </div>
             
             <div class="header-right">
+                <!-- Прогресс в хедере для мобильных -->
+                <div class="mobile-progress" style="display: none;">
+                    <span id="mobileProgressText">0%</span>
+                </div>
+                
                 <!-- Упрощенный профиль пользователя -->
                 <div class="user-profile">
                     <div class="user-info" onclick="showNameInput('login')" title="Изменить имя">
@@ -59,7 +64,6 @@
                 </div>
             </div>
         </header>
-
 
         <div class="app-container">
             <!-- Боковая панель навигации -->
@@ -77,6 +81,9 @@
                     </div>
                     
                     <div class="sidebar-controls">
+                        <button id="finalExamBtn" class="btn-certificate disabled">
+                            <i class="fas fa-graduation-cap"></i> Итоговый экзамен
+                        </button>
                         <button id="certificateBtn" class="btn-certificate disabled">
                             <i class="fas fa-award"></i> Сертификат
                         </button>
@@ -96,6 +103,12 @@
                             <div>
                                 <h2 id="moduleTitle">Добро пожаловать на курс</h2>
                                 <p id="moduleSubtitle">«Эмпатия и поддержка в общении»</p>
+                            </div>
+                            <div class="module-progress-indicator" id="moduleProgressIndicator" style="display: none;">
+                                <span>Прогресс модуля: <span id="moduleProgressPercent">0%</span></span>
+                                <div class="mini-progress-bar">
+                                    <div class="mini-progress-fill" id="moduleProgressFill"></div>
+                                </div>
                             </div>
                         </div>
 
@@ -119,13 +132,32 @@
                                 <button id="closeTestBtn" class="btn-secondary">Вернуться к модулю</button>
                             </div>
                         </div>
+
+                        <!-- Область для итогового экзамена -->
+                        <div class="final-exam-area" id="finalExamArea" style="display: none;">
+                            <div class="test-header">
+                                <h3 id="finalExamTitle">Итоговый экзамен</h3>
+                                <p id="finalExamDescription"></p>
+                            </div>
+                            <div class="test-content" id="finalExamContent"></div>
+                            <div class="test-controls">
+                                <button id="submitFinalExamBtn" class="btn-primary">Отправить итоговый экзамен</button>
+                                <button id="closeFinalExamBtn" class="btn-secondary">Вернуться к курсу</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Футер -->
                 <footer class="content-footer">
-                    <p>© 2025 Курс «Эмпатия и поддержка в общении».</p>
-                    <p class="bot-notice"><i class="fas fa-robot"></i> Проверка заданий выполняется системой анализа ключевых слов.</p>
+                    <p>© 2025 Курс «Эмпатия и поддержка в общении». Все права защищены.</p>
+                    <p class="bot-notice">
+                        <i class="fas fa-robot"></i> 
+                        Проверка заданий выполняется интеллектуальной системой анализа текста.
+                        <span class="bot-hint" onclick="showBotInfo()" style="color: #4a90e2; cursor: pointer; margin-left: 10px;">
+                            <i class="fas fa-info-circle"></i> Как работает проверка?
+                        </span>
+                    </p>
                 </footer>
             </main>
         </div>
@@ -143,6 +175,76 @@
                 </div>
             </div>
         </div>
+
+        <!-- Модальное окно с информацией о боте -->
+        <div class="modal-overlay" id="botInfoModal" style="display: none;">
+            <div class="modal">
+                <div class="modal-header">
+                    <h3><i class="fas fa-robot"></i> Как работает проверка заданий?</h3>
+                    <button class="close-modal" onclick="closeBotInfo()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div style="padding: 20px;">
+                        <h4>📊 Система интеллектуальной проверки</h4>
+                        <p>Наш бот анализирует ваши ответы по нескольким критериям:</p>
+                        
+                        <div class="checking-criteria">
+                            <div class="criterion">
+                                <i class="fas fa-search"></i>
+                                <div>
+                                    <strong>Ключевые слова</strong>
+                                    <p>Ищет важные термины и понятия из теории</p>
+                                </div>
+                            </div>
+                            
+                            <div class="criterion">
+                                <i class="fas fa-brain"></i>
+                                <div>
+                                    <strong>Смысловой анализ</strong>
+                                    <p>Определяет, соответствует ли ответ теме</p>
+                                </div>
+                            </div>
+                            
+                            <div class="criterion">
+                                <i class="fas fa-ruler"></i>
+                                <div>
+                                    <strong>Объем и качество</strong>
+                                    <p>Оценивает полноту и детализацию ответа</p>
+                                </div>
+                            </div>
+                            
+                            <div class="criterion">
+                                <i class="fas fa-check-double"></i>
+                                <div>
+                                    <strong>Проверка на ошибки</strong>
+                                    <p>Выявляет распространенные заблуждения</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bot-tips" style="margin-top: 20px; padding: 15px; background: #2a2a2a; border-radius: 8px;">
+                            <h5><i class="fas fa-lightbulb"></i> Советы для успешной проверки:</h5>
+                            <ul style="margin: 10px 0 0 20px;">
+                                <li>Используйте термины из теории урока</li>
+                                <li>Отвечайте развернуто, не одним предложением</li>
+                                <li>Приводите примеры из жизни</li>
+                                <li>Сравнивайте разные понятия (если требуется)</li>
+                                <li>Не копируйте ответы из интернета</li>
+                            </ul>
+                        </div>
+                        
+                        <p style="margin-top: 20px; font-size: 0.9em; color: #888;">
+                            <i class="fas fa-shield-alt"></i> 
+                            <strong>Примечание:</strong> Система совершенствуется. Если вы считаете оценку несправедливой, 
+                            попробуйте дополнить ответ или обратитесь к теории.
+                        </p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-primary" onclick="closeBotInfo()">Понятно</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Подключение скриптов -->
@@ -157,8 +259,22 @@
                 const app = document.getElementById('app');
                 app.style.opacity = '1';
                 app.style.display = 'block';
+                
+                // Инициализация мобильного прогресса
+                if (window.innerWidth <= 768) {
+                    document.querySelector('.mobile-progress').style.display = 'block';
+                }
             }, 500);
         });
+        
+        // Функции для модального окна бота
+        function showBotInfo() {
+            document.getElementById('botInfoModal').style.display = 'flex';
+        }
+        
+        function closeBotInfo() {
+            document.getElementById('botInfoModal').style.display = 'none';
+        }
     </script>
 </body>
 </html>
