@@ -46,7 +46,7 @@ function getDefaultProgress() {
         completedSubmodules: [],
         testResults: {},
         assignmentResults: {},
-        userName: "Ученик"
+        userName: "Гость"
     };
 }
 
@@ -72,10 +72,10 @@ function updateProgressUI() {
     if (progressText) progressText.textContent = `Прогресс: ${percent}%`;
     
     // Обновляем имя пользователя если есть
-    const userNameElements = document.querySelectorAll('#userName, #dropdownUserName');
+    const userNameElements = document.querySelectorAll('#userName');
     userNameElements.forEach(el => {
-        if (el && userProgress.userName) {
-            el.textContent = userProgress.userName;
+        if (el) {
+            el.textContent = userProgress.userName || "Гость";
         }
     });
     
@@ -857,15 +857,7 @@ function setupEventListeners() {
             document.getElementById('moduleTabs').style.display = 'flex';
         });
     }
-
-    // Обработчик клика на профиль для изменения имени
-const userInfo = document.querySelector('.user-info');
-if (userInfo) {
-    userInfo.addEventListener('click', function(e) {
-        e.preventDefault();
-        showNameInput('login');
-    });
-}
+    
     // Кнопка сброса прогресса
     const resetBtn = document.getElementById('resetBtn');
     if (resetBtn) {
@@ -883,30 +875,41 @@ if (userInfo) {
     };
     if (modalOk) modalOk.onclick = () => modalOverlay.style.display = 'none';
     
-    // Простая авторизация по имени
-    const loginBtn = document.getElementById('loginBtn');
-    const registerBtn = document.getElementById('registerBtn');
-    
-    if (loginBtn) {
-        loginBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            showNameInput('login');
+    // Обработчик для профиля (долгое нажатие для меню)
+    const userInfo = document.querySelector('.user-info');
+    if (userInfo) {
+        let pressTimer;
+        
+        userInfo.addEventListener('touchstart', function(e) {
+            pressTimer = setTimeout(() => {
+                showProfileMenu(e);
+            }, 1000);
         });
-    }
-    
-    if (registerBtn) {
-        registerBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            showNameInput('register');
+        
+        userInfo.addEventListener('touchend', function() {
+            clearTimeout(pressTimer);
         });
-    }
-    
-    // Кнопка прогресса
-    const myProgressBtn = document.getElementById('myProgressBtn');
-    if (myProgressBtn) {
-        myProgressBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            showProgressDetails();
+        
+        userInfo.addEventListener('mousedown', function(e) {
+            pressTimer = setTimeout(() => {
+                showProfileMenu(e);
+            }, 1000);
+        });
+        
+        userInfo.addEventListener('mouseup', function() {
+            clearTimeout(pressTimer);
+        });
+        
+        userInfo.addEventListener('mouseleave', function() {
+            clearTimeout(pressTimer);
+        });
+        
+        // Обычный клик для изменения имени
+        userInfo.addEventListener('click', function(e) {
+            clearTimeout(pressTimer);
+            if (!e.target.closest('.profile-menu')) {
+                showNameInput('login');
+            }
         });
     }
 }
@@ -921,10 +924,10 @@ function showNameInput(type) {
         <div style="padding: 20px; text-align: center;">
             <div class="name-input-container">
                 <label for="userNameInput" style="display: block; margin-bottom: 10px; color: #f5f5f5;">Введите ваше имя:</label>
-                <input type="text" id="userNameInput" placeholder="Иван Иванов" style="width: 100%; padding: 12px; border-radius: 8px; border: 2px solid #3498db; background: #2a2a2a; color: white;">
+                <input type="text" id="userNameInput" placeholder="Иван Иванов" value="${userProgress.userName || ''}" style="width: 100%; padding: 12px; border-radius: 8px; border: 2px solid #3498db; background: #2a2a2a; color: white;">
             </div>
             <button class="btn-primary" onclick="submitName('${type}')" style="margin-top: 20px; width: 100%; padding: 12px;">
-                ${type === 'login' ? 'Войти' : 'Зарегистрироваться'}
+                ${type === 'login' ? 'Сохранить имя' : 'Зарегистрироваться'}
             </button>
         </div>
     `;
@@ -934,7 +937,10 @@ function showNameInput(type) {
     // Фокус на поле ввода
     setTimeout(() => {
         const input = document.getElementById('userNameInput');
-        if (input) input.focus();
+        if (input) {
+            input.focus();
+            input.select();
+        }
     }, 100);
 }
 
@@ -948,11 +954,194 @@ function submitName(type) {
         return;
     }
     
+    if (name.length > 30) {
+        alert('Имя слишком длинное. Максимум 30 символов.');
+        return;
+    }
+    
     userProgress.userName = name;
     saveProgress();
     
     document.getElementById('modalOverlay').style.display = 'none';
-    alert(type === 'login' ? `Добро пожаловать, ${name}!` : `Регистрация успешна, ${name}!`);
+    alert(type === 'login' ? `Имя сохранено: ${name}!` : `Регистрация успешна, ${name}!`);
+}
+
+// Показать меню профиля (долгое нажатие)
+function showProfileMenu(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    // Скрываем все существующие меню
+    document.querySelectorAll('.profile-menu').forEach(menu => menu.remove());
+    
+    const profileMenu = document.createElement('div');
+    profileMenu.className = 'profile-menu';
+    profileMenu.innerHTML = `
+        <div class="profile-menu-content">
+            <div class="profile-menu-header">
+                <h4>Управление профилем</h4>
+                <button class="close-profile-menu">&times;</button>
+            </div>
+            <div class="profile-menu-body">
+                <div class="profile-info">
+                    <i class="fas fa-user-circle"></i>
+                    <div>
+                        <strong>${userProgress.userName || 'Гость'}</strong>
+                        <small>ID: ${userProgress.userName ? userProgress.userName.toLowerCase().replace(/\s+/g, '') + Date.now().toString().slice(-6) : 'guest'}</small>
+                    </div>
+                </div>
+                <div class="profile-menu-actions">
+                    <button class="profile-menu-btn" onclick="showNameInput('login')">
+                        <i class="fas fa-edit"></i> Изменить имя
+                    </button>
+                    <button class="profile-menu-btn" onclick="exportProgress()">
+                        <i class="fas fa-download"></i> Экспорт прогресса
+                    </button>
+                    <button class="profile-menu-btn" onclick="importProgress()">
+                        <i class="fas fa-upload"></i> Импорт прогресса
+                    </button>
+                    <button class="profile-menu-btn logout-btn" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i> Выйти из профиля
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Позиционируем меню
+    const userInfo = document.querySelector('.user-info');
+    const rect = userInfo.getBoundingClientRect();
+    
+    profileMenu.style.position = 'fixed';
+    profileMenu.style.top = rect.bottom + 5 + 'px';
+    profileMenu.style.right = '15px';
+    profileMenu.style.zIndex = '2000';
+    
+    document.body.appendChild(profileMenu);
+    
+    // Обработчик закрытия меню
+    const closeBtn = profileMenu.querySelector('.close-profile-menu');
+    closeBtn.onclick = () => profileMenu.remove();
+    
+    // Закрытие при клике вне меню
+    setTimeout(() => {
+        const closeMenuOutside = function(e) {
+            if (!profileMenu.contains(e.target) && !userInfo.contains(e.target)) {
+                profileMenu.remove();
+                document.removeEventListener('click', closeMenuOutside);
+                document.removeEventListener('touchstart', closeMenuOutside);
+            }
+        };
+        
+        document.addEventListener('click', closeMenuOutside);
+        document.addEventListener('touchstart', closeMenuOutside);
+    }, 10);
+    
+    // Закрытие при нажатии Escape
+    const closeOnEscape = function(e) {
+        if (e.key === 'Escape') {
+            profileMenu.remove();
+            document.removeEventListener('keydown', closeOnEscape);
+        }
+    };
+    document.addEventListener('keydown', closeOnEscape);
+}
+
+// Выход из профиля
+function logout() {
+    if (confirm('Вы уверены, что хотите выйти из профиля?\nВаше имя будет сброшено, но прогресс сохранится.')) {
+        userProgress.userName = "Гость";
+        saveProgress();
+        
+        // Обновляем отображение
+        const userNameElements = document.querySelectorAll('#userName');
+        userNameElements.forEach(el => {
+            el.textContent = "Гость";
+        });
+        
+        // Скрываем меню профиля
+        document.querySelectorAll('.profile-menu').forEach(menu => menu.remove());
+        
+        alert('Вы вышли из профиля. Имя сброшено на "Гость".');
+    }
+}
+
+// Экспорт прогресса
+function exportProgress() {
+    try {
+        const dataStr = JSON.stringify(userProgress, null, 2);
+        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+        
+        const url = URL.createObjectURL(dataBlob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `empathy-course-progress-${new Date().toISOString().split('T')[0]}.json`;
+        
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        URL.revokeObjectURL(url);
+        
+        document.querySelectorAll('.profile-menu').forEach(menu => menu.remove());
+        alert('Прогресс успешно экспортирован!');
+    } catch (error) {
+        alert('Ошибка при экспорте прогресса: ' + error.message);
+    }
+}
+
+// Импорт прогресса
+function importProgress() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json,application/json';
+    
+    input.onchange = e => {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            try {
+                const importedProgress = JSON.parse(e.target.result);
+                
+                // Проверяем структуру
+                if (importedProgress && 
+                    typeof importedProgress === 'object' && 
+                    importedProgress.completedModules !== undefined &&
+                    importedProgress.completedSubmodules !== undefined) {
+                    
+                    if (confirm('Заменить текущий прогресс импортированным?\nИмя пользователя также будет заменено.')) {
+                        userProgress = importedProgress;
+                        saveProgress();
+                        
+                        // Обновляем имя
+                        const userNameElements = document.querySelectorAll('#userName');
+                        userNameElements.forEach(el => {
+                            el.textContent = userProgress.userName || "Гость";
+                        });
+                        
+                        // Перезагружаем интерфейс
+                        location.reload();
+                    }
+                } else {
+                    alert('Некорректный файл прогресса. Проверьте формат.');
+                }
+            } catch (error) {
+                alert('Ошибка чтения файла: ' + error.message);
+            }
+        };
+        
+        reader.onerror = function() {
+            alert('Ошибка при чтении файла');
+        };
+        
+        reader.readAsText(file);
+    };
+    
+    input.click();
+    document.querySelectorAll('.profile-menu').forEach(menu => menu.remove());
 }
 
 // Показать детали прогресса
@@ -971,14 +1160,14 @@ function showProgressDetails() {
         }
     });
     
-    const moduleProgress = Math.round((completedModules / totalModules) * 100);
-    const submoduleProgress = Math.round((completedSubmodules / totalSubmodules) * 100);
+    const moduleProgress = totalModules > 0 ? Math.round((completedModules / totalModules) * 100) : 0;
+    const submoduleProgress = totalSubmodules > 0 ? Math.round((completedSubmodules / totalSubmodules) * 100) : 0;
     
     modalTitle.textContent = 'Мой прогресс';
     modalBody.innerHTML = `
         <div style="padding: 20px;">
             <div style="text-align: center; margin-bottom: 30px;">
-                <h3 style="color: #f5f5f5;">${userProgress.userName || 'Ученик'}</h3>
+                <h3 style="color: #f5f5f5;">${userProgress.userName || 'Гость'}</h3>
                 <p style="color: #888;">ID: ${userProgress.userName ? userProgress.userName.toLowerCase().replace(/\s+/g, '') + Date.now().toString().slice(-6) : 'guest'}</p>
             </div>
             
@@ -1038,5 +1227,10 @@ window.submitName = submitName;
 window.printCertificate = printCertificate;
 window.saveCertificateAsImage = saveCertificateAsImage;
 window.shareCertificate = shareCertificate;
+window.showProfileMenu = showProfileMenu;
+window.logout = logout;
+window.exportProgress = exportProgress;
+window.importProgress = importProgress;
+window.showProgressDetails = showProgressDetails;
 
 console.log("✅ Курс эмпатии загружен и готов к работе!");
