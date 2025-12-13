@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
@@ -40,7 +40,7 @@
 
     <!-- Основная структура -->
     <div id="app">
-        <!-- Шапка с настройками -->
+        <!-- Шапка с настройками - КОМПАКТНАЯ ВЕРСИЯ -->
         <header class="main-header">
             <div class="header-left">
                 <div class="logo">
@@ -52,13 +52,14 @@
             <div class="header-right">
                 <!-- Упрощенный профиль пользователя -->
                 <div class="user-profile">
-                    <div class="user-info">
+                    <div class="user-info" onclick="showNameInput('login')" title="Изменить имя">
                         <i class="fas fa-user-circle"></i>
-                        <span id="userName">${userProgress.userName || "Ученик"}</span>
+                        <span id="userName">Гость</span>
                     </div>
                 </div>
             </div>
         </header>
+
 
         <div class="app-container">
             <!-- Боковая панель навигации -->
