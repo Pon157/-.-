@@ -857,7 +857,15 @@ function setupEventListeners() {
             document.getElementById('moduleTabs').style.display = 'flex';
         });
     }
-    
+
+    // Обработчик клика на профиль для изменения имени
+const userInfo = document.querySelector('.user-info');
+if (userInfo) {
+    userInfo.addEventListener('click', function(e) {
+        e.preventDefault();
+        showNameInput('login');
+    });
+}
     // Кнопка сброса прогресса
     const resetBtn = document.getElementById('resetBtn');
     if (resetBtn) {
