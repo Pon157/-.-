@@ -1658,3 +1658,208 @@ input::placeholder, textarea::placeholder {
         }
     }
 }
+
+/* =============================================
+   МЕНЮ ПРОФИЛЯ (ВЫПАДАЮЩЕЕ)
+============================================= */
+
+.profile-menu {
+    animation: fadeIn 0.2s ease;
+    min-width: 280px;
+    max-width: 320px;
+}
+
+.profile-menu-content {
+    background: var(--modal-bg);
+    border-radius: 12px;
+    box-shadow: var(--shadow-xl);
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+}
+
+.profile-menu-header {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.profile-menu-header h4 {
+    color: #ffffff !important;
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.close-profile-menu {
+    background: none;
+    border: none;
+    color: #ffffff !important;
+    font-size: 1.5rem;
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.close-profile-menu:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.profile-menu-body {
+    padding: 20px;
+}
+
+.profile-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    background: var(--hover-color);
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.profile-info i {
+    font-size: 2.5rem;
+    color: var(--primary-color) !important;
+}
+
+.profile-info div {
+    flex: 1;
+}
+
+.profile-info strong {
+    display: block;
+    color: #ffffff !important;
+    font-size: 1.1rem;
+    margin-bottom: 5px;
+}
+
+.profile-info small {
+    color: var(--text-muted) !important;
+    font-size: 0.85rem;
+}
+
+.profile-menu-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.profile-menu-btn {
+    padding: 12px 15px;
+    background: var(--card-bg);
+    color: #ffffff !important;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    text-align: left;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+}
+
+.profile-menu-btn:hover {
+    background: var(--hover-color);
+    border-color: var(--primary-color);
+    transform: translateX(5px);
+}
+
+.profile-menu-btn i {
+    width: 20px;
+    color: var(--primary-color) !important;
+}
+
+.logout-btn {
+    margin-top: 10px;
+    background: rgba(231, 76, 60, 0.1) !important;
+    border-color: #e74c3c !important;
+    color: #e74c3c !important;
+}
+
+.logout-btn:hover {
+    background: rgba(231, 76, 60, 0.2) !important;
+}
+
+.logout-btn i {
+    color: #e74c3c !important;
+}
+
+/* Адаптивность для меню профиля */
+@media (max-width: 768px) {
+    .profile-menu {
+        position: fixed !important;
+        top: 70px !important;
+        right: 15px !important;
+        left: 15px !important;
+        width: auto !important;
+        max-width: none !important;
+        animation: slideDown 0.3s ease;
+    }
+    
+    .profile-menu-content {
+        max-width: 400px;
+        margin: 0 auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .profile-menu {
+        top: 65px !important;
+        right: 10px !important;
+        left: 10px !important;
+    }
+    
+    .profile-menu-content {
+        max-width: none;
+    }
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* =============================================
+   ПОДСКАЗКА ДЛЯ ДОЛГОГО НАЖАТИЯ
+============================================= */
+@media (max-width: 768px) {
+    .user-info {
+        position: relative;
+    }
+    
+    .user-info::after {
+        content: 'Долгое нажатие для меню';
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background: var(--primary-color);
+        color: white;
+        padding: 5px 10px;
+        border-radius: 6px;
+        font-size: 0.7rem;
+        white-space: nowrap;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        pointer-events: none;
+        z-index: 1000;
+    }
+    
+    .user-info:hover::after {
+        opacity: 1;
+    }
+}
