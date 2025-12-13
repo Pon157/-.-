@@ -1378,3 +1378,283 @@ input::placeholder, textarea::placeholder {
     color: #e74c3c !important;
     border-color: #e74c3c;
 }
+
+/* =============================================
+   КОМПАКТНЫЙ HEADER ДЛЯ МОБИЛЬНЫХ
+============================================= */
+
+@media (max-width: 768px) {
+    .main-header {
+        padding: 10px 15px !important;
+        flex-wrap: nowrap;
+        min-height: 60px;
+    }
+    
+    .header-left, .header-right {
+        width: auto !important;
+        justify-content: space-between;
+        gap: 10px;
+    }
+    
+    .logo {
+        margin: 0 !important;
+        padding: 0 !important;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-shrink: 1; /* Позволяет сжиматься */
+        min-width: 0; /* Разрешает сжатие текста */
+    }
+    
+    .logo i {
+        font-size: 1.8rem !important;
+        margin-right: 0 !important;
+        flex-shrink: 0; /* Не дает сжиматься иконке */
+    }
+    
+    .logo h1 {
+        font-size: 1.1rem !important;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 150px; /* Максимальная ширина текста */
+        flex-shrink: 1;
+    }
+    
+    .user-profile {
+        flex-shrink: 0; /* Не дает сжиматься профилю */
+    }
+    
+    .user-info {
+        padding: 6px 12px !important;
+        gap: 8px;
+    }
+    
+    .user-info i {
+        font-size: 1.3rem !important;
+    }
+    
+    #userName {
+        display: inline !important;
+        font-size: 0.9rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 80px;
+    }
+    
+    /* Для очень маленьких экранов */
+    @media (max-width: 480px) {
+        .logo h1 {
+            font-size: 1rem !important;
+            max-width: 120px;
+        }
+        
+        #userName {
+            max-width: 60px;
+            font-size: 0.85rem;
+        }
+        
+        .user-info {
+            padding: 5px 10px !important;
+        }
+        
+        .logo i {
+            font-size: 1.5rem !important;
+        }
+    }
+    
+    @media (max-width: 360px) {
+        .logo h1 {
+            font-size: 0.9rem !important;
+            max-width: 100px;
+        }
+        
+        #userName {
+            display: none !important; /* Скрываем имя на очень маленьких экранах */
+        }
+        
+        .user-info {
+            padding: 5px 8px !important;
+        }
+        
+        .logo {
+            gap: 5px;
+        }
+    }
+}
+
+/* Для планшетов */
+@media (min-width: 769px) and (max-width: 992px) {
+    .main-header {
+        padding: 12px 20px !important;
+    }
+    
+    .logo h1 {
+        font-size: 1.2rem !important;
+    }
+    
+    .logo i {
+        font-size: 2rem !important;
+    }
+}
+
+/* =============================================
+   УЛУЧШЕНИЕ ОТСТУПОВ В САЙДБАРЕ НА МОБИЛЬНЫХ
+============================================= */
+@media (max-width: 992px) {
+    .sidebar {
+        padding: 15px !important;
+        max-height: 50vh; /* Уменьшаем высоту сайдбара на мобильных */
+    }
+    
+    .modules-container {
+        max-height: 250px; /* Уменьшаем максимальную высоту списка модулей */
+    }
+    
+    .module-item {
+        padding: 10px 12px !important;
+        margin-bottom: 8px;
+    }
+    
+    .module-item h3 {
+        font-size: 1rem !important;
+    }
+    
+    .module-item p {
+        font-size: 0.8rem !important;
+    }
+    
+    .submodule-item {
+        padding: 8px 12px 8px 20px !important;
+    }
+    
+    .sidebar-footer {
+        margin-top: 15px;
+    }
+    
+    .progress-container {
+        margin-top: 15px;
+        padding-top: 15px;
+    }
+}
+
+/* =============================================
+   УЛУЧШЕНИЕ КОНТЕНТНОЙ ОБЛАСТИ
+============================================= */
+@media (max-width: 768px) {
+    .content-header {
+        padding: 15px !important;
+    }
+    
+    .content-header h2 {
+        font-size: 1.3rem !important;
+        margin-bottom: 3px;
+    }
+    
+    .content-header p {
+        font-size: 0.9rem !important;
+    }
+    
+    .content-wrapper {
+        padding: 15px !important;
+    }
+    
+    .tabs {
+        margin-top: 10px;
+        border-radius: 8px 8px 0 0;
+    }
+    
+    .tab {
+        padding: 10px 15px;
+        font-size: 0.85rem;
+    }
+    
+    .content-display {
+        padding: 15px;
+        margin-top: 0;
+    }
+}
+
+/* =============================================
+   КНОПКИ НА МОБИЛЬНЫХ
+============================================= */
+@media (max-width: 768px) {
+    .btn-primary, .btn-secondary {
+        padding: 10px 15px;
+        font-size: 0.9rem;
+    }
+    
+    .sidebar-controls {
+        gap: 8px;
+    }
+    
+    .btn-certificate, .btn-reset {
+        padding: 10px 12px;
+        font-size: 0.85rem;
+    }
+}
+
+/* =============================================
+   СКРЫТИЕ ЛИШНИХ ЭЛЕМЕНТОВ НА МОБИЛЬНЫХ
+============================================= */
+@media (max-width: 768px) {
+    .welcome-screen h1 {
+        font-size: 1.6rem !important;
+    }
+    
+    .welcome-screen > p {
+        font-size: 1rem !important;
+    }
+    
+    .feature {
+        padding: 15px;
+    }
+    
+    .feature i {
+        font-size: 2rem !important;
+    }
+    
+    .feature h3 {
+        font-size: 1.1rem !important;
+    }
+    
+    .feature p {
+        font-size: 0.9rem !important;
+    }
+}
+
+/* =============================================
+   ТАБЫ - ПЕРЕНАСТРОЙКА НА МОБИЛЬНЫХ
+============================================= */
+@media (max-width: 768px) {
+    .tabs {
+        position: relative;
+    }
+    
+    .tab {
+        flex: 0 0 auto;
+        padding: 12px 15px;
+        font-size: 0.85rem;
+        min-width: 120px;
+    }
+    
+    .tab i {
+        margin-right: 5px;
+        font-size: 0.9rem;
+    }
+    
+    /* Улучшение для очень маленьких экранов */
+    @media (max-width: 480px) {
+        .tab {
+            min-width: 110px;
+            padding: 10px 12px;
+            font-size: 0.8rem;
+        }
+        
+        .tab i {
+            margin-right: 3px;
+            font-size: 0.85rem;
+        }
+    }
+}
