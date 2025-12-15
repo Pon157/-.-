@@ -105,10 +105,10 @@ const enhancedStyles = `
         line-height: 1.6;
     }
     
-    /* Стили для терминов */
+    /* Стили для терминов - ИЗМЕНЕН ЦВЕТ НА ФИОЛЕТОВЫЙ */
     .definition-box {
-        background: linear-gradient(135deg, rgba(241, 196, 15, 0.1) 0%, rgba(243, 156, 18, 0.1) 100%);
-        border-left: 4px solid #f1c40f;
+        background: linear-gradient(135deg, rgba(155, 89, 182, 0.1) 0%, rgba(142, 68, 173, 0.1) 100%);
+        border-left: 4px solid #9b59b6;
         padding: 20px;
         margin: 20px 0;
         border-radius: 0 10px 10px 0;
@@ -116,7 +116,7 @@ const enhancedStyles = `
     }
     
     .definition-box h4 {
-        color: #f1c40f;
+        color: #9b59b6; /* Изменен цвет с #f1c40f на #9b59b6 */
         margin-top: 0;
         display: flex;
         align-items: center;
@@ -124,8 +124,8 @@ const enhancedStyles = `
     }
     
     .term {
-        background: #f1c40f;
-        color: #2c3e50;
+        background: #9b59b6; /* Изменен цвет с #f1c40f на #9b59b6 */
+        color: white; /* Изменен цвет текста на белый для лучшей читаемости */
         padding: 3px 10px;
         border-radius: 20px;
         font-size: 0.9em;
@@ -441,34 +441,6 @@ const enhancedStyles = `
         background: rgba(255, 255, 255, 0.08);
     }
     
-    /* Стили для таблиц в контенте */
-    .theory-block table {
-        width: 100%;
-        border-collapse: collapse;
-        margin: 20px 0;
-        background: rgba(255, 255, 255, 0.05);
-        border-radius: 10px;
-        overflow: hidden;
-    }
-    
-    .theory-block th {
-        background: rgba(52, 152, 219, 0.2);
-        padding: 15px;
-        text-align: left;
-        color: #3498db;
-        font-weight: 600;
-    }
-    
-    .theory-block td {
-        padding: 12px 15px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        color: #e0e0e0;
-    }
-    
-    .theory-block tr:hover {
-        background: rgba(52, 152, 219, 0.1);
-    }
-    
     /* Адаптивные стили */
     @media (max-width: 768px) {
         .test-stats,
@@ -514,6 +486,8 @@ const enhancedStyles = `
     .test-tab.completed {
         background: linear-gradient(135deg, #3498db 0%, #2980b9 100%) !important;
     }
+    
+    /* Удаляем дублирующиеся стили таблиц, так как они уже есть в data.js */
 </style>
 `;
 
