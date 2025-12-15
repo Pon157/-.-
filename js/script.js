@@ -1,6 +1,506 @@
 // Состояние прогресса - ОБЪЯВЛЯЕМ ТОЛЬКО ЗДЕСЬ!
 let userProgress;
 
+// Стили для улучшенного отображения
+const enhancedStyles = `
+<style>
+    /* Стили для контрольных работ */
+    .module-test {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        border-radius: 15px;
+        padding: 25px;
+        margin: 25px 0;
+        border-left: 5px solid #3498db;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+    
+    .module-test h3 {
+        color: #3498db;
+        font-size: 1.5em;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .module-test h3 i {
+        color: #3498db;
+    }
+    
+    .test-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 15px;
+        margin: 20px 0;
+    }
+    
+    .test-stat {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 15px;
+        border-radius: 10px;
+        text-align: center;
+        border: 1px solid rgba(52, 152, 219, 0.2);
+    }
+    
+    .test-stat strong {
+        display: block;
+        font-size: 1.8em;
+        color: #3498db;
+        margin-bottom: 5px;
+    }
+    
+    .test-stat span {
+        font-size: 0.9em;
+        color: #95a5a6;
+    }
+    
+    /* Стили для цитат */
+    .quote-box {
+        background: linear-gradient(135deg, rgba(155, 89, 182, 0.1) 0%, rgba(142, 68, 173, 0.1) 100%);
+        border-left: 4px solid #9b59b6;
+        padding: 25px;
+        margin: 25px 0;
+        border-radius: 0 12px 12px 0;
+        position: relative;
+        font-style: italic;
+        font-size: 1.1em;
+        line-height: 1.6;
+    }
+    
+    .quote-box:before {
+        content: "❝";
+        position: absolute;
+        top: -15px;
+        left: 20px;
+        font-size: 3em;
+        color: rgba(155, 89, 182, 0.3);
+        font-family: serif;
+    }
+    
+    .quote-author {
+        text-align: right;
+        color: #95a5a6;
+        font-style: normal;
+        margin-top: 15px;
+        font-size: 0.9em;
+        padding-right: 20px;
+    }
+    
+    /* Стили для источников */
+    .source-box {
+        background: linear-gradient(135deg, rgba(46, 204, 113, 0.1) 0%, rgba(39, 174, 96, 0.1) 100%);
+        border-left: 4px solid #2ecc71;
+        padding: 20px;
+        margin: 20px 0;
+        border-radius: 0 10px 10px 0;
+    }
+    
+    .source-box h4 {
+        color: #2ecc71;
+        margin-top: 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .source-box h4 i {
+        color: #2ecc71;
+    }
+    
+    .source-box p {
+        margin: 10px 0;
+        color: #e0e0e0;
+        line-height: 1.6;
+    }
+    
+    /* Стили для терминов */
+    .definition-box {
+        background: linear-gradient(135deg, rgba(241, 196, 15, 0.1) 0%, rgba(243, 156, 18, 0.1) 100%);
+        border-left: 4px solid #f1c40f;
+        padding: 20px;
+        margin: 20px 0;
+        border-radius: 0 10px 10px 0;
+        position: relative;
+    }
+    
+    .definition-box h4 {
+        color: #f1c40f;
+        margin-top: 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .term {
+        background: #f1c40f;
+        color: #2c3e50;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 0.9em;
+        font-weight: bold;
+        margin-right: 10px;
+    }
+    
+    /* Стили для вопросов проверки */
+    .check-question {
+        background: rgba(52, 152, 219, 0.1);
+        padding: 20px;
+        border-radius: 10px;
+        margin: 20px 0;
+        border: 1px solid rgba(52, 152, 219, 0.2);
+    }
+    
+    .check-question h4 {
+        color: #3498db;
+        margin-top: 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    /* Практические советы */
+    .practical-tip {
+        background: linear-gradient(135deg, rgba(231, 76, 60, 0.1) 0%, rgba(192, 57, 43, 0.1) 100%);
+        border-left: 4px solid #e74c3c;
+        padding: 20px;
+        margin: 20px 0;
+        border-radius: 0 10px 10px 0;
+    }
+    
+    .practical-tip h4 {
+        color: #e74c3c;
+        margin-top: 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    /* Стили для контрольных вопросов */
+    .test-question {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 20px;
+        border-radius: 10px;
+        margin: 20px 0;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .test-question h4 {
+        color: #3498db;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid rgba(52, 152, 219, 0.2);
+    }
+    
+    .test-options {
+        margin: 15px 0;
+    }
+    
+    .test-option {
+        background: rgba(255, 255, 255, 0.03);
+        padding: 12px 15px;
+        margin: 8px 0;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        cursor: pointer;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    
+    .test-option:hover {
+        background: rgba(52, 152, 219, 0.1);
+        border-color: rgba(52, 152, 219, 0.3);
+    }
+    
+    .test-option input[type="radio"] {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+    }
+    
+    .test-option-label {
+        flex: 1;
+        cursor: pointer;
+        color: #e0e0e0;
+    }
+    
+    /* Стили для практических заданий в тестах */
+    .practical-task {
+        background: rgba(46, 204, 113, 0.1);
+        padding: 20px;
+        border-radius: 10px;
+        margin: 20px 0;
+        border: 1px solid rgba(46, 204, 113, 0.2);
+    }
+    
+    .practical-task h4 {
+        color: #2ecc71;
+        margin-bottom: 15px;
+    }
+    
+    /* Стили для статистики экзамена */
+    .exam-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 15px;
+        margin: 25px 0;
+        padding: 20px;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 12px;
+        border: 1px solid rgba(52, 152, 219, 0.2);
+    }
+    
+    .exam-stat {
+        text-align: center;
+        padding: 15px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+        transition: transform 0.3s;
+    }
+    
+    .exam-stat:hover {
+        transform: translateY(-5px);
+        background: rgba(52, 152, 219, 0.1);
+    }
+    
+    .exam-stat strong {
+        display: block;
+        font-size: 2em;
+        color: #3498db;
+        margin-bottom: 8px;
+    }
+    
+    .exam-stat span {
+        font-size: 0.9em;
+        color: #95a5a6;
+        display: block;
+    }
+    
+    /* Стили для правильных/неправильных ответов */
+    .option-correct {
+        background: rgba(46, 204, 113, 0.15) !important;
+        border-color: #2ecc71 !important;
+        animation: pulseCorrect 0.5s ease;
+    }
+    
+    .option-incorrect {
+        background: rgba(231, 76, 60, 0.15) !important;
+        border-color: #e74c3c !important;
+        animation: pulseIncorrect 0.5s ease;
+    }
+    
+    @keyframes pulseCorrect {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.02); }
+        100% { transform: scale(1); }
+    }
+    
+    @keyframes pulseIncorrect {
+        0% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        50% { transform: translateX(5px); }
+        75% { transform: translateX(-5px); }
+        100% { transform: translateX(0); }
+    }
+    
+    /* Стили для результатов теста */
+    .test-result {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        border-radius: 15px;
+        padding: 30px;
+        margin: 25px 0;
+        text-align: center;
+        border: 2px solid rgba(52, 152, 219, 0.3);
+    }
+    
+    .test-result-score {
+        font-size: 3em;
+        font-weight: bold;
+        color: #3498db;
+        margin: 20px 0;
+    }
+    
+    .test-result-passed {
+        color: #2ecc71;
+        font-size: 1.3em;
+        margin-bottom: 20px;
+    }
+    
+    .test-result-failed {
+        color: #e74c3c;
+        font-size: 1.3em;
+        margin-bottom: 20px;
+    }
+    
+    /* Улучшенные стили для заданий */
+    .assignment {
+        background: linear-gradient(135deg, rgba(41, 128, 185, 0.1) 0%, rgba(52, 152, 219, 0.1) 100%);
+        padding: 25px;
+        border-radius: 12px;
+        margin: 25px 0;
+        border: 2px solid rgba(52, 152, 219, 0.2);
+    }
+    
+    .assignment h4 {
+        color: #3498db;
+        margin-top: 0;
+        margin-bottom: 20px;
+        font-size: 1.2em;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .additional-task {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 20px;
+        border-radius: 10px;
+        margin-top: 25px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .additional-task h5 {
+        color: #f39c12;
+        margin-top: 0;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    /* Стили для фидбэка */
+    .feedback {
+        padding: 15px;
+        margin-top: 15px;
+        border-radius: 8px;
+        font-size: 0.95em;
+        line-height: 1.5;
+        animation: slideIn 0.3s ease;
+        display: none;
+    }
+    
+    .feedback.correct {
+        background: rgba(46, 204, 113, 0.15);
+        border-left: 4px solid #2ecc71;
+        color: #2ecc71;
+    }
+    
+    .feedback.incorrect {
+        background: rgba(231, 76, 60, 0.15);
+        border-left: 4px solid #e74c3c;
+        color: #e74c3c;
+    }
+    
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    /* Стили для кнопок */
+    .btn-primary, .btn-secondary {
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s;
+        border: none;
+        font-size: 1em;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+        color: white;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+    }
+    
+    .btn-secondary {
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+        color: var(--text-color);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .btn-secondary:hover {
+        background: rgba(255, 255, 255, 0.15);
+        transform: translateY(-2px);
+    }
+    
+    /* Стили для текстовых полей */
+    textarea {
+        width: 100%;
+        min-height: 100px;
+        padding: 15px;
+        border-radius: 8px;
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--text-color);
+        font-family: inherit;
+        font-size: 1em;
+        resize: vertical;
+        transition: all 0.3s;
+        margin: 10px 0;
+    }
+    
+    textarea:focus {
+        outline: none;
+        border-color: #3498db;
+        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        background: rgba(255, 255, 255, 0.08);
+    }
+    
+    /* Адаптивные стили */
+    @media (max-width: 768px) {
+        .test-stats,
+        .exam-stats {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .module-test {
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .quote-box {
+            padding: 20px 15px;
+            font-size: 1em;
+        }
+        
+        .test-result-score {
+            font-size: 2em;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .test-stats,
+        .exam-stats {
+            grid-template-columns: 1fr;
+        }
+        
+        .btn-primary, .btn-secondary {
+            width: 100%;
+            justify-content: center;
+            margin: 5px 0;
+        }
+    }
+</style>
+`;
+
+// Добавляем стили в документ
+document.head.insertAdjacentHTML('beforeend', enhancedStyles);
+
 // Инициализация при загрузке страницы
 document.addEventListener('DOMContentLoaded', function() {
     console.log("Курс эмпатии загружается...");
