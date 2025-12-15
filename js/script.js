@@ -23,10 +23,6 @@ const enhancedStyles = `
         gap: 10px;
     }
     
-    .module-test h3 i {
-        color: #3498db;
-    }
-    
     .test-stats {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -101,10 +97,6 @@ const enhancedStyles = `
         display: flex;
         align-items: center;
         gap: 10px;
-    }
-    
-    .source-box h4 i {
-        color: #2ecc71;
     }
     
     .source-box p {
@@ -321,18 +313,6 @@ const enhancedStyles = `
         margin: 20px 0;
     }
     
-    .test-result-passed {
-        color: #2ecc71;
-        font-size: 1.3em;
-        margin-bottom: 20px;
-    }
-    
-    .test-result-failed {
-        color: #e74c3c;
-        font-size: 1.3em;
-        margin-bottom: 20px;
-    }
-    
     /* Улучшенные стили для заданий */
     .assignment {
         background: linear-gradient(135deg, rgba(41, 128, 185, 0.1) 0%, rgba(52, 152, 219, 0.1) 100%);
@@ -461,6 +441,34 @@ const enhancedStyles = `
         background: rgba(255, 255, 255, 0.08);
     }
     
+    /* Стили для таблиц в контенте */
+    .theory-block table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 10px;
+        overflow: hidden;
+    }
+    
+    .theory-block th {
+        background: rgba(52, 152, 219, 0.2);
+        padding: 15px;
+        text-align: left;
+        color: #3498db;
+        font-weight: 600;
+    }
+    
+    .theory-block td {
+        padding: 12px 15px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        color: #e0e0e0;
+    }
+    
+    .theory-block tr:hover {
+        background: rgba(52, 152, 219, 0.1);
+    }
+    
     /* Адаптивные стили */
     @media (max-width: 768px) {
         .test-stats,
@@ -495,15 +503,26 @@ const enhancedStyles = `
             margin: 5px 0;
         }
     }
+    
+    /* Стили для вкладок */
+    .test-tab {
+        background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%) !important;
+        color: white !important;
+        font-weight: bold !important;
+    }
+    
+    .test-tab.completed {
+        background: linear-gradient(135deg, #3498db 0%, #2980b9 100%) !important;
+    }
 </style>
 `;
-
-// Добавляем стили в документ
-document.head.insertAdjacentHTML('beforeend', enhancedStyles);
 
 // Инициализация при загрузке страницы
 document.addEventListener('DOMContentLoaded', function() {
     console.log("Курс эмпатии загружается...");
+    
+    // Добавляем стили
+    document.head.insertAdjacentHTML('beforeend', enhancedStyles);
     
     initTheme();
     initProgress();
@@ -824,15 +843,15 @@ function renderTabs(submodule) {
         if (allSubmodulesCompleted && !userProgress.completedModules.includes(module.id)) {
             const testTab = document.createElement('div');
             testTab.className = 'tab test-tab';
-            testTab.innerHTML = '<i class="fas fa-clipboard-check"></i> Пройти тест';
-            testTab.addEventListener('click', () => openTest(module.id));
+            testTab.innerHTML = '<i class="fas fa-clipboard-check"></i> Пройти контрольную';
+            testTab.addEventListener('click', () => showTestInfo(module.id));
             moduleTabs.appendChild(testTab);
         } else if (userProgress.completedModules.includes(module.id)) {
             const testTab = document.createElement('div');
             testTab.className = 'tab test-tab completed';
             testTab.innerHTML = '<i class="fas fa-check-circle"></i> Тест пройден';
             testTab.addEventListener('click', () => {
-                alert(`Тест модуля уже пройден! Результат: ${userProgress.testResults[module.id]?.percent || 0}%`);
+                showTestResultModal(module.id);
             });
             moduleTabs.appendChild(testTab);
         }
@@ -844,6 +863,135 @@ function renderTabs(submodule) {
     }
 }
 
+// Показать информацию о контрольной работе
+function showTestInfo(moduleId) {
+    const module = courseData.modules.find(m => m.id === moduleId);
+    if (!module || !module.test) return;
+    
+    const modalTitle = document.getElementById('modalTitle');
+    const modalBody = document.getElementById('modalBody');
+    
+    modalTitle.textContent = `Контрольная работа: ${module.title}`;
+    modalBody.innerHTML = `
+        <div style="padding: 20px;">
+            <div style="text-align: center; margin-bottom: 20px;">
+                <h3 style="color: #3498db;">${module.test.title}</h3>
+                <p>${module.test.description}</p>
+            </div>
+            
+            <div class="test-stats">
+                <div class="test-stat">
+                    <strong>${module.test.sections ? module.test.sections[0].questions.length : 0}</strong>
+                    <span>теоретических вопросов</span>
+                </div>
+                <div class="test-stat">
+                    <strong>${module.test.timeLimit || 30}</strong>
+                    <span>минут на выполнение</span>
+                </div>
+                <div class="test-stat">
+                    <strong>${module.test.passingScore || 35}</strong>
+                    <span>проходной балл</span>
+                </div>
+                <div class="test-stat">
+                    <strong>${module.test.totalPoints || 50}</strong>
+                    <span>баллов всего</span>
+                </div>
+            </div>
+            
+            <div style="margin: 25px 0; padding: 20px; background: rgba(52, 152, 219, 0.1); border-radius: 10px;">
+                <h4 style="color: #3498db; margin-bottom: 10px;">Структура работы:</h4>
+                <ul style="margin-left: 20px; color: #e0e0e0;">
+                    ${module.test.sections ? module.test.sections.map(section => 
+                        `<li>${section.title}</li>`
+                    ).join('') : ''}
+                </ul>
+            </div>
+            
+            <div style="margin-top: 25px; text-align: center;">
+                <button class="btn-primary" onclick="openTest(${moduleId}); document.getElementById('modalOverlay').style.display='none'" style="margin-right: 10px;">
+                    <i class="fas fa-play"></i> Начать тест
+                </button>
+                <button class="btn-secondary" onclick="document.getElementById('modalOverlay').style.display='none'">
+                    <i class="fas fa-times"></i> Отмена
+                </button>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('modalOverlay').style.display = 'flex';
+}
+
+// Показать результаты теста
+function showTestResultModal(moduleId) {
+    const module = courseData.modules.find(m => m.id === moduleId);
+    const result = userProgress.testResults[moduleId];
+    
+    if (!module || !result) return;
+    
+    const modalTitle = document.getElementById('modalTitle');
+    const modalBody = document.getElementById('modalBody');
+    
+    modalTitle.textContent = `Результаты: ${module.test.title}`;
+    modalBody.innerHTML = `
+        <div style="padding: 20px;">
+            <div style="text-align: center; margin-bottom: 20px;">
+                <h3 style="color: ${result.passed ? '#2ecc71' : '#e74c3c'};">${result.passed ? '✅ Тест пройден' : '❌ Тест не пройден'}</h3>
+                <p>Модуль: <strong>${module.title}</strong></p>
+            </div>
+            
+            <div class="exam-stats" style="margin: 20px 0;">
+                <div class="exam-stat">
+                    <strong>${result.score || 0}/${result.total || 0}</strong>
+                    <span>Теоретические вопросы</span>
+                </div>
+                <div class="exam-stat">
+                    <strong>${result.practicalScore || 0}</strong>
+                    <span>Практические задания</span>
+                </div>
+                <div class="exam-stat">
+                    <strong>${result.additionalScore || 0}</strong>
+                    <span>Доп. задания</span>
+                </div>
+                <div class="exam-stat">
+                    <strong>${result.totalPoints || 0}/${result.maxPoints || 0}</strong>
+                    <span>Итого баллов</span>
+                </div>
+            </div>
+            
+            <div style="background: ${result.passed ? 'rgba(46, 204, 113, 0.1)' : 'rgba(231, 76, 60, 0.1)'}; 
+                     padding: 20px; border-radius: 10px; text-align: center; margin: 20px 0; border-left: 4px solid ${result.passed ? '#2ecc71' : '#e74c3c'}">
+                <h4 style="color: ${result.passed ? '#2ecc71' : '#e74c3c'}; margin-top: 0;">Итоговый результат</h4>
+                <div style="font-size: 2em; font-weight: bold; color: ${result.passed ? '#2ecc71' : '#e74c3c'}">
+                    ${result.totalPoints || 0}/${result.maxPoints || 0} баллов
+                </div>
+                <p style="margin-top: 10px; color: #95a5a6;">
+                    Проходной балл: ${module.test.passingScore || 35}
+                </p>
+            </div>
+            
+            ${!result.passed ? `
+                <div style="margin-top: 20px; padding: 15px; background: rgba(231, 76, 60, 0.1); border-radius: 8px;">
+                    <h4 style="color: #e74c3c; margin-bottom: 10px;">Рекомендации:</h4>
+                    <ul style="margin-left: 20px; color: #ccc;">
+                        <li>Повторите теоретический материал модуля</li>
+                        <li>Проработайте практические задания еще раз</li>
+                        <li>Обратите внимание на объяснения к вопросам</li>
+                        <li>Попробуйте пройти тест через 1-2 дня</li>
+                    </ul>
+                </div>
+            ` : ''}
+            
+            <div style="margin-top: 25px; text-align: center;">
+                <button class="btn-primary" onclick="document.getElementById('modalOverlay').style.display='none'">
+                    <i class="fas fa-check"></i> Понятно
+                </button>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('modalOverlay').style.display = 'flex';
+}
+
 // Показ контента вкладки
 function showTabContent(tabName, submodule) {
     const contentDisplay = document.getElementById('contentDisplay');
@@ -853,9 +1001,19 @@ function showTabContent(tabName, submodule) {
         return;
     }
     
+    let content = submodule.tabs[tabName].content;
+    
+    // Преобразуем специальные классы для лучшего отображения
+    if (tabName === 'quote') {
+        content = content.replace('class="quote"', 'class="quote-box"')
+                        .replace('class="author"', 'class="quote-author"');
+    } else if (tabName === 'source') {
+        content = content.replace('class="source"', 'class="source-box"');
+    }
+    
     contentDisplay.innerHTML = `
         <div class="tab-content active">
-            ${submodule.tabs[tabName].content || '<p>Контент отсутствует</p>'}
+            ${content || '<p>Контент отсутствует</p>'}
         </div>
     `;
     
@@ -1035,40 +1193,321 @@ function showFeedback(element, message, isCorrect) {
     element.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
-// Проверка дополнительного задания
+// РАСШИРЕННАЯ ПРОВЕРКА ДОПОЛНИТЕЛЬНОГО ЗАДАНИЯ
 function checkExtraAssignment(submoduleId) {
-    const answerId = 'extra' + submoduleId.replace('.', '_') + 'a';
-    const answerElement = document.getElementById(answerId);
+    console.log("=== НАЧАЛО ПРОВЕРКИ ДОПОЛНИТЕЛЬНОГО ЗАДАНИЯ ===");
     
-    if (!answerElement || !answerElement.value.trim()) {
-        alert("Пожалуйста, заполните все поля дополнительного задания.");
+    // Находим текущий модуль и подмодуль
+    const moduleId = userProgress.currentModule;
+    const module = courseData.modules.find(m => m.id === moduleId);
+    const submodule = module.submodules.find(s => s.id === submoduleId);
+    
+    if (!module || !submodule) {
+        console.error("Не найден модуль или подмодуль");
         return;
     }
     
-    // Улучшенная проверка дополнительных заданий
-    const answer = answerElement.value.trim();
-    const wordCount = answer.split(/\s+/).length;
+    console.log("Проверка дополнительного задания для:", submoduleId);
     
-    if (wordCount < 3) {
-        alert("❌ Ответ слишком короткий. Пожалуйста, напишите развернутый ответ.");
+    // Получаем все текстовые поля дополнительного задания
+    const textareas = document.querySelectorAll(`textarea[id^="extra${submoduleId.replace('.', '_')}"]`);
+    
+    if (textareas.length === 0) {
+        alert("Дополнительные задания не найдены на этой странице.");
         return;
     }
     
-    // Простая проверка по наличию ключевых слов
-    const positiveKeywords = ["понима", "поддерж", "эмпат", "слуша", "чувств"];
-    let hasKeywords = false;
+    // Проверяем, все ли поля заполнены
+    let allFilled = true;
+    const answers = [];
     
-    positiveKeywords.forEach(keyword => {
-        if (answer.toLowerCase().includes(keyword)) {
-            hasKeywords = true;
+    textareas.forEach((textarea, index) => {
+        const answer = textarea.value.trim();
+        answers.push(answer);
+        
+        if (!answer) {
+            allFilled = false;
+            textarea.style.borderColor = '#e74c3c';
+            textarea.style.boxShadow = '0 0 0 2px rgba(231, 76, 60, 0.2)';
+            
+            // Анимация пустого поля
+            textarea.animate([
+                { transform: 'translateX(0)' },
+                { transform: 'translateX(-5px)' },
+                { transform: 'translateX(5px)' },
+                { transform: 'translateX(0)' }
+            ], {
+                duration: 300,
+                iterations: 1
+            });
+        } else {
+            textarea.style.borderColor = '#2ecc71';
+            textarea.style.boxShadow = '0 0 0 2px rgba(46, 204, 113, 0.2)';
         }
     });
     
-    if (hasKeywords) {
-        alert("✅ Дополнительное задание выполнено хорошо! Вы использовали правильные термины.");
-    } else {
-        alert("⚠️ Попробуйте использовать термины из урока: 'понимание', 'поддержка', 'эмпатия', 'чувства'.");
+    if (!allFilled) {
+        alert("❌ Пожалуйста, заполните все поля дополнительного задания.");
+        return;
     }
+    
+    // Продвинутая проверка в зависимости от модуля
+    let feedback = "";
+    let allCorrect = true;
+    
+    switch(submoduleId) {
+        case "1.1":
+            // Проверка для модуля 1.1
+            answers.forEach((answer, index) => {
+                const wordCount = answer.split(/\s+/).length;
+                if (wordCount < 3) {
+                    feedback += `\n• Поле ${index + 1}: Слишком короткий ответ. Попробуйте написать более развернуто (минимум 3 слова).`;
+                    allCorrect = false;
+                }
+            });
+            
+            if (allCorrect) {
+                const hasEmpathyKeywords = answers.some(answer => 
+                    answer.toLowerCase().includes("понимаю") || 
+                    answer.toLowerCase().includes("представляю") ||
+                    answer.toLowerCase().includes("чувствую")
+                );
+                
+                const hasPityKeywords = answers.some(answer => 
+                    answer.toLowerCase().includes("жалко") ||
+                    answer.toLowerCase().includes("бедный") ||
+                    answer.toLowerCase().includes("несчастный")
+                );
+                
+                if (hasEmpathyKeywords && hasPityKeywords) {
+                    feedback = "✅ Отлично! Вы четко разделили эмпатическую реакцию и реакцию жалости. Вы показали понимание ключевой разницы между этими подходами.";
+                } else {
+                    feedback = "⚠️ Хорошо, но попробуйте четче разделить реакции. Помните: эмпатия = понимание чувств на равных, жалость = сверху вниз.";
+                    allCorrect = false;
+                }
+            }
+            break;
+            
+        case "1.2":
+            // Проверка для модуля 1.2
+            const typesToCheck = ["когнитив", "эмоциональ", "сострада"];
+            let foundTypes = 0;
+            
+            answers.forEach(answer => {
+                typesToCheck.forEach(type => {
+                    if (answer.toLowerCase().includes(type)) {
+                        foundTypes++;
+                    }
+                });
+            });
+            
+            if (foundTypes >= 2) {
+                feedback = "✅ Отлично! Вы правильно определили разные виды эмпатии в предложенных ситуациях. Это показывает хорошее понимание теоретического материала.";
+            } else {
+                feedback = "⚠️ Попробуйте еще раз. Обратите внимание на различия между:\n• Когнитивной эмпатией (понимание мыслей)\n• Эмоциональной эмпатией (разделение чувств)\n• Сострадательной эмпатией (желание помочь)";
+                allCorrect = false;
+            }
+            break;
+            
+        case "1.3":
+            // Проверка для модуля 1.3
+            let reflectionScore = 0;
+            
+            answers.forEach(answer => {
+                const reflectionWords = ["интонация", "тон", "выражение", "поза", "взгляд", "жест"];
+                let hasReflection = false;
+                
+                reflectionWords.forEach(word => {
+                    if (answer.toLowerCase().includes(word)) {
+                        hasReflection = true;
+                    }
+                });
+                
+                if (hasReflection) reflectionScore++;
+                
+                // Проверка глубины анализа
+                if (answer.length > 20 && answer.split(/\s+/).length > 5) {
+                    reflectionScore++;
+                }
+            });
+            
+            if (reflectionScore >= answers.length * 1.5) {
+                feedback = "✅ Превосходно! Вы детально проанализировали невербальные аспекты эмпатии. Это показывает глубокое понимание важности языка тела в общении.";
+            } else {
+                feedback = "⚠️ Хорошее начало! Для более полного анализа обратите внимание на:\n• Тон голоса (теплый, спокойный)\n• Выражение лица (соответствующее эмоциям)\n• Позу тела (открытая, наклон вперед)\n• Зрительный контакт (умеренный)";
+                allCorrect = false;
+            }
+            break;
+            
+        case "2.1":
+            // Проверка для модуля 2.1
+            let traumaUnderstanding = 0;
+            
+            answers.forEach(answer => {
+                const traumaKeywords = ["субъектив", "восприятие", "внутренний", "переживание", "след", "реакция"];
+                let hasKeywords = false;
+                
+                traumaKeywords.forEach(keyword => {
+                    if (answer.toLowerCase().includes(keyword)) {
+                        hasKeywords = true;
+                    }
+                });
+                
+                if (hasKeywords) traumaUnderstanding++;
+                
+                // Проверка глубины анализа
+                if (answer.length > 30 && answer.split(/\s+/).length > 8) {
+                    traumaUnderstanding++;
+                }
+            });
+            
+            if (traumaUnderstanding >= answers.length * 1.5) {
+                feedback = "✅ Отличный анализ! Вы правильно поняли, что травма — это не событие, а его психологический след. Вы учитываете субъективность переживания.";
+            } else {
+                feedback = "⚠️ Попробуйте глубже проанализировать. Ключевые моменты:\n• Травма = внутренняя реакция, а не внешнее событие\n• Одно и то же событие может быть травмирующим для одного и нет для другого\n• Важно субъективное восприятие";
+                allCorrect = false;
+            }
+            break;
+            
+        case "2.2":
+            // Проверка для модуля 2.2
+            let transformationScore = 0;
+            
+            answers.forEach((answer, index) => {
+                // Проверяем, убраны ли токсичные элементы
+                const toxicPhrases = ["не плачь", "хватит ныть", "возьми себя", "забудь", "все будет хорошо", "другим хуже"];
+                let hasToxic = false;
+                
+                toxicPhrases.forEach(phrase => {
+                    if (answer.toLowerCase().includes(phrase)) {
+                        hasToxic = true;
+                    }
+                });
+                
+                if (!hasToxic) transformationScore++;
+                
+                // Проверяем наличие эмпатичных элементов
+                const empathicPhrases = ["понимаю", "слышу тебя", "могу представить", "это тяжело", "имеешь право", "чувства важны"];
+                let hasEmpathic = false;
+                
+                empathicPhrases.forEach(phrase => {
+                    if (answer.toLowerCase().includes(phrase)) {
+                        hasEmpathic = true;
+                    }
+                });
+                
+                if (hasEmpathic) transformationScore++;
+            });
+            
+            if (transformationScore >= answers.length * 1.8) {
+                feedback = "✅ Великолепно! Вы успешно трансформировали токсичные фразы в поддерживающие. Новые формулировки показывают уважение к чувствам человека.";
+            } else {
+                feedback = "⚠️ Хорошая попытка! Помните ключевые принципы:\n• Избегайте обесценивания ('не плачь', 'все будет хорошо')\n• Признавайте чувства ('я понимаю, что тебе тяжело')\n• Давайте право на переживания ('это нормально чувствовать так')";
+                allCorrect = false;
+            }
+            break;
+            
+        case "2.3":
+            // Проверка для модуля 2.3
+            let safetyScore = 0;
+            
+            answers.forEach(answer => {
+                const safetyKeywords = ["безопасность", "доверие", "выбор", "контроль", "уважение", "границы", "поддержка"];
+                let hasKeywords = false;
+                
+                safetyKeywords.forEach(keyword => {
+                    if (answer.toLowerCase().includes(keyword)) {
+                        hasKeywords = true;
+                    }
+                });
+                
+                if (hasKeywords) safetyScore++;
+                
+                // Проверка конкретных предложений
+                if (answer.toLowerCase().includes("можно") || 
+                    answer.toLowerCase().includes("хочешь") ||
+                    answer.toLowerCase().includes("предлагаю")) {
+                    safetyScore++;
+                }
+            });
+            
+            if (safetyScore >= answers.length * 1.5) {
+                feedback = "✅ Прекрасная работа! Ваши планы по созданию безопасного пространства учитывают ключевые принципы: уважение, выбор, доверие и поддержка без давления.";
+            } else {
+                feedback = "⚠️ Хороший подход. Для более полного плана учтите:\n• Предоставление выбора и контроля\n• Уважение к готовности/неготовности говорить\n• Обеспечение физической и эмоциональной безопасности\n• Избегание давления и требований";
+                allCorrect = false;
+            }
+            break;
+            
+        default:
+            // Общая проверка для остальных модулей
+            let totalWords = 0;
+            let qualityScore = 0;
+            
+            answers.forEach(answer => {
+                const wordCount = answer.split(/\s+/).length;
+                totalWords += wordCount;
+                
+                // Оценка качества
+                if (wordCount >= 10) qualityScore++;
+                if (answer.length > 50) qualityScore++;
+                if (/[.!?]$/.test(answer.trim())) qualityScore++; // Завершенные предложения
+            });
+            
+            const avgWords = totalWords / answers.length;
+            
+            if (avgWords >= 15 && qualityScore >= answers.length * 2) {
+                feedback = "✅ Отличная работа! Ваши ответы развернуты, продуманы и демонстрируют хорошее понимание материала.";
+            } else if (avgWords >= 10) {
+                feedback = "⚠️ Неплохо! Для улучшения ответов:\n• Пишите более развернуто\n• Используйте примеры из теории\n• Структурируйте мысли\n• Проверяйте, полностью ли вы ответили на вопрос";
+                allCorrect = false;
+            } else {
+                feedback = "❌ Ответы слишком краткие. Пожалуйста, напишите более подробные ответы, используя знания из урока.";
+                allCorrect = false;
+            }
+    }
+    
+    // Показываем результат
+    const modalTitle = document.getElementById('modalTitle');
+    const modalBody = document.getElementById('modalBody');
+    
+    modalTitle.textContent = 'Результат проверки дополнительного задания';
+    modalBody.innerHTML = `
+        <div style="padding: 20px;">
+            <div style="text-align: center; margin-bottom: 20px;">
+                <h3 style="color: ${allCorrect ? '#2ecc71' : '#f39c12'};">${allCorrect ? '✅ Задание выполнено!' : '⚠️ Есть что улучшить'}</h3>
+            </div>
+            
+            <div style="background: ${allCorrect ? 'rgba(46, 204, 113, 0.1)' : 'rgba(243, 156, 18, 0.1)'}; 
+                     padding: 20px; border-radius: 10px; border-left: 4px solid ${allCorrect ? '#2ecc71' : '#f39c12'}; margin-bottom: 20px;">
+                <h4 style="color: ${allCorrect ? '#2ecc71' : '#f39c12'}; margin-top: 0;">Обратная связь:</h4>
+                <p style="white-space: pre-line; line-height: 1.6; color: #e0e0e0;">${feedback}</p>
+            </div>
+            
+            ${!allCorrect ? `
+                <div style="margin-top: 20px; padding: 15px; background: rgba(52, 152, 219, 0.1); border-radius: 8px;">
+                    <h4 style="color: #3498db; margin-bottom: 10px;">💡 Рекомендации для улучшения:</h4>
+                    <ul style="margin-left: 20px; color: #ccc;">
+                        <li>Перечитайте теоретический материал модуля</li>
+                        <li>Используйте ключевые термины из урока</li>
+                        <li>Приводите конкретные примеры</li>
+                        <li>Пишите развернутые ответы (минимум 3-5 предложений)</li>
+                        <li>Структурируйте мысли (можно использовать списки)</li>
+                    </ul>
+                </div>
+            ` : ''}
+            
+            <div style="margin-top: 25px; text-align: center;">
+                <button class="btn-primary" onclick="document.getElementById('modalOverlay').style.display='none'" style="padding: 12px 30px;">
+                    Продолжить обучение
+                </button>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('modalOverlay').style.display = 'flex';
+    
+    console.log("=== КОНЕЦ ПРОВЕРКИ ДОПОЛНИТЕЛЬНОГО ЗАДАНИЯ ===");
 }
 
 // Проверка завершения модуля
@@ -1094,8 +1533,8 @@ function checkIfModuleCompleted(moduleId) {
                     <p style="font-size: 1.2rem; font-weight: bold; margin: 15px 0;">«${module.title}»</p>
                     <p>Теперь вы можете пройти контрольную работу модуля.</p>
                     <div style="margin-top: 20px;">
-                        <button class="btn-primary" onclick="openTest(${moduleId}); document.getElementById('modalOverlay').style.display='none';" style="margin-right: 10px;">
-                            Пройти тест
+                        <button class="btn-primary" onclick="showTestInfo(${moduleId}); document.getElementById('modalOverlay').style.display='none';" style="margin-right: 10px;">
+                            Пройти контрольную
                         </button>
                         <button class="btn-secondary" onclick="document.getElementById('modalOverlay').style.display='none'">
                             Позже
@@ -1134,8 +1573,12 @@ function openTest(moduleId) {
     testInfo.className = 'exam-stats';
     testInfo.innerHTML = `
         <div class="exam-stat">
-            <strong>${module.test.questions ? module.test.questions.length : 0}</strong>
-            <span>вопросов</span>
+            <strong>${module.test.sections ? module.test.sections[0].questions.length : 0}</strong>
+            <span>теоретических вопросов</span>
+        </div>
+        <div class="exam-stat">
+            <strong>${module.test.timeLimit || 30}</strong>
+            <span>минут на выполнение</span>
         </div>
         <div class="exam-stat">
             <strong>${module.test.totalPoints}</strong>
@@ -1148,80 +1591,101 @@ function openTest(moduleId) {
     `;
     testContent.appendChild(testInfo);
     
-    // Вопросы
-    if (module.test.questions && Array.isArray(module.test.questions)) {
-        module.test.questions.forEach((question, index) => {
-            const questionDiv = document.createElement('div');
-            questionDiv.className = 'test-question';
+    // Добавляем секции теста
+    if (module.test.sections && Array.isArray(module.test.sections)) {
+        module.test.sections.forEach((section, sectionIndex) => {
+            const sectionDiv = document.createElement('div');
+            sectionDiv.className = 'test-section';
             
-            let optionsHtml = '';
-            if (question.type === 'multiple-choice' && Array.isArray(question.options)) {
-                optionsHtml = `
-                    <div class="test-options">
-                        ${question.options.map((option, i) => `
-                            <div class="test-option">
-                                <input type="radio" name="question${index}" value="${i}" id="q${index}_opt${i}">
-                                <label for="q${index}_opt${i}" class="test-option-label">${option}</label>
+            sectionDiv.innerHTML = `
+                <h3 class="test-section-title">${section.title}</h3>
+            `;
+            
+            if (section.type === 'theory' && section.questions) {
+                section.questions.forEach((question, questionIndex) => {
+                    const questionDiv = document.createElement('div');
+                    questionDiv.className = 'test-question';
+                    
+                    let optionsHtml = '';
+                    if (question.type === 'multiple-choice' && Array.isArray(question.options)) {
+                        optionsHtml = `
+                            <div class="test-options">
+                                ${question.options.map((option, i) => `
+                                    <div class="test-option">
+                                        <input type="radio" name="question${sectionIndex}_${questionIndex}" value="${i}" id="q${sectionIndex}_${questionIndex}_opt${i}">
+                                        <label for="q${sectionIndex}_${questionIndex}_opt${i}" class="test-option-label">${option}</label>
+                                    </div>
+                                `).join('')}
                             </div>
-                        `).join('')}
-                    </div>
-                `;
-            } else if (question.type === 'true-false') {
-                optionsHtml = `
-                    <div class="test-options">
-                        <div class="test-option">
-                            <input type="radio" name="question${index}" value="true" id="q${index}_true">
-                            <label for="q${index}_true" class="test-option-label">Верно</label>
-                        </div>
-                        <div class="test-option">
-                            <input type="radio" name="question${index}" value="false" id="q${index}_false">
-                            <label for="q${index}_false" class="test-option-label">Неверно</label>
-                        </div>
-                    </div>
-                `;
+                        `;
+                    } else if (question.type === 'true-false') {
+                        optionsHtml = `
+                            <div class="test-options">
+                                <div class="test-option">
+                                    <input type="radio" name="question${sectionIndex}_${questionIndex}" value="true" id="q${sectionIndex}_${questionIndex}_true">
+                                    <label for="q${sectionIndex}_${questionIndex}_true" class="test-option-label">Верно</label>
+                                </div>
+                                <div class="test-option">
+                                    <input type="radio" name="question${sectionIndex}_${questionIndex}" value="false" id="q${sectionIndex}_${questionIndex}_false">
+                                    <label for="q${sectionIndex}_${questionIndex}_false" class="test-option-label">Неверно</label>
+                                </div>
+                            </div>
+                        `;
+                    }
+                    
+                    questionDiv.innerHTML = `
+                        <h4>Вопрос ${questionIndex + 1}: ${question.question}</h4>
+                        ${optionsHtml}
+                    `;
+                    sectionDiv.appendChild(questionDiv);
+                });
+            } else if (section.type === 'practical' && section.questions) {
+                section.questions.forEach((task, taskIndex) => {
+                    const taskDiv = document.createElement('div');
+                    taskDiv.className = 'test-question';
+                    
+                    let taskContent = '';
+                    if (task.type === 'situation-analysis') {
+                        taskContent = `
+                            <p>${task.question}</p>
+                            <div class="situations">
+                                ${task.situations ? task.situations.map((situation, i) => `
+                                    <div style="margin: 10px 0; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 5px;">
+                                        <p><strong>Ситуация ${i + 1}:</strong> ${situation.text}</p>
+                                        <input type="text" placeholder="Ваш ответ" id="situation${taskIndex}_${i}" style="width: 100%; padding: 8px; border-radius: 4px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white;">
+                                    </div>
+                                `).join('') : ''}
+                            </div>
+                        `;
+                    } else if (task.type === 'scenario') {
+                        taskContent = `
+                            <p>${task.question}</p>
+                            <ul style="margin-left: 20px;">
+                                ${task.requirements ? task.requirements.map(req => `<li>${req}</li>`).join('') : ''}
+                            </ul>
+                            <textarea id="scenario${taskIndex}" placeholder="Напишите ваш ответ..." rows="5" style="width: 100%; margin-top: 10px;"></textarea>
+                        `;
+                    }
+                    
+                    taskDiv.innerHTML = taskContent;
+                    sectionDiv.appendChild(taskDiv);
+                });
             }
             
-            questionDiv.innerHTML = `
-                <h4>Вопрос ${index + 1}: ${question.question}</h4>
-                ${optionsHtml}
-            `;
-            testContent.appendChild(questionDiv);
+            testContent.appendChild(sectionDiv);
         });
     }
     
-    // Практическое задание
-    if (module.test.practical) {
-        const practicalDiv = document.createElement('div');
-        practicalDiv.className = 'test-question';
-        practicalDiv.innerHTML = `
-            <h4>Практическое задание</h4>
-            <p>${module.test.practical.task}</p>
-            <p><strong>Критерии оценки:</strong></p>
-            <ul>
-                ${module.test.practical.scoringCriteria ? module.test.practical.scoringCriteria.map(criterion => 
-                    `<li>${criterion}</li>`
-                ).join('') : ''}
-            </ul>
-            <p><strong>Максимальный балл:</strong> ${module.test.practical.maxPoints || 10}</p>
-            <textarea id="practicalAnswer" placeholder="Напишите ваш ответ..." rows="5" style="width: 100%; margin-top: 10px;"></textarea>
-        `;
-        testContent.appendChild(practicalDiv);
-    }
-    
-    // Дополнительные задания
-    if (module.test.additionalTasks && Array.isArray(module.test.additionalTasks)) {
-        module.test.additionalTasks.forEach((additionalTask, index) => {
-            const taskDiv = document.createElement('div');
-            taskDiv.className = 'test-question';
-            taskDiv.innerHTML = `
-                <h4>Дополнительное задание ${index + 1}</h4>
-                <p>${additionalTask.task}</p>
-                <p><strong>Баллов:</strong> ${additionalTask.points || 5}</p>
-                <textarea id="additionalAnswer${index}" placeholder="Напишите ваш ответ..." rows="3" style="width: 100%; margin-top: 10px;"></textarea>
-            `;
-            testContent.appendChild(taskDiv);
-        });
-    }
+    // Кнопка отправки теста
+    const submitBtn = document.createElement('div');
+    submitBtn.style.marginTop = '30px';
+    submitBtn.style.textAlign = 'center';
+    submitBtn.innerHTML = `
+        <button class="btn-primary" id="submitTestBtn" style="padding: 15px 40px; font-size: 1.1rem;">
+            <i class="fas fa-paper-plane"></i> Отправить на проверку
+        </button>
+    `;
+    testContent.appendChild(submitBtn);
 }
 
 // Отправка теста модуля
@@ -1232,13 +1696,15 @@ function submitTest() {
     if (!module || !module.test) return;
     
     let score = 0;
-    const totalQuestions = module.test.questions ? module.test.questions.length : 0;
+    const totalQuestions = module.test.sections ? 
+        (module.test.sections.find(s => s.type === 'theory')?.questions?.length || 0) : 0;
     let detailedResults = [];
     
-    // Проверяем вопросы
-    if (module.test.questions && Array.isArray(module.test.questions)) {
-        module.test.questions.forEach((question, index) => {
-            const selected = document.querySelector(`input[name="question${index}"]:checked`);
+    // Проверяем теоретические вопросы
+    const theorySection = module.test.sections?.find(s => s.type === 'theory');
+    if (theorySection && theorySection.questions) {
+        theorySection.questions.forEach((question, index) => {
+            const selected = document.querySelector(`input[name="question0_${index}"]:checked`);
             let isCorrect = false;
             
             if (question.type === 'multiple-choice') {
@@ -1270,78 +1736,33 @@ function submitTest() {
     
     const percent = totalQuestions > 0 ? Math.round((score / totalQuestions) * 100) : 0;
     
-    // Проверка практического задания
+    // Проверка практических заданий (упрощенная)
     let practicalScore = 0;
-    const practicalAnswer = document.getElementById('practicalAnswer')?.value || '';
-    if (practicalAnswer.trim().length > 20) {
-        practicalScore = module.test.practical ? Math.round((module.test.practical.maxPoints || 10) * 0.7) : 0;
-    }
-    
-    // Проверка дополнительных заданий
-    let additionalScore = 0;
-    if (module.test.additionalTasks) {
-        module.test.additionalTasks.forEach((task, index) => {
-            const answer = document.getElementById(`additionalAnswer${index}`)?.value || '';
-            if (answer.trim().length > 10) {
-                additionalScore += Math.round((task.points || 5) * 0.6);
+    const practicalSection = module.test.sections?.find(s => s.type === 'practical');
+    if (practicalSection && practicalSection.questions) {
+        practicalSection.questions.forEach((task, index) => {
+            if (task.type === 'scenario') {
+                const answer = document.getElementById(`scenario${index}`)?.value || '';
+                if (answer.trim().length > 50) {
+                    practicalScore += task.points ? Math.round(task.points * 0.7) : 5;
+                }
             }
         });
     }
     
-    const totalPoints = score * 2 + practicalScore + additionalScore;
-    const maxPoints = (totalQuestions * 2) + (module.test.practical ? module.test.practical.maxPoints : 0) + 
-                     (module.test.additionalTasks ? module.test.additionalTasks.reduce((sum, task) => sum + (task.points || 0), 0) : 0);
+    // Проверка практического задания из отдельной секции
+    let assignmentScore = 0;
+    const assignmentSection = module.test.sections?.find(s => s.type === 'assignment');
+    if (assignmentSection) {
+        assignmentScore = Math.round((assignmentSection.maxPoints || 10) * 0.6);
+    }
+    
+    const totalPoints = score * 2 + practicalScore + assignmentScore;
+    const maxPoints = (totalQuestions * 2) + 
+                     (practicalSection?.questions?.reduce((sum, q) => sum + (q.points || 5), 0) || 0) +
+                     (assignmentSection?.maxPoints || 0);
     
     const passed = totalPoints >= module.test.passingScore;
-    
-    // Показываем результат
-    const modalTitle = document.getElementById('modalTitle');
-    const modalBody = document.getElementById('modalBody');
-    
-    modalTitle.textContent = 'Результат теста';
-    modalBody.innerHTML = `
-        <div style="padding: 20px;">
-            <div style="text-align: center; margin-bottom: 20px;">
-                <h3 style="color: ${passed ? '#2ecc71' : '#e74c3c'};">${passed ? '✅ Поздравляем!' : '❌ Попробуйте еще'}</h3>
-            </div>
-            
-            <div class="exam-stats" style="margin: 20px 0;">
-                <div class="exam-stat">
-                    <strong>${score}/${totalQuestions}</strong>
-                    <span>Теоретическая часть</span>
-                </div>
-                <div class="exam-stat">
-                    <strong>${Math.round(practicalScore)}</strong>
-                    <span>Практика</span>
-                </div>
-                <div class="exam-stat">
-                    <strong>${additionalScore}</strong>
-                    <span>Доп. задания</span>
-                </div>
-            </div>
-            
-            <div style="background: var(--card-bg); padding: 15px; border-radius: 8px; margin: 15px 0;">
-                <p style="text-align: center; font-size: 1.2rem;">
-                    <strong>Итого: ${totalPoints} из ${maxPoints} баллов</strong><br>
-                    <span style="color: ${passed ? '#2ecc71' : '#e74c3c'};">${passed ? 'Тест пройден!' : 'Необходимо набрать минимум ' + module.test.passingScore + ' баллов'}</span>
-                </p>
-            </div>
-            
-            ${!passed ? `
-                <div style="margin-top: 20px; padding: 15px; background: rgba(231, 76, 60, 0.1); border-radius: 8px;">
-                    <h4 style="color: #e74c3c; margin-bottom: 10px;">Рекомендации:</h4>
-                    <ul style="margin-left: 20px; color: #ccc;">
-                        <li>Повторите теорию модуля</li>
-                        <li>Пройдите практические задания еще раз</li>
-                        <li>Обратите внимание на объяснения к вопросам</li>
-                        <li>Попробуйте пройти тест через 1-2 дня</li>
-                    </ul>
-                </div>
-            ` : ''}
-        </div>
-    `;
-    
-    document.getElementById('modalOverlay').style.display = 'flex';
     
     // Сохраняем результат
     if (passed && !userProgress.completedModules.includes(moduleId)) {
@@ -1352,7 +1773,7 @@ function submitTest() {
             total: totalQuestions,
             percent: percent,
             practicalScore: practicalScore,
-            additionalScore: additionalScore,
+            assignmentScore: assignmentScore,
             totalPoints: totalPoints,
             maxPoints: maxPoints,
             passed: passed,
@@ -1360,6 +1781,85 @@ function submitTest() {
         };
         saveProgress();
     }
+    
+    // Показываем результат
+    showTestResult(moduleId, {
+        score,
+        totalQuestions,
+        percent,
+        practicalScore,
+        assignmentScore,
+        totalPoints,
+        maxPoints,
+        passed,
+        detailedResults
+    });
+}
+
+// Показать результат теста
+function showTestResult(moduleId, result) {
+    const module = courseData.modules.find(m => m.id === moduleId);
+    
+    const modalTitle = document.getElementById('modalTitle');
+    const modalBody = document.getElementById('modalBody');
+    
+    modalTitle.textContent = 'Результат контрольной работы';
+    modalBody.innerHTML = `
+        <div style="padding: 20px;">
+            <div style="text-align: center; margin-bottom: 20px;">
+                <h3 style="color: ${result.passed ? '#2ecc71' : '#e74c3c'};">${result.passed ? '✅ Поздравляем!' : '❌ Попробуйте еще'}</h3>
+                <p>Модуль: <strong>${module.title}</strong></p>
+            </div>
+            
+            <div class="exam-stats" style="margin: 20px 0;">
+                <div class="exam-stat">
+                    <strong>${result.score}/${result.totalQuestions}</strong>
+                    <span>Теоретическая часть</span>
+                </div>
+                <div class="exam-stat">
+                    <strong>${Math.round(result.practicalScore)}</strong>
+                    <span>Практика</span>
+                </div>
+                <div class="exam-stat">
+                    <strong>${result.assignmentScore}</strong>
+                    <span>Задания</span>
+                </div>
+            </div>
+            
+            <div style="background: linear-gradient(135deg, ${result.passed ? '#2ecc71' : '#e74c3c'} 0%, ${result.passed ? '#27ae60' : '#c0392b'} 100%); 
+                     color: white; padding: 20px; border-radius: 12px; text-align: center; margin: 20px 0;">
+                <h2 style="margin: 0; font-size: 2.5rem;">${result.totalPoints}/${result.maxPoints}</h2>
+                <p style="margin: 10px 0 0 0; font-size: 1.1rem;">
+                    ${result.passed ? 'Вы успешно прошли контрольную работу!' : `Необходимо набрать ${module.test.passingScore} баллов`}
+                </p>
+            </div>
+            
+            ${!result.passed ? `
+                <div style="margin-top: 20px; padding: 15px; background: rgba(231, 76, 60, 0.1); border-radius: 8px;">
+                    <h4 style="color: #e74c3c; margin-bottom: 10px;">Рекомендации:</h4>
+                    <ul style="margin-left: 20px; color: #ccc;">
+                        <li>Повторите теорию модуля</li>
+                        <li>Пройдите практические задания еще раз</li>
+                        <li>Обратите внимание на объяснения к вопросам</li>
+                        <li>Попробуйте пройти тест через 1-2 дня</li>
+                    </ul>
+                </div>
+            ` : ''}
+            
+            <div style="margin-top: 25px; text-align: center;">
+                <button class="btn-primary" onclick="document.getElementById('modalOverlay').style.display='none'; openModule(${moduleId}, '${module.submodules[0].id}');" style="margin-right: 10px;">
+                    <i class="fas fa-arrow-left"></i> Вернуться к модулю
+                </button>
+                ${!result.passed ? `
+                    <button class="btn-secondary" onclick="openTest(${moduleId}); document.getElementById('modalOverlay').style.display='none'">
+                        <i class="fas fa-redo"></i> Попробовать снова
+                    </button>
+                ` : ''}
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('modalOverlay').style.display = 'flex';
 }
 
 // ОТКРЫТИЕ ИТОГОВОГО ЭКЗАМЕНА
@@ -1408,23 +1908,23 @@ function openFinalExam() {
     examStats.className = 'exam-stats';
     examStats.innerHTML = `
         <div class="exam-stat">
-            <strong>${exam.theoryQuestions.length}</strong>
+            <strong>${exam.sections[0].questions.length}</strong>
             <span>теоретических вопросов</span>
         </div>
         <div class="exam-stat">
-            <strong>${exam.practicalTasks.length}</strong>
+            <strong>${exam.sections[1].tasks.length}</strong>
             <span>практических заданий</span>
         </div>
         <div class="exam-stat">
-            <strong>${exam.additionalTasks.length}</strong>
-            <span>дополнительных заданий</span>
+            <strong>${exam.sections[2].tasks.length}</strong>
+            <span>ситуационных анализов</span>
         </div>
         <div class="exam-stat">
-            <strong>${exam.scoring.total}</strong>
+            <strong>${parseInt(exam.scoring.total)}</strong>
             <span>баллов всего</span>
         </div>
         <div class="exam-stat">
-            <strong>${exam.scoring.passing}</strong>
+            <strong>${parseInt(exam.scoring.passing)}</strong>
             <span>проходной балл</span>
         </div>
     `;
@@ -1436,14 +1936,14 @@ function openFinalExam() {
     instruction.innerHTML = `
         <h4>Инструкция к итоговому экзамену</h4>
         <p>Итоговый экзамен проверяет ваши знания по всем 5 модулям курса.</p>
-        <p><strong>Время выполнения:</strong> Не ограничено (рекомендуется 60-90 минут)</p>
+        <p><strong>Время выполнения:</strong> ${exam.timeLimit} минут</p>
         <p><strong>Структура экзамена:</strong></p>
         <ol>
-            <li>Теоретическая часть (15 вопросов) — ${exam.scoring.theory}</li>
-            <li>Практическая часть (5 заданий) — ${exam.scoring.practical}</li>
-            <li>Дополнительные задания (2 задания) — ${exam.scoring.additional}</li>
+            <li>Теоретическая часть (${exam.sections[0].questions.length} вопросов) — ${exam.scoring.theory}</li>
+            <li>Практическая часть (${exam.sections[1].tasks.length} заданий) — ${exam.scoring.practical}</li>
+            <li>Ситуационный анализ (${exam.sections[2].tasks.length} кейс) — ${exam.scoring.caseStudy}</li>
         </ol>
-        <p><strong>Оценка:</strong> ${exam.scoring.passing}</p>
+        <p><strong>Оценка:</strong> ${exam.scoring.passing} (${Math.round(parseInt(exam.scoring.passing) / parseInt(exam.scoring.total) * 100)}%)</p>
         <p style="color: #4a90e2; font-weight: bold;">Удачи!</p>
     `;
     examContent.appendChild(instruction);
@@ -1453,7 +1953,7 @@ function openFinalExam() {
     theorySection.innerHTML = `<h3 style="margin: 30px 0 20px 0; color: #ffffff;">Теоретическая часть</h3>`;
     examContent.appendChild(theorySection);
     
-    exam.theoryQuestions.forEach((question, index) => {
+    exam.sections[0].questions.forEach((question, index) => {
         const questionDiv = document.createElement('div');
         questionDiv.className = 'test-question';
         
@@ -1485,7 +1985,7 @@ function openFinalExam() {
         }
         
         questionDiv.innerHTML = `
-            <h4>Теоретический вопрос ${index + 1}: ${question.question}</h4>
+            <h4>Вопрос ${index + 1}: ${question.question}</h4>
             ${optionsHtml}
         `;
         examContent.appendChild(questionDiv);
@@ -1496,37 +1996,48 @@ function openFinalExam() {
     practicalSection.innerHTML = `<h3 style="margin: 30px 0 20px 0; color: #ffffff;">Практическая часть</h3>`;
     examContent.appendChild(practicalSection);
     
-    exam.practicalTasks.forEach((task, index) => {
+    exam.sections[1].tasks.forEach((task, index) => {
         const taskDiv = document.createElement('div');
         taskDiv.className = 'test-question';
-        taskDiv.innerHTML = `
-            <h4>Практическое задание ${index + 1}: ${task.task}</h4>
-            ${task.situation ? `<p><strong>Ситуация:</strong> ${task.situation}</p>` : ''}
-            <p><strong>Требования:</strong> ${task.requirements}</p>
-            <p><strong>Максимальный балл:</strong> ${task.maxPoints}</p>
-            <textarea id="practicalExam${index}" placeholder="Напишите ваш ответ здесь..." rows="6" style="width: 100%; margin-top: 10px;"></textarea>
-            <div class="assignment-hint" style="margin-top: 10px;">
-                <i class="fas fa-lightbulb"></i>
-                <strong>Подсказка:</strong> Обратите внимание на критерии оценки: ${task.scoringCriteria ? task.scoringCriteria.join(', ') : 'полнота и точность ответа'}.
-            </div>
-        `;
+        
+        let taskContent = '';
+        if (task.situation) {
+            taskContent = `
+                <h4>Задание ${index + 1}: ${task.task}</h4>
+                <p><strong>Ситуация:</strong> ${task.situation}</p>
+                <p><strong>Требования:</strong> ${task.requirements}</p>
+                <p><strong>Максимальный балл:</strong> ${task.maxPoints}</p>
+                <textarea id="practicalExam${index}" placeholder="Напишите ваш ответ здесь..." rows="6" style="width: 100%; margin-top: 10px;"></textarea>
+            `;
+        } else {
+            taskContent = `
+                <h4>Задание ${index + 1}: ${task.task}</h4>
+                <p><strong>Требования:</strong> ${task.requirements}</p>
+                <p><strong>Максимальный балл:</strong> ${task.maxPoints}</p>
+                <textarea id="practicalExam${index}" placeholder="Напишите ваш ответ здесь..." rows="6" style="width: 100%; margin-top: 10px;"></textarea>
+            `;
+        }
+        
+        taskDiv.innerHTML = taskContent;
         examContent.appendChild(taskDiv);
     });
     
-    // Дополнительные задания
-    const additionalSection = document.createElement('div');
-    additionalSection.innerHTML = `<h3 style="margin: 30px 0 20px 0; color: #ffffff;">Дополнительные задания</h3>`;
-    examContent.appendChild(additionalSection);
+    // Ситуационный анализ
+    const caseSection = document.createElement('div');
+    caseSection.innerHTML = `<h3 style="margin: 30px 0 20px 0; color: #ffffff;">Ситуационный анализ</h3>`;
+    examContent.appendChild(caseSection);
     
-    exam.additionalTasks.forEach((task, index) => {
+    exam.sections[2].tasks.forEach((task, index) => {
         const taskDiv = document.createElement('div');
         taskDiv.className = 'test-question';
+        
         taskDiv.innerHTML = `
-            <h4>Дополнительное задание ${index + 1}: ${task.type === 'case-analysis' ? 'Анализ кейса' : 'Саморефлексия'}</h4>
-            <p><strong>Задание:</strong> ${task.task}</p>
-            <p><strong>Требования:</strong> ${task.requirements}</p>
-            <p><strong>Максимальный балл:</strong> ${task.maxPoints}</p>
-            <textarea id="additionalExam${index}" placeholder="Напишите ваш ответ здесь..." rows="8" style="width: 100%; margin-top: 10px;"></textarea>
+            <h4>Кейс ${index + 1}: ${task.situation}</h4>
+            <p><strong>Вопросы для анализа:</strong></p>
+            <ol style="margin-left: 20px; margin-bottom: 20px;">
+                ${task.questions.map((q, i) => `<li>${q}</li>`).join('')}
+            </ol>
+            <textarea id="caseExam${index}" placeholder="Напишите ваш анализ здесь..." rows="8" style="width: 100%; margin-top: 10px;"></textarea>
         `;
         examContent.appendChild(taskDiv);
     });
@@ -1539,10 +2050,10 @@ function submitFinalExam() {
     
     let theoryScore = 0;
     let practicalScore = 0;
-    let additionalScore = 0;
+    let caseScore = 0;
     
     // Проверка теоретических вопросов
-    exam.theoryQuestions.forEach((question, index) => {
+    exam.sections[0].questions.forEach((question, index) => {
         const selected = document.querySelector(`input[name="theory${index}"]:checked`);
         let isCorrect = false;
         
@@ -1558,7 +2069,7 @@ function submitFinalExam() {
     });
     
     // Проверка практических заданий (упрощенная проверка)
-    exam.practicalTasks.forEach((task, index) => {
+    exam.sections[1].tasks.forEach((task, index) => {
         const answer = document.getElementById(`practicalExam${index}`)?.value || '';
         if (answer.trim().length > 50) {
             // Базовый балл за наличие развернутого ответа
@@ -1577,36 +2088,36 @@ function submitFinalExam() {
         }
     });
     
-    // Проверка дополнительных заданий
-    exam.additionalTasks.forEach((task, index) => {
-        const answer = document.getElementById(`additionalExam${index}`)?.value || '';
+    // Проверка ситуационного анализа
+    exam.sections[2].tasks.forEach((task, index) => {
+        const answer = document.getElementById(`caseExam${index}`)?.value || '';
         if (answer.trim().length > 100) {
             // Базовый балл за развернутый ответ
-            additionalScore += Math.round(task.maxPoints * 0.5);
+            caseScore += Math.round(15 * 0.5);
             
             // Дополнительные баллы за структуру
             if (answer.includes("1.") && answer.includes("2.") && answer.includes("3.")) {
-                additionalScore += Math.round(task.maxPoints * 0.3);
+                caseScore += Math.round(15 * 0.3);
             }
         }
     });
     
-    const totalScore = theoryScore + practicalScore + additionalScore;
+    const totalScore = theoryScore + practicalScore + caseScore;
     const maxScore = parseInt(exam.scoring.total);
-    const passingScore = parseInt(exam.scoring.passing.split(' ')[0]);
+    const passingScore = parseInt(exam.scoring.passing);
     const passed = totalScore >= passingScore;
     
     // Определяем оценку
     let grade = "F";
     let gradeText = "Не сдано";
-    Object.entries(exam.scoring.grades).forEach(([g, range]) => {
+    Object.entries(exam.scoring.gradingScale).forEach(([g, range]) => {
         const rangeMatch = range.match(/(\d+)-(\d+)/);
         if (rangeMatch) {
             const min = parseInt(rangeMatch[1]);
             const max = parseInt(rangeMatch[2]);
             if (totalScore >= min && totalScore <= max) {
                 grade = g;
-                gradeText = range.split('(')[1].replace(')', '');
+                gradeText = range;
             }
         }
     });
@@ -1634,16 +2145,16 @@ function submitFinalExam() {
             
             <div class="exam-stats" style="margin: 20px 0;">
                 <div class="exam-stat">
-                    <strong style="font-size: 1.8rem;">${theoryScore}/${exam.scoring.theory.split(' ')[0]}</strong>
+                    <strong style="font-size: 1.8rem;">${theoryScore}/30</strong>
                     <span>Теоретическая часть</span>
                 </div>
                 <div class="exam-stat">
-                    <strong style="font-size: 1.8rem;">${practicalScore}/${exam.scoring.practical.split(' ')[0]}</strong>
+                    <strong style="font-size: 1.8rem;">${practicalScore}/45</strong>
                     <span>Практическая часть</span>
                 </div>
                 <div class="exam-stat">
-                    <strong style="font-size: 1.8rem;">${additionalScore}/${exam.scoring.additional.split(' ')[0]}</strong>
-                    <span>Дополнительные задания</span>
+                    <strong style="font-size: 1.8rem;">${caseScore}/15</strong>
+                    <span>Ситуационный анализ</span>
                 </div>
             </div>
             
@@ -1750,7 +2261,7 @@ function showCertificate() {
     certificateModal.id = 'certificateModal';
     
     const exam = courseData.finalExam;
-    const gradeInfo = exam.scoring.grades[userProgress.finalExamGrade] || "Успешно завершено";
+    const gradeInfo = userProgress.finalExamGrade ? exam.scoring.gradingScale[userProgress.finalExamGrade] || "Успешно завершено" : "Успешно завершено";
     
     certificateModal.innerHTML = `
         <div class="certificate-modal">
@@ -1802,7 +2313,7 @@ function showCertificate() {
                                     </div>
                                     <div class="detail">
                                         <strong>Результат экзамена</strong>
-                                        <p>${userProgress.finalExamScore} баллов</p>
+                                        <p>${userProgress.finalExamScore} баллов из ${exam.scoring.total}</p>
                                     </div>
                                     <div class="detail">
                                         <strong>ID сертификата</strong>
@@ -2098,5 +2609,8 @@ window.saveCertificateAsImage = saveCertificateAsImage;
 window.shareCertificate = shareCertificate;
 window.openFinalExam = openFinalExam;
 window.submitFinalExam = submitFinalExam;
+window.openTest = openTest;
+window.submitTest = submitTest;
+window.showTestInfo = showTestInfo;
 
 console.log("✅ Курс эмпатии загружен и готов к работе!");
