@@ -8,8 +8,9 @@ if (typeof supabase === 'undefined') {
 }
 
 const SUPABASE_CONFIG = {
-    url: window.ENV?.SUPABASE_URL || process.env.SUPABASE_URL,
-    anonKey: window.ENV?.SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY
+    // Получаем конфигурацию только из window.ENV (для браузера)
+    url: window.ENV?.SUPABASE_URL,
+    anonKey: window.ENV?.SUPABASE_ANON_KEY
 };
 
 console.log('🔧 Конфигурация Supabase:', SUPABASE_CONFIG.url ? 'Найдена' : 'Не найдена');
@@ -32,6 +33,7 @@ function initSupabase() {
             console.log('✅ Supabase инициализирован');
             return true;
         }
+        console.warn('⚠️ Supabase не инициализирован. Работа в гостевом режиме.');
         return false;
     } catch (error) {
         console.error('❌ Ошибка инициализации Supabase:', error);
