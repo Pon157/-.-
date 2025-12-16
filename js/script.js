@@ -2,30 +2,41 @@
 
 // ========== КОНФИГУРАЦИЯ SUPABASE ==========
 const SUPABASE_CONFIG = {
-    url: window.ENV?.VITE_SUPABASE_URL || import.meta.env?.VITE_SUPABASE_URL,
-    anonKey: window.ENV?.VITE_SUPABASE_ANON_KEY || import.meta.env?.VITE_SUPABASE_ANON_KEY
+    url: window.ENV?.VITE_SUPABASE_URL,
+    anonKey: window.ENV?.VITE_SUPABASE_ANON_KEY
 };
 
 // Проверяем конфигурацию
 if (!SUPABASE_CONFIG.url || !SUPABASE_CONFIG.anonKey) {
     console.error('❌ Supabase конфигурация не найдена!');
-    console.error('Добавьте в .env:');
-    console.error('VITE_SUPABASE_URL=https://your-project.supabase.co');
-    console.error('VITE_SUPABASE_ANON_KEY=your-anon-key');
+    console.error('Добавьте в HTML:');
+    console.error(`
+        <script>
+            window.ENV = {
+                VITE_SUPABASE_URL: 'https://your-project.supabase.co',
+                VITE_SUPABASE_ANON_KEY: 'your-anon-key'
+            };
+        </script>
+    `);
 }
 
 // Инициализируем Supabase клиент
-const supabase = window.supabase.createClient(
-    SUPABASE_CONFIG.url,
-    SUPABASE_CONFIG.anonKey,
-    {
-        auth: {
-            persistSession: true,
-            autoRefreshToken: true,
-            detectSessionInUrl: false
+let supabase;
+if (window.supabase && SUPABASE_CONFIG.url && SUPABASE_CONFIG.anonKey) {
+    supabase = window.supabase.createClient(
+        SUPABASE_CONFIG.url,
+        SUPABASE_CONFIG.anonKey,
+        {
+            auth: {
+                persistSession: true,
+                autoRefreshToken: true,
+                detectSessionInUrl: false
+            }
         }
-    }
-);
+    );
+} else {
+    console.warn('⚠️ Supabase не инициализирован. Работа в гостевом режиме.');
+}
 
 // ========== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ==========
 let userProgress = {
@@ -215,41 +226,47 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 async function initApp() {
     try {
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-        
-        if (sessionError) {
-            console.error("Ошибка получения сессии:", sessionError);
-            await loadGuestProgress();
-            showAuthModal();
-            return;
-        }
-        
-        if (session) {
-            currentUserId = session.user.id;
-            isAuthenticated = true;
-            console.log("✅ Пользователь авторизован:", session.user.email);
+        if (supabase) {
+            const { data: { session }, error: sessionError } = await supabase.auth.getSession();
             
-            await loadUserProgress();
-            await loadAnswerDrafts();
-            await loadUIState();
-            
-            updateUserUI(session.user);
-            
-            if (userProgress.currentModule && userProgress.currentSubmodule) {
-                setTimeout(() => {
-                    openModule(userProgress.currentModule, userProgress.currentSubmodule);
-                }, 500);
-            } else {
-                showWelcomeScreen();
+            if (sessionError) {
+                console.error("Ошибка получения сессии:", sessionError);
+                await loadGuestProgress();
+                showAuthModal();
+                return;
             }
             
+            if (session) {
+                currentUserId = session.user.id;
+                isAuthenticated = true;
+                console.log("✅ Пользователь авторизован:", session.user.email);
+                
+                await loadUserProgress();
+                await loadAnswerDrafts();
+                await loadUIState();
+                
+                updateUserUI(session.user);
+                
+                if (userProgress.currentModule && userProgress.currentSubmodule) {
+                    setTimeout(() => {
+                        openModule(userProgress.currentModule, userProgress.currentSubmodule);
+                    }, 500);
+                } else {
+                    showWelcomeScreen();
+                }
+                
+                setupAuthListener();
+                
+            } else {
+                console.log("👤 Гостевой режим");
+                await loadGuestProgress();
+                showAuthModal();
+            }
         } else {
-            console.log("👤 Гостевой режим");
+            console.log("🔄 Работа в гостевом режиме (Supabase не настроен)");
             await loadGuestProgress();
-            showAuthModal();
+            showWelcomeScreen();
         }
-        
-        setupAuthListener();
         
     } catch (error) {
         console.error("❌ Ошибка инициализации:", error);
@@ -260,6 +277,8 @@ async function initApp() {
 
 async function loadUserProgress() {
     try {
+        if (!supabase || !currentUserId) return;
+        
         const { data: userData, error: userError } = await supabase
             .from('users')
             .select('current_module, current_submodule, course_progress, name')
@@ -299,6 +318,8 @@ async function loadUserProgress() {
 
 async function createUserProgressRecord() {
     try {
+        if (!supabase || !currentUserId) return;
+        
         const { error } = await supabase
             .from('users')
             .update({
@@ -326,6 +347,8 @@ async function createUserProgressRecord() {
 
 async function loadAnswerDrafts() {
     try {
+        if (!supabase || !currentUserId) return;
+        
         const { data: drafts, error } = await supabase
             .from('answer_drafts')
             .select('submodule_id, answer_type, answer_text, form_data')
@@ -392,6 +415,8 @@ function restoreAnswerDrafts() {
 
 async function loadUIState() {
     try {
+        if (!supabase || !currentUserId) return;
+        
         const { data, error } = await supabase
             .from('ui_state')
             .select('open_tabs, scroll_positions, theme, settings')
@@ -438,6 +463,8 @@ async function loadGuestProgress() {
 }
 
 function setupAuthListener() {
+    if (!supabase) return;
+    
     supabase.auth.onAuthStateChange((event, session) => {
         console.log("Событие авторизации:", event);
         
@@ -885,7 +912,7 @@ function showAuthTab(tabName) {
     document.getElementById('registerTab').style.display = tabName === 'register' ? 'block' : 'none';
 }
 
-// ========== ОСНОВНЫЕ ФУНКЦИИ КУРСА (твои оригинальные функции) ==========
+// ========== ОСНОВНЫЕ ФУНКЦИИ КУРСА ==========
 
 function getDefaultProgress() {
     return {
@@ -935,18 +962,8 @@ async function openModule(moduleId, submoduleId) {
     setTimeout(() => setupAutoSaveForModule(), 100);
 }
 
-function initTheme() {
-    const savedTheme = localStorage.getItem('empathyCourseTheme') || 'dark';
-    setTheme(savedTheme);
-}
-
 function setTheme(theme) {
     document.documentElement.setAttribute('data-theme', theme);
-}
-
-function saveProgress() {
-    localStorage.setItem('empathyCourseProgress', JSON.stringify(userProgress));
-    updateProgressUI();
 }
 
 function updateProgressUI() {
@@ -1235,8 +1252,8 @@ function initCheckButtons() {
     });
 }
 
-// ТВОЯ ОБНОВЛЕННАЯ ФУНКЦИЯ checkAssignment
-function checkAssignment(submoduleId) {
+// ОБНОВЛЕННАЯ ФУНКЦИЯ checkAssignment
+async function checkAssignment(submoduleId) {
     console.log("=== НАЧАЛО ПРОВЕРКИ ===");
     console.log("Подмодуль для проверки:", submoduleId);
     
@@ -1326,7 +1343,7 @@ function checkAssignment(submoduleId) {
                     assignmentHeader.appendChild(checkIcon);
                 }
                 
-                await saveProgress(); // Добавляем await
+                await saveProgress();
                 
                 checkIfModuleCompleted(moduleId);
             }
@@ -1421,7 +1438,18 @@ function checkExtraAssignment(submoduleId) {
         return;
     }
     
-    // ... остальная логика проверки extra заданий ...
+    // Простая проверка - если все поля заполнены, считаем успешным
+    const allValid = answers.every(answer => answer.trim().length > 10);
+    
+    if (allValid) {
+        alert("✅ Все дополнительные задания выполнены правильно!");
+        textareas.forEach(textarea => {
+            textarea.style.borderColor = '#2ecc71';
+            textarea.style.boxShadow = '0 0 0 2px rgba(46, 204, 113, 0.2)';
+        });
+    } else {
+        alert("❌ Некоторые ответы слишком короткие. Пожалуйста, напишите более развернутые ответы (минимум 10 символов).");
+    }
 }
 
 function checkIfModuleCompleted(moduleId) {
@@ -2561,7 +2589,6 @@ window.openModule = openModule;
 window.resetProgress = resetProgress;
 window.showCertificate = showCertificate;
 window.showWelcomeScreen = showWelcomeScreen;
-window.showNameInput = showNameInput;
 window.submitName = submitName;
 window.printCertificate = printCertificate;
 window.saveCertificateAsImage = saveCertificateAsImage;
@@ -2579,4 +2606,4 @@ window.handleRegister = handleRegister;
 window.continueAsGuest = continueAsGuest;
 window.handleLogout = handleLogout;
 
-console.log("✅ Курс эмпатии загружен с Supabase и автосохранением!");
+console.log("✅ Курс эмпатии загружен!");
