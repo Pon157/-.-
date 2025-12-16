@@ -2,25 +2,14 @@
 
 // ========== КОНФИГУРАЦИЯ SUPABASE ==========
 const SUPABASE_CONFIG = {
-    url: window.ENV?.VITE_SUPABASE_URL,
-    anonKey: window.ENV?.VITE_SUPABASE_ANON_KEY
+    // Получаем конфигурацию из переменных окружения сервера
+    url: window.ENV?.SUPABASE_URL || process.env.SUPABASE_URL,
+    anonKey: window.ENV?.SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY
 };
 
-// Проверяем конфигурацию
-if (!SUPABASE_CONFIG.url || !SUPABASE_CONFIG.anonKey) {
-    console.error('❌ Supabase конфигурация не найдена!');
-    console.error('Добавьте в HTML:');
-    console.error(`
-        <script>
-            window.ENV = {
-                VITE_SUPABASE_URL: 'https://your-project.supabase.co',
-                VITE_SUPABASE_ANON_KEY: 'your-anon-key'
-            };
-        </script>
-    `);
-}
+console.log('🔧 Конфигурация Supabase:', SUPABASE_CONFIG.url ? 'Найдена' : 'Не найдена');
 
-// Инициализируем Supabase клиент
+// Инициализируем Supabase клиент только если есть конфигурация
 let supabase;
 if (window.supabase && SUPABASE_CONFIG.url && SUPABASE_CONFIG.anonKey) {
     supabase = window.supabase.createClient(
@@ -34,6 +23,7 @@ if (window.supabase && SUPABASE_CONFIG.url && SUPABASE_CONFIG.anonKey) {
             }
         }
     );
+    console.log('✅ Supabase инициализирован');
 } else {
     console.warn('⚠️ Supabase не инициализирован. Работа в гостевом режиме.');
 }
