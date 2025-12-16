@@ -139,11 +139,14 @@ bot.command('check', async (ctx) => {
     
     await ctx.reply('🔍 Введите ID сертификата для проверки (формат: EMP-XXXXXXX):');
     
-    // Временный обработчик для ввода ID
+    // Создаем уникальный обработчик для этого пользователя
     const certIdHandler = async (ctx) => {
+        // Проверяем что это тот же пользователь
+        if (ctx.from.id !== userId) return;
+        
         const certId = ctx.message.text.trim().toUpperCase();
         
-        // Удаляем обработчик после использования
+        // Удаляем этот обработчик
         bot.off('text', certIdHandler);
         
         // Проверка формата
@@ -198,6 +201,7 @@ bot.command('check', async (ctx) => {
         }
     };
     
+    // Устанавливаем обработчик только для этого пользователя
     bot.on('text', certIdHandler);
 });
 
@@ -333,6 +337,9 @@ bot.command('my_certificates', async (ctx) => {
 
 // ========== АДМИН КОМАНДЫ ==========
 
+// Обработчики для админских команд
+const adminHandlers = new Map();
+
 // Команда /add_user - Добавить пользователя
 bot.command('add_user', async (ctx) => {
     const userId = ctx.from.id;
@@ -346,11 +353,19 @@ bot.command('add_user', async (ctx) => {
     
     await ctx.reply('Введите Telegram ID пользователя для добавления:');
     
+    // Создаем обработчик для этого пользователя
     const userIdHandler = async (ctx) => {
+        // Проверяем что это тот же пользователь
+        if (ctx.from.id !== userId) return;
+        
         const newUserId = parseInt(ctx.message.text.trim());
         
-        // Удаляем обработчик
-        bot.off('text', userIdHandler);
+        // Удаляем обработчик из Map
+        const handler = adminHandlers.get(userId);
+        if (handler) {
+            bot.off('text', handler);
+            adminHandlers.delete(userId);
+        }
         
         if (isNaN(newUserId) || newUserId.toString().length < 5) {
             return ctx.reply('❌ Введите корректный Telegram ID (только цифры).');
@@ -404,6 +419,8 @@ bot.command('add_user', async (ctx) => {
         }
     };
     
+    // Сохраняем обработчик в Map
+    adminHandlers.set(userId, userIdHandler);
     bot.on('text', userIdHandler);
 });
 
@@ -417,11 +434,17 @@ bot.command('remove_user', async (ctx) => {
     
     await ctx.reply('Введите Telegram ID пользователя для удаления:');
     
-    const userIdHandler = async (ctx) => {
+    const removeHandler = async (ctx) => {
+        if (ctx.from.id !== userId) return;
+        
         const removeUserId = parseInt(ctx.message.text.trim());
         
         // Удаляем обработчик
-        bot.off('text', userIdHandler);
+        const handler = adminHandlers.get(`remove_${userId}`);
+        if (handler) {
+            bot.off('text', handler);
+            adminHandlers.delete(`remove_${userId}`);
+        }
         
         if (isNaN(removeUserId)) {
             return ctx.reply('❌ Введите корректный Telegram ID (только цифры).');
@@ -447,7 +470,8 @@ bot.command('remove_user', async (ctx) => {
         }
     };
     
-    bot.on('text', userIdHandler);
+    adminHandlers.set(`remove_${userId}`, removeHandler);
+    bot.on('text', removeHandler);
 });
 
 // Команда /list_users - Список пользователей
