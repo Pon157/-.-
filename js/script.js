@@ -1,11 +1,12 @@
 // ========== КОНФИГУРАЦИЯ SUPABASE ==========
-// Важно: Создайте файл env.js с вашими ключами:
-// window.ENV = {
-//   SUPABASE_URL: 'https://your-project.supabase.co',
-//   SUPABASE_ANON_KEY: 'your-anon-key'
-// };
+// Если переменная supabase уже объявлена (например в data.js), используем её
+// Если нет - объявляем здесь
 
-// Альтернативно используйте переменные окружения сервера
+// Проверяем, объявлена ли уже переменная supabase
+if (typeof supabase === 'undefined') {
+    var supabase; // Объявляем только если не существует
+}
+
 const SUPABASE_CONFIG = {
     url: window.ENV?.SUPABASE_URL || process.env.SUPABASE_URL,
     anonKey: window.ENV?.SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY
@@ -13,9 +14,32 @@ const SUPABASE_CONFIG = {
 
 console.log('🔧 Конфигурация Supabase:', SUPABASE_CONFIG.url ? 'Найдена' : 'Не найдена');
 
-// ========== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ==========
-let supabase; // ОБЪЯВЛЕНО ТОЛЬКО ОДИН РАЗ ЗДЕСЬ!
+// Инициализируем Supabase клиент если есть конфигурация
+function initSupabase() {
+    try {
+        if (!supabase && window.supabase && SUPABASE_CONFIG.url && SUPABASE_CONFIG.anonKey) {
+            supabase = window.supabase.createClient(
+                SUPABASE_CONFIG.url,
+                SUPABASE_CONFIG.anonKey,
+                {
+                    auth: {
+                        persistSession: true,
+                        autoRefreshToken: true,
+                        detectSessionInUrl: false
+                    }
+                }
+            );
+            console.log('✅ Supabase инициализирован');
+            return true;
+        }
+        return false;
+    } catch (error) {
+        console.error('❌ Ошибка инициализации Supabase:', error);
+        return false;
+    }
+}
 
+// ========== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ==========
 let userProgress = {
     currentModule: 1,
     currentSubmodule: "1.1",
@@ -42,49 +66,6 @@ let uiState = {
         notifications: true
     }
 };
-
-// ========== ИНИЦИАЛИЗАЦИЯ SUPABASE КЛИЕНТА ==========
-function initializeSupabase() {
-    try {
-        if (window.supabase && SUPABASE_CONFIG.url && SUPABASE_CONFIG.anonKey) {
-            supabase = window.supabase.createClient(
-                SUPABASE_CONFIG.url,
-                SUPABASE_CONFIG.anonKey,
-                {
-                    auth: {
-                        persistSession: true,
-                        autoRefreshToken: true,
-                        detectSessionInUrl: false,
-                        storage: window.localStorage,
-                        storageKey: 'supabase.auth.token'
-                    },
-                    global: {
-                        headers: {
-                            'apikey': SUPABASE_CONFIG.anonKey,
-                            'Content-Type': 'application/json'
-                        }
-                    },
-                    realtime: {
-                        params: {
-                            eventsPerSecond: 10
-                        }
-                    }
-                }
-            );
-            console.log('✅ Supabase клиент инициализирован');
-            return true;
-        } else {
-            console.warn('⚠️ Supabase не инициализирован. Проверьте конфигурацию.');
-            console.warn('URL:', SUPABASE_CONFIG.url ? '✓ Установлен' : '✗ Отсутствует');
-            console.warn('Anon Key:', SUPABASE_CONFIG.anonKey ? '✓ Установлен' : '✗ Отсутствует');
-            console.warn('Библиотека:', window.supabase ? '✓ Загружена' : '✗ Не загружена');
-            return false;
-        }
-    } catch (error) {
-        console.error('❌ Ошибка инициализации Supabase:', error);
-        return false;
-    }
-}
 
 
 
