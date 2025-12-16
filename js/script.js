@@ -86,33 +86,6 @@ function initializeSupabase() {
 }
 
 
-// ========== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ==========
-let userProgress = {
-    currentModule: 1,
-    currentSubmodule: "1.1",
-    completedModules: [],
-    completedSubmodules: [],
-    testResults: {},
-    assignmentResults: {},
-    finalExamCompleted: false,
-    finalExamScore: 0,
-    userName: "Гость"
-};
-
-let answerDraftsCache = new Map();
-let currentUserId = null;
-let isAuthenticated = false;
-let autoSaveTimer = null;
-let uiState = {
-    openTabs: {},
-    scrollPositions: {},
-    theme: 'dark',
-    settings: {
-        autoSave: true,
-        autoSaveInterval: 3000,
-        notifications: true
-    }
-};
 
 // ========== СТИЛИ ==========
 const enhancedStyles = `
