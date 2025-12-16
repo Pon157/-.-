@@ -41,6 +41,7 @@ function checkAssignment(submoduleId) {
             .eq('submodule_id', submoduleId)
             .eq('answer_type', 'main');
     }
+}
 // Данные курса: модули, подмодули, задания  
 const courseData = {
     title: "Эмпатия и поддержка в общении",
