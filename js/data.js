@@ -4273,3 +4273,4 @@ const tableStyles = `
 document.head.insertAdjacentHTML('beforeend', tableStyles);
 
 console.log("✅ Стили для таблиц и контрольных работ добавлены");
+}
