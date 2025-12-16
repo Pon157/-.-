@@ -1,4 +1,3 @@
-// script.js - Полный код курса эмпатии с Supabase и автосохранением
 
 // ========== КОНФИГУРАЦИЯ SUPABASE ==========
 const SUPABASE_CONFIG = {
