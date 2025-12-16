@@ -13,8 +13,9 @@ const SUPABASE_CONFIG = {
 
 console.log('🔧 Конфигурация Supabase:', SUPABASE_CONFIG.url ? 'Найдена' : 'Не найдена');
 
-// Глобальные переменные
-let supabase;
+// ========== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ==========
+let supabase; // ОБЪЯВЛЕНО ТОЛЬКО ОДИН РАЗ ЗДЕСЬ!
+
 let userProgress = {
     currentModule: 1,
     currentSubmodule: "1.1",
