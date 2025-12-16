@@ -1,7 +1,7 @@
 {
   "name": "telegram-certificate-bot",
   "version": "1.0.0",
-  "description": "Telegram bot for certificate verification",
+  "description": "Telegram bot for empathy course certificate verification",
   "main": "telegram-bot.js",
   "scripts": {
     "start": "node telegram-bot.js",
