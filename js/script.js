@@ -1,31 +1,90 @@
-
 // ========== КОНФИГУРАЦИЯ SUPABASE ==========
+// Важно: Создайте файл env.js с вашими ключами:
+// window.ENV = {
+//   SUPABASE_URL: 'https://your-project.supabase.co',
+//   SUPABASE_ANON_KEY: 'your-anon-key'
+// };
+
+// Альтернативно используйте переменные окружения сервера
 const SUPABASE_CONFIG = {
-    // Получаем конфигурацию из переменных окружения сервера
     url: window.ENV?.SUPABASE_URL || process.env.SUPABASE_URL,
     anonKey: window.ENV?.SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY
 };
 
 console.log('🔧 Конфигурация Supabase:', SUPABASE_CONFIG.url ? 'Найдена' : 'Не найдена');
 
-// Инициализируем Supabase клиент только если есть конфигурация
+// Глобальные переменные
 let supabase;
-if (window.supabase && SUPABASE_CONFIG.url && SUPABASE_CONFIG.anonKey) {
-    supabase = window.supabase.createClient(
-        SUPABASE_CONFIG.url,
-        SUPABASE_CONFIG.anonKey,
-        {
-            auth: {
-                persistSession: true,
-                autoRefreshToken: true,
-                detectSessionInUrl: false
-            }
+let userProgress = {
+    currentModule: 1,
+    currentSubmodule: "1.1",
+    completedModules: [],
+    completedSubmodules: [],
+    testResults: {},
+    assignmentResults: {},
+    finalExamCompleted: false,
+    finalExamScore: 0,
+    userName: "Гость"
+};
+
+let answerDraftsCache = new Map();
+let currentUserId = null;
+let isAuthenticated = false;
+let autoSaveTimer = null;
+let uiState = {
+    openTabs: {},
+    scrollPositions: {},
+    theme: 'dark',
+    settings: {
+        autoSave: true,
+        autoSaveInterval: 3000,
+        notifications: true
+    }
+};
+
+// ========== ИНИЦИАЛИЗАЦИЯ SUPABASE КЛИЕНТА ==========
+function initializeSupabase() {
+    try {
+        if (window.supabase && SUPABASE_CONFIG.url && SUPABASE_CONFIG.anonKey) {
+            supabase = window.supabase.createClient(
+                SUPABASE_CONFIG.url,
+                SUPABASE_CONFIG.anonKey,
+                {
+                    auth: {
+                        persistSession: true,
+                        autoRefreshToken: true,
+                        detectSessionInUrl: false,
+                        storage: window.localStorage,
+                        storageKey: 'supabase.auth.token'
+                    },
+                    global: {
+                        headers: {
+                            'apikey': SUPABASE_CONFIG.anonKey,
+                            'Content-Type': 'application/json'
+                        }
+                    },
+                    realtime: {
+                        params: {
+                            eventsPerSecond: 10
+                        }
+                    }
+                }
+            );
+            console.log('✅ Supabase клиент инициализирован');
+            return true;
+        } else {
+            console.warn('⚠️ Supabase не инициализирован. Проверьте конфигурацию.');
+            console.warn('URL:', SUPABASE_CONFIG.url ? '✓ Установлен' : '✗ Отсутствует');
+            console.warn('Anon Key:', SUPABASE_CONFIG.anonKey ? '✓ Установлен' : '✗ Отсутствует');
+            console.warn('Библиотека:', window.supabase ? '✓ Загружена' : '✗ Не загружена');
+            return false;
         }
-    );
-    console.log('✅ Supabase инициализирован');
-} else {
-    console.warn('⚠️ Supabase не инициализирован. Работа в гостевом режиме.');
+    } catch (error) {
+        console.error('❌ Ошибка инициализации Supabase:', error);
+        return false;
+    }
 }
+
 
 // ========== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ==========
 let userProgress = {
