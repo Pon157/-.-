@@ -231,35 +231,35 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 async function initApp() {
     try {
-        // Спочатку ініціалізуємо Supabase
+        // Сначала инициализируем Supabase
         const supabaseInitialized = initSupabase();
         
         if (supabase && supabaseInitialized) {
-            console.log('🔄 Перевірка сесії...');
+            console.log('🔄 Проверка сессии...');
             
             const { data: { session }, error: sessionError } = await supabase.auth.getSession();
             
             if (sessionError) {
-                console.error("❌ Помилка отримання сесії:", sessionError);
+                console.error("❌ Ошибка получения сессии:", sessionError);
                 
-                // Спробуємо оновити токен
+                // Пробуем обновить токен
                 try {
                     const { data: { session: refreshedSession }, error: refreshError } = await supabase.auth.refreshSession();
                     
                     if (refreshError || !refreshedSession) {
-                        console.log("⚠️ Не вдалося оновити сесію, переходимо в гостьовий режим");
+                        console.log("⚠️ Не удалось обновить сессию, переходим в гостевой режим");
                         await loadGuestProgress();
                         renderModulesList();
                         showWelcomeScreen();
                         return;
                     }
                     
-                    // Якщо оновлення успішне, продовжуємо з новою сесією
-                    console.log("✅ Сесія оновлена");
-                    return initApp(); // Рекурсивно викликаємо ще раз
+                    // Если обновление успешно, продолжаем с новой сессией
+                    console.log("✅ Сессия обновлена");
+                    return initApp(); // Рекурсивно вызываем еще раз
                     
                 } catch (refreshError) {
-                    console.error("❌ Помилка оновлення сесії:", refreshError);
+                    console.error("❌ Ошибка обновления сессии:", refreshError);
                     await loadGuestProgress();
                     renderModulesList();
                     showWelcomeScreen();
@@ -270,7 +270,7 @@ async function initApp() {
             if (session) {
                 currentUserId = session.user.id;
                 isAuthenticated = true;
-                console.log("✅ Користувач авторизований:", session.user.email);
+                console.log("✅ Пользователь авторизован:", session.user.email);
                 
                 try {
                     await loadUserProgress();
@@ -290,32 +290,32 @@ async function initApp() {
                     setupAuthListener();
                     
                 } catch (loadError) {
-                    console.error("❌ Помилка завантаження даних:", loadError);
-                    showMessage('error', 'Помилка завантаження даних. Спробуйте оновити сторінку.');
+                    console.error("❌ Ошибка загрузки данных:", loadError);
+                    showMessage('error', 'Ошибка загрузки данных. Попробуйте обновить страницу.');
                     await loadGuestProgress();
                     renderModulesList();
                     showWelcomeScreen();
                 }
                 
             } else {
-                console.log("👤 Гостьовий режим - сесія відсутня");
+                console.log("👤 Гостевой режим - сессия отсутствует");
                 await loadGuestProgress();
                 renderModulesList();
                 showWelcomeScreen();
             }
         } else {
-            console.log("🔄 Робота в гостьовому режимі (Supabase не налаштовано)");
+            console.log("🔄 Работа в гостевом режиме (Supabase не настроен)");
             await loadGuestProgress();
             renderModulesList();
             showWelcomeScreen();
         }
         
     } catch (error) {
-        console.error("❌ Критична помилка ініціалізації:", error);
+        console.error("❌ Критическая ошибка инициализации:", error);
         await loadGuestProgress();
         renderModulesList();
         showWelcomeScreen();
-        showMessage('error', 'Помилка ініціалізації додатку');
+        showMessage('error', 'Ошибка инициализации приложения');
     }
 }
 
@@ -510,7 +510,7 @@ function updateUserUI(user) {
     if (!user) return;
     
     const userNameElements = document.querySelectorAll('#userName');
-    const displayName = user.user_metadata?.full_name || user.email?.split('@')[0] || 'Користувач';
+    const displayName = user.user_metadata?.full_name || user.email?.split('@')[0] || 'Пользователь';
     
     userNameElements.forEach(el => {
         if (el) {
@@ -520,7 +520,7 @@ function updateUserUI(user) {
         }
     });
     
-    // Додаємо меню користувача
+    // Добавляем меню пользователя
     const userProfile = document.querySelector('.user-profile');
     if (userProfile && isAuthenticated) {
         userProfile.innerHTML = `
@@ -531,32 +531,32 @@ function updateUserUI(user) {
                 </div>
                 <div class="user-menu-content">
                     <a href="#" class="user-menu-item" onclick="event.preventDefault(); showProfile()">
-                        <i class="fas fa-user"></i> Профіль
+                        <i class="fas fa-user"></i> Профиль
                     </a>
                     <a href="#" class="user-menu-item" onclick="event.preventDefault(); handleLogout()">
-                        <i class="fas fa-sign-out-alt"></i> Вийти
+                        <i class="fas fa-sign-out-alt"></i> Выйти
                     </a>
                 </div>
             </div>
         `;
     }
     
-    console.log('✅ UI користувача оновлено:', displayName);
+    console.log('✅ UI пользователя обновлено:', displayName);
 }
 
 function showProfile() {
     const modalTitle = document.getElementById('modalTitle');
     const modalBody = document.getElementById('modalBody');
     
-    modalTitle.textContent = 'Профіль користувача';
+    modalTitle.textContent = 'Профиль пользователя';
     modalBody.innerHTML = `
         <div style="padding: 20px;">
-            <h3><i class="fas fa-user-circle"></i> Інформація про профіль</h3>
-            <p><strong>Ім'я:</strong> ${userProgress.userName}</p>
-            <p><strong>Email:</strong> ${currentUserId ? 'Прихований' : 'Гість'}</p>
-            <p><strong>Статус:</strong> ${isAuthenticated ? '✅ Авторизовано' : '❌ Гість'}</p>
-            <p><strong>Прогрес:</strong> ${userProgress.completedSubmodules.length} підмодулів завершено</p>
-            ${userProgress.finalExamCompleted ? '<p><strong>Іспит:</strong> ✅ Завершено</p>' : ''}
+            <h3><i class="fas fa-user-circle"></i> Информация о профиле</h3>
+            <p><strong>Имя:</strong> ${userProgress.userName}</p>
+            <p><strong>Email:</strong> ${currentUserId ? 'Скрыт' : 'Гость'}</p>
+            <p><strong>Статус:</strong> ${isAuthenticated ? '✅ Авторизован' : '❌ Гость'}</p>
+            <p><strong>Прогресс:</strong> ${userProgress.completedSubmodules.length} подмодулей завершено</p>
+            ${userProgress.finalExamCompleted ? '<p><strong>Экзамен:</strong> ✅ Завершен</p>' : ''}
         </div>
     `;
     
@@ -1008,24 +1008,31 @@ async function handleRegister() {
     const password = document.getElementById('registerPassword').value;
     
     if (!name || !email || !password) {
-        showMessage('error', 'Заповніть всі поля');
+        showMessage('error', 'Заполните все поля');
         return;
     }
     
     if (password.length < 6) {
-        showMessage('error', 'Пароль мінімум 6 символів');
+        showMessage('error', 'Пароль минимум 6 символов');
         return;
     }
     
-    // Перевірка формату email
+    // Проверка формата email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-        showMessage('error', 'Введіть коректний email');
+        showMessage('error', 'Введите корректный email');
+        return;
+    }
+    
+    // Проверяем наличие Supabase
+    if (!supabase) {
+        showMessage('error', '❌ Supabase не настроен. Настройте ключи в js/data.js');
+        console.error('❌ Supabase не инициализирован. Проверьте конфигурацию в js/data.js');
         return;
     }
     
     try {
-        showMessage('info', '⏳ Реєстрація...');
+        showMessage('info', '⏳ Регистрация...');
         
         const { data: authData, error: authError } = await supabase.auth.signUp({
             email,
@@ -1039,17 +1046,17 @@ async function handleRegister() {
         });
         
         if (authError) {
-            // Перевірка на вже існуючий email
+            // Проверка на уже существующий email
             if (authError.message.includes('already registered')) {
-                throw new Error('Цей email вже зареєстрований. Спробуйте увійти.');
+                throw new Error('Этот email уже зарегистрирован. Попробуйте войти.');
             }
             throw authError;
         }
         
         if (authData.user) {
-            console.log('✅ Користувач створений в Auth:', authData.user.id);
+            console.log('✅ Пользователь создан в Auth:', authData.user.id);
             
-            // Створюємо запис користувача в таблиці users
+            // Создаем запись пользователя в таблице users
             const { error: userError } = await supabase
                 .from('users')
                 .insert([
@@ -1074,13 +1081,13 @@ async function handleRegister() {
                 ]);
             
             if (userError && userError.code !== '23505') { // 23505 = duplicate key
-                console.error('Помилка створення користувача:', userError);
+                console.error('Ошибка создания пользователя:', userError);
                 throw userError;
             }
             
-            console.log('✅ Запис користувача створено');
+            console.log('✅ Запись пользователя создана');
             
-            // Додаємо користувача до allowed_users для доступу до бота
+            // Добавляем пользователя в allowed_users для доступа к боту
             try {
                 const { error: allowedError } = await supabase
                     .from('allowed_users')
@@ -1094,26 +1101,26 @@ async function handleRegister() {
                     ]);
                 
                 if (allowedError && allowedError.code !== '23505') {
-                    console.warn('Помилка додавання до allowed_users:', allowedError);
+                    console.warn('Ошибка добавления в allowed_users:', allowedError);
                 }
             } catch (err) {
-                console.warn('Не вдалося додати до allowed_users:', err);
+                console.warn('Не удалось добавить в allowed_users:', err);
             }
         }
         
         document.getElementById('modalOverlay').style.display = 'none';
         
-        // Перевіряємо чи потрібне підтвердження email
+        // Проверяем нужно ли подтверждение email
         if (authData.user && !authData.user.confirmed_at) {
-            showMessage('success', '✅ Реєстрація успішна! Перевірте пошту та підтвердіть email.');
+            showMessage('success', '✅ Регистрация успешна! Проверьте почту и подтвердите email.');
         } else {
-            showMessage('success', '✅ Реєстрація успішна! Входимо...');
+            showMessage('success', '✅ Регистрация успешна! Входим...');
             setTimeout(() => location.reload(), 1500);
         }
         
     } catch (error) {
-        console.error('❌ Помилка реєстрації:', error);
-        showMessage('error', error.message || 'Помилка реєстрації. Спробуйте ще раз.');
+        console.error('❌ Ошибка регистрации:', error);
+        showMessage('error', error.message || 'Ошибка регистрации. Попробуйте еще раз.');
     }
 }
 
@@ -2829,7 +2836,6 @@ window.openModule = openModule;
 window.resetProgress = resetProgress;
 window.showCertificate = showCertificate;
 window.showWelcomeScreen = showWelcomeScreen;
-window.submitName = submitName;
 window.printCertificate = printCertificate;
 window.saveCertificateAsImage = saveCertificateAsImage;
 window.shareCertificate = shareCertificate;
