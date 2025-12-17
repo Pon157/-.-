@@ -1,47 +1,8 @@
-// ========== КОНФИГУРАЦИЯ SUPABASE ==========
-// Если переменная supabase уже объявлена (например в data.js), используем её
-// Если нет - объявляем здесь
+// ========== КОНФИГУРАЦИЯ ==========
+let supabase = null;
+let currentUserId = null;
+let isAuthenticated = false;
 
-// Проверяем, объявлена ли уже переменная supabase
-if (typeof supabase === 'undefined') {
-    var supabase; // Объявляем только если не существует
-}
-
-const SUPABASE_CONFIG = {
-    // Получаем конфигурацию только из window.ENV (для браузера)
-    url: window.ENV?.SUPABASE_URL,
-    anonKey: window.ENV?.SUPABASE_ANON_KEY
-};
-
-console.log('🔧 Конфигурация Supabase:', SUPABASE_CONFIG.url ? 'Найдена' : 'Не найдена');
-
-// Инициализируем Supabase клиент если есть конфигурация
-function initSupabase() {
-    try {
-        if (!supabase && window.supabase && SUPABASE_CONFIG.url && SUPABASE_CONFIG.anonKey) {
-            supabase = window.supabase.createClient(
-                SUPABASE_CONFIG.url,
-                SUPABASE_CONFIG.anonKey,
-                {
-                    auth: {
-                        persistSession: true,
-                        autoRefreshToken: true,
-                        detectSessionInUrl: false
-                    }
-                }
-            );
-            console.log('✅ Supabase инициализирован');
-            return true;
-        }
-        console.warn('⚠️ Supabase не инициализирован. Работа в гостевом режиме.');
-        return false;
-    } catch (error) {
-        console.error('❌ Ошибка инициализации Supabase:', error);
-        return false;
-    }
-}
-
-// ========== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ==========
 let userProgress = {
     currentModule: 1,
     currentSubmodule: "1.1",
@@ -55,9 +16,6 @@ let userProgress = {
 };
 
 let answerDraftsCache = new Map();
-let currentUserId = null;
-let isAuthenticated = false;
-let autoSaveTimer = null;
 let uiState = {
     openTabs: {},
     scrollPositions: {},
@@ -68,13 +26,12 @@ let uiState = {
         notifications: true
     }
 };
-
-
+let autoSaveTimer = null;
 
 // ========== СТИЛИ ==========
 const enhancedStyles = `
 <style>
-    /* Все твои оригинальные стили остаются */
+    /* Все ваши оригинальные стили */
     .module-test { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); }
     .quote-box { background: linear-gradient(135deg, rgba(155, 89, 182, 0.1) 0%, rgba(142, 68, 173, 0.1) 100%); }
     .definition-box { background: linear-gradient(135deg, rgba(155, 89, 182, 0.1) 0%, rgba(142, 68, 173, 0.1) 100%); }
@@ -96,7 +53,6 @@ const enhancedStyles = `
     .btn-secondary:hover { background: rgba(255, 255, 255, 0.15); transform: translateY(-2px); }
     textarea:focus { outline: none; border-color: #3498db; box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2); }
     
-    /* Новые стили для автосохранения */
     .draft-saved {
         border: 2px solid #2ecc71 !important;
         background: rgba(46, 204, 113, 0.05) !important;
@@ -125,227 +81,286 @@ const enhancedStyles = `
     }
     
     @keyframes slideInUp {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
     }
     
     @keyframes slideOutDown {
-        from {
-            opacity: 1;
-            transform: translateY(0);
-        }
-        to {
-            opacity: 0;
-            transform: translateY(20px);
-        }
+        from { opacity: 1; transform: translateY(0); }
+        to { opacity: 0; transform: translateY(20px); }
     }
     
-    .auth-modal {
-        background: rgba(0, 0, 0, 0.95) !important;
+    .auth-modal { background: rgba(0, 0, 0, 0.95) !important; }
+    .auth-tab { cursor: pointer; padding: 12px 20px; border: none; background: none; color: #95a5a6; font-size: 1rem; border-bottom: 2px solid transparent; transition: all 0.3s; }
+    .auth-tab.active { color: #3498db; border-bottom: 2px solid #3498db; font-weight: bold; }
+    .user-menu { position: relative; display: inline-block; }
+    .user-menu-content { display: none; position: absolute; right: 0; top: 100%; background: #2c3e50; min-width: 200px; box-shadow: 0 8px 16px rgba(0,0,0,0.2); z-index: 1000; border-radius: 8px; overflow: hidden; }
+    .user-menu:hover .user-menu-content { display: block; }
+    .user-menu-item { display: block; padding: 12px 20px; color: white; text-decoration: none; border-bottom: 1px solid rgba(255,255,255,0.1); transition: background 0.3s; }
+    .user-menu-item:hover { background: #3498db; }
+    .guest-warning { background: rgba(243, 156, 18, 0.1); border-left: 4px solid #f39c12; padding: 15px; margin: 15px 0; border-radius: 0 8px 8px 0; color: #f39c12; }
+    
+    @keyframes slideInRight {
+        from { opacity: 0; transform: translateX(100px); }
+        to { opacity: 1; transform: translateX(0); }
     }
     
-    .auth-tab {
-        cursor: pointer;
-        padding: 12px 20px;
-        border: none;
-        background: none;
-        color: #95a5a6;
-        font-size: 1rem;
-        border-bottom: 2px solid transparent;
-        transition: all 0.3s;
-    }
-    
-    .auth-tab.active {
-        color: #3498db;
-        border-bottom: 2px solid #3498db;
-        font-weight: bold;
-    }
-    
-    .user-menu {
-        position: relative;
-        display: inline-block;
-    }
-    
-    .user-menu-content {
-        display: none;
-        position: absolute;
-        right: 0;
-        top: 100%;
-        background: #2c3e50;
-        min-width: 200px;
-        box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-        z-index: 1000;
-        border-radius: 8px;
-        overflow: hidden;
-    }
-    
-    .user-menu:hover .user-menu-content {
-        display: block;
-    }
-    
-    .user-menu-item {
-        display: block;
-        padding: 12px 20px;
-        color: white;
-        text-decoration: none;
-        border-bottom: 1px solid rgba(255,255,255,0.1);
-        transition: background 0.3s;
-    }
-    
-    .user-menu-item:hover {
-        background: #3498db;
-    }
-    
-    .guest-warning {
-        background: rgba(243, 156, 18, 0.1);
-        border-left: 4px solid #f39c12;
-        padding: 15px;
-        margin: 15px 0;
-        border-radius: 0 8px 8px 0;
-        color: #f39c12;
+    @keyframes slideOutRight {
+        from { opacity: 1; transform: translateX(0); }
+        to { opacity: 0; transform: translateX(100px); }
     }
 </style>
 `;
 
-// ========== ИНИЦИАЛИЗАЦИЯ ПРИЛОЖЕНИЯ ==========
-document.addEventListener('DOMContentLoaded', async function() {
-    console.log("🚀 Курс эмпатии загружается...");
+// ========== ЗАГРУЗКА КОНФИГУРАЦИИ ==========
+async function loadConfigFromServer() {
+    console.log('🔄 Загрузка конфигурации с сервера...');
     
-    // Добавляем стили
-    document.head.insertAdjacentHTML('beforeend', enhancedStyles);
-    
-    // Инициализируем приложение
-    await initApp();
-    
-    // Настраиваем обработчики событий
-    setupEventListeners();
-});
-
-// ========== ОСНОВНЫЕ ФУНКЦИИ ИНИЦИАЛИЗАЦИИ ==========
-
-async function initApp() {
     try {
-        // Сначала инициализируем Supabase
-        const supabaseInitialized = initSupabase();
+        const response = await fetch('/api/config');
         
-        if (supabase && supabaseInitialized) {
-            console.log('🔄 Проверка сессии...');
-            
-            const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-            
-            if (sessionError) {
-                console.error("❌ Ошибка получения сессии:", sessionError);
-                
-                // Пробуем обновить токен
-                try {
-                    const { data: { session: refreshedSession }, error: refreshError } = await supabase.auth.refreshSession();
-                    
-                    if (refreshError || !refreshedSession) {
-                        console.log("⚠️ Не удалось обновить сессию, переходим в гостевой режим");
-                        await loadGuestProgress();
-                        renderModulesList();
-                        showWelcomeScreen();
-                        return;
-                    }
-                    
-                    // Если обновление успешно, продолжаем с новой сессией
-                    console.log("✅ Сессия обновлена");
-                    return initApp(); // Рекурсивно вызываем еще раз
-                    
-                } catch (refreshError) {
-                    console.error("❌ Ошибка обновления сессии:", refreshError);
-                    await loadGuestProgress();
-                    renderModulesList();
-                    showWelcomeScreen();
-                    return;
-                }
-            }
-            
-            if (session) {
-                currentUserId = session.user.id;
-                isAuthenticated = true;
-                console.log("✅ Пользователь авторизован:", session.user.email);
-                
-                try {
-                    await loadUserProgress();
-                    await loadAnswerDrafts();
-                    await loadUIState();
-                    
-                    updateUserUI(session.user);
-                    
-                    if (userProgress.currentModule && userProgress.currentSubmodule) {
-                        setTimeout(() => {
-                            openModule(userProgress.currentModule, userProgress.currentSubmodule);
-                        }, 500);
-                    } else {
-                        showWelcomeScreen();
-                    }
-                    
-                    setupAuthListener();
-                    
-                } catch (loadError) {
-                    console.error("❌ Ошибка загрузки данных:", loadError);
-                    showMessage('error', 'Ошибка загрузки данных. Попробуйте обновить страницу.');
-                    await loadGuestProgress();
-                    renderModulesList();
-                    showWelcomeScreen();
-                }
-                
-            } else {
-                console.log("👤 Гостевой режим - сессия отсутствует");
-                await loadGuestProgress();
-                renderModulesList();
-                showWelcomeScreen();
-            }
-        } else {
-            console.log("🔄 Работа в гостевом режиме (Supabase не настроен)");
-            await loadGuestProgress();
-            renderModulesList();
-            showWelcomeScreen();
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
         }
         
+        const config = await response.json();
+        
+        window.ENV = {
+            SUPABASE_URL: config.SUPABASE_URL,
+            SUPABASE_ANON_KEY: config.SUPABASE_ANON_KEY
+        };
+        
+        console.log('✅ Конфигурация загружена с сервера');
+        console.log('📦 URL:', window.ENV.SUPABASE_URL);
+        console.log('🔑 Key (первые 20):', window.ENV.SUPABASE_ANON_KEY.substring(0, 20) + '...');
+        
+        await initApp();
+        
     } catch (error) {
-        console.error("❌ Критическая ошибка инициализации:", error);
-        await loadGuestProgress();
-        renderModulesList();
-        showWelcomeScreen();
-        showMessage('error', 'Ошибка инициализации приложения');
+        console.error('❌ Ошибка загрузки конфигурации:', error);
+        showConfigError();
     }
 }
 
-// Заменяем loadUserProgress
+function showConfigError() {
+    document.body.innerHTML = `
+        <div style="
+            padding: 50px;
+            text-align: center;
+            font-family: Arial, sans-serif;
+            background: #1a1a2e;
+            color: white;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        ">
+            <h1 style="color: #e74c3c;">⚠️ Ошибка загрузки</h1>
+            <p>Не удалось загрузить конфигурацию с сервера</p>
+            <p style="color: #95a5a6; font-size: 0.9rem; margin-top: 20px;">
+                Ошибка: Сервер конфигурации недоступен
+            </p>
+            <div style="margin-top: 30px;">
+                <button onclick="location.reload()" style="
+                    background: #3498db;
+                    color: white;
+                    border: none;
+                    padding: 12px 24px;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    font-size: 1rem;
+                ">
+                    Попробовать снова
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+// ========== ИНИЦИАЛИЗАЦИЯ ==========
+document.addEventListener('DOMContentLoaded', async function() {
+    console.log("🚀 Курс эмпатии загружается...");
+    document.head.insertAdjacentHTML('beforeend', enhancedStyles);
+    await loadConfigFromServer();
+});
+
+async function initApp() {
+    console.log('🔄 Инициализация приложения...');
+    
+    try {
+        if (!window.courseData) {
+            console.error('❌ Данные курса не загружены!');
+            return;
+        }
+        
+        console.log('✅ Данные курса:', window.courseData.modules.length, 'модулей');
+        
+        const supabaseInitialized = await initSupabase();
+        
+        if (supabaseInitialized) {
+            console.log('🔄 Проверка сессии...');
+            
+            const { data: { session }, error } = await supabase.auth.getSession();
+            
+            if (error) {
+                console.error('❌ Ошибка сессии:', error);
+                await initGuestMode();
+                return;
+            }
+            
+            if (session) {
+                console.log('✅ Сессия найдена:', session.user.email);
+                await handleUserSession(session);
+            } else {
+                console.log('👤 Гостевой режим');
+                await initGuestMode();
+            }
+        } else {
+            console.log('🔄 Гостевой режим (Supabase не инициализирован)');
+            await initGuestMode();
+        }
+        
+    } catch (error) {
+        console.error('❌ Критическая ошибка:', error);
+        await initGuestMode();
+    }
+    
+    setupEventListeners();
+}
+
+async function initSupabase() {
+    console.log('🔧 Инициализация Supabase клиента...');
+    
+    if (!window.ENV || !window.ENV.SUPABASE_URL || !window.ENV.SUPABASE_ANON_KEY) {
+        console.error('❌ Конфигурация Supabase не найдена');
+        return false;
+    }
+    
+    try {
+        if (typeof window.supabase === 'undefined') {
+            console.log('📚 Загружаем библиотеку Supabase...');
+            await loadSupabaseLibrary();
+        }
+        
+        supabase = window.supabase.createClient(
+            window.ENV.SUPABASE_URL,
+            window.ENV.SUPABASE_ANON_KEY,
+            {
+                auth: {
+                    persistSession: true,
+                    autoRefreshToken: true,
+                    detectSessionInUrl: false
+                }
+            }
+        );
+        
+        console.log('✅ Supabase клиент создан');
+        
+        const isConnected = await testSupabaseConnection();
+        if (!isConnected) {
+            console.warn('⚠️ Нет подключения к Supabase');
+            supabase = null;
+            return false;
+        }
+        
+        return true;
+        
+    } catch (error) {
+        console.error('❌ Ошибка инициализации Supabase:', error);
+        supabase = null;
+        return false;
+    }
+}
+
+function loadSupabaseLibrary() {
+    return new Promise((resolve, reject) => {
+        if (window.supabase && window.supabase.createClient) {
+            resolve();
+            return;
+        }
+        
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
+        
+        script.onload = () => {
+            console.log('✅ Библиотека Supabase загружена');
+            resolve();
+        };
+        
+        script.onerror = () => {
+            console.error('❌ Ошибка загрузки библиотеки');
+            reject();
+        };
+        
+        document.head.appendChild(script);
+    });
+}
+
+async function testSupabaseConnection() {
+    try {
+        const { data, error } = await supabase.auth.getSession();
+        
+        if (error) {
+            console.error('❌ Ошибка подключения:', error.message);
+            return false;
+        }
+        
+        console.log('✅ Подключение к Supabase работает');
+        return true;
+        
+    } catch (error) {
+        console.error('❌ Исключение при подключении:', error);
+        return false;
+    }
+}
+
+// ========== РАБОТА С ПОЛЬЗОВАТЕЛЕМ ==========
+async function handleUserSession(session) {
+    currentUserId = session.user.id;
+    isAuthenticated = true;
+    
+    console.log('✅ Пользователь авторизован:', session.user.email);
+    
+    try {
+        await loadUserProgress();
+        await loadAnswerDrafts();
+        await loadUIState();
+        
+        updateUserUI(session.user);
+        
+        if (userProgress.currentModule && userProgress.currentSubmodule) {
+            setTimeout(() => {
+                openModule(userProgress.currentModule, userProgress.currentSubmodule);
+            }, 500);
+        } else {
+            showWelcomeScreen();
+        }
+        
+        setupAuthListener();
+        
+    } catch (error) {
+        console.error('❌ Ошибка загрузки данных:', error);
+        await initGuestMode();
+    }
+}
+
 async function loadUserProgress() {
     try {
         if (!supabase || !currentUserId) return;
         
-        // Пробуем найти пользователя по email из сессии
-        const { data: { user } } = await supabase.auth.getUser();
+        const { data: userData, error } = await supabase
+            .from('users')
+            .select('current_module, current_submodule, course_progress, name')
+            .eq('id', currentUserId)
+            .maybeSingle();
         
-        if (!user || !user.email) {
-            console.log('Пользователь не найден в сессии');
-            return;
-        }
-        
-        // Ищем в новой таблице course_users
-        const { data: userData, error: userError } = await supabase
-            .from('course_users')
-            .select('*')
-            .eq('email', user.email)
-            .single();
-        
-        if (userError && userError.code !== 'PGRST116') {
-            console.error('Ошибка поиска пользователя:', userError);
-            return;
+        if (error) {
+            console.error('Ошибка загрузки прогресса:', error);
+            throw error;
         }
         
         if (userData) {
-            // Загружаем прогресс из новой таблицы
             userProgress.currentModule = userData.current_module || 1;
             userProgress.currentSubmodule = userData.current_submodule || "1.1";
             
@@ -356,59 +371,48 @@ async function loadUserProgress() {
             userProgress.assignmentResults = progressData.assignmentResults || {};
             userProgress.finalExamCompleted = progressData.finalExamCompleted || false;
             userProgress.finalExamScore = progressData.finalExamScore || 0;
-            userProgress.userName = progressData.userName || userData.name || "Гость";
+            userProgress.userName = userData.name || "Гость";
             
-            console.log("✅ Прогресс загружен из course_users");
+            console.log('✅ Прогресс загружен из Supabase');
         } else {
-            // Создаем нового пользователя
-            await createUserInCourseTable(user);
+            await createUserProgressRecord();
         }
         
         updateProgressUI();
         renderModulesList();
         
     } catch (error) {
-        console.error("❌ Ошибка загрузки прогресса:", error);
-        // При ошибке загружаем гостевой режим
-        await loadGuestProgress();
+        console.error('❌ Ошибка загрузки прогресса:', error);
+        throw error;
     }
 }
 
-async function createUserInCourseTable(authUser) {
+async function createUserProgressRecord() {
     try {
-        if (!supabase || !authUser) return;
+        if (!supabase || !currentUserId) return;
         
-        const newUser = {
-            email: authUser.email,
-            name: authUser.user_metadata?.full_name || authUser.email?.split('@')[0] || 'Пользователь',
-            auth_user_id: authUser.id,
-            current_module: 1,
-            current_submodule: '1.1',
-            course_progress: {
-                completedModules: [],
-                completedSubmodules: [],
-                testResults: {},
-                assignmentResults: {},
-                finalExamCompleted: false,
-                finalExamScore: 0,
-                userName: authUser.user_metadata?.full_name || authUser.email?.split('@')[0] || 'Пользователь'
-            }
-        };
-        
-        const { data, error } = await supabase
-            .from('course_users')
-            .insert([newUser])
-            .select()
-            .single();
+        const { error } = await supabase
+            .from('users')
+            .update({
+                current_module: 1,
+                current_submodule: '1.1',
+                course_progress: {
+                    completedModules: [],
+                    completedSubmodules: [],
+                    testResults: {},
+                    assignmentResults: {},
+                    finalExamCompleted: false,
+                    finalExamScore: 0
+                },
+                last_active: new Date().toISOString()
+            })
+            .eq('id', currentUserId);
         
         if (error) throw error;
-        
-        console.log("✅ Пользователь создан в course_users");
-        return data;
+        console.log('✅ Запись прогресса создана');
         
     } catch (error) {
-        console.error("❌ Ошибка создания пользователя:", error);
-        throw error;
+        console.error('❌ Ошибка создания записи:', error);
     }
 }
 
@@ -450,20 +454,17 @@ function restoreAnswerDrafts() {
     if (!userProgress.currentSubmodule) return;
     
     const currentSubmoduleId = userProgress.currentSubmodule;
-    
-    // Восстанавливаем основной ответ
     const mainKey = `${currentSubmoduleId}_main`;
+    
     if (answerDraftsCache.has(mainKey)) {
         const draft = answerDraftsCache.get(mainKey);
         const textarea = document.getElementById(`answer${currentSubmoduleId.replace('.', '_')}`);
         if (textarea && draft.text) {
             textarea.value = draft.text;
             textarea.classList.add('draft-saved');
-            console.log("✅ Восстановлен основной ответ");
         }
     }
     
-    // Восстанавливаем дополнительные ответы
     const extraKey = `${currentSubmoduleId}_extra`;
     if (answerDraftsCache.has(extraKey)) {
         const draft = answerDraftsCache.get(extraKey);
@@ -475,7 +476,6 @@ function restoreAnswerDrafts() {
                     field.classList.add('draft-saved');
                 }
             });
-            console.log("✅ Восстановлены дополнительные ответы");
         }
     }
 }
@@ -504,7 +504,6 @@ async function loadUIState() {
             };
             
             setTheme(uiState.theme);
-            console.log("✅ Состояние UI загружено");
         }
         
     } catch (error) {
@@ -518,7 +517,7 @@ async function loadGuestProgress() {
         try {
             userProgress = JSON.parse(saved);
         } catch (e) {
-            console.error("Ошибка загрузки:", e);
+            console.error('Ошибка загрузки гостевого прогресса:', e);
             userProgress = getDefaultProgress();
         }
     } else {
@@ -529,660 +528,12 @@ async function loadGuestProgress() {
     renderModulesList();
 }
 
-function updateUserUI(user) {
-    if (!user) return;
-    
-    const userNameElements = document.querySelectorAll('#userName');
-    const displayName = user.user_metadata?.full_name || user.email?.split('@')[0] || 'Пользователь';
-    
-    userNameElements.forEach(el => {
-        if (el) {
-            el.textContent = displayName;
-            el.style.cursor = 'default';
-            el.onclick = null;
-        }
-    });
-    
-    // Добавляем меню пользователя
-    const userProfile = document.querySelector('.user-profile');
-    if (userProfile && isAuthenticated) {
-        userProfile.innerHTML = `
-            <div class="user-menu">
-                <div class="user-info">
-                    <i class="fas fa-user-circle"></i>
-                    <span id="userName">${displayName}</span>
-                </div>
-                <div class="user-menu-content">
-                    <a href="#" class="user-menu-item" onclick="event.preventDefault(); showProfile()">
-                        <i class="fas fa-user"></i> Профиль
-                    </a>
-                    <a href="#" class="user-menu-item" onclick="event.preventDefault(); handleLogout()">
-                        <i class="fas fa-sign-out-alt"></i> Выйти
-                    </a>
-                </div>
-            </div>
-        `;
-    }
-    
-    console.log('✅ UI пользователя обновлено:', displayName);
-}
-
-function showProfile() {
-    const modalTitle = document.getElementById('modalTitle');
-    const modalBody = document.getElementById('modalBody');
-    
-    modalTitle.textContent = 'Профиль пользователя';
-    modalBody.innerHTML = `
-        <div style="padding: 20px;">
-            <h3><i class="fas fa-user-circle"></i> Информация о профиле</h3>
-            <p><strong>Имя:</strong> ${userProgress.userName}</p>
-            <p><strong>Email:</strong> ${currentUserId ? 'Скрыт' : 'Гость'}</p>
-            <p><strong>Статус:</strong> ${isAuthenticated ? '✅ Авторизован' : '❌ Гость'}</p>
-            <p><strong>Прогресс:</strong> ${userProgress.completedSubmodules.length} подмодулей завершено</p>
-            ${userProgress.finalExamCompleted ? '<p><strong>Экзамен:</strong> ✅ Завершен</p>' : ''}
-        </div>
-    `;
-    
-    document.getElementById('modalOverlay').style.display = 'flex';
-}
-
-function setupAuthListener() {
-    if (!supabase) return;
-    
-    supabase.auth.onAuthStateChange((event, session) => {
-        console.log("Событие авторизации:", event);
-        
-        switch (event) {
-            case 'SIGNED_IN':
-                location.reload();
-                break;
-            case 'SIGNED_OUT':
-                currentUserId = null;
-                isAuthenticated = false;
-                answerDraftsCache.clear();
-                showAuthModal();
-                break;
-        }
-    });
-}
-
-// ========== ФУНКЦИИ АВТОСОХРАНЕНИЯ ==========
-
-function setupAutoSaveForModule() {
-    const currentSubmoduleId = userProgress.currentSubmodule;
-    if (!currentSubmoduleId) return;
-    
-    const textareas = document.querySelectorAll('#contentDisplay textarea');
-    
-    textareas.forEach(textarea => {
-        const id = textarea.id;
-        let answerType = '';
-        
-        if (id.startsWith('answer')) {
-            answerType = 'main';
-        } else if (id.includes('extra')) {
-            answerType = 'extra';
-        } else if (id.includes('test') || id.includes('exam')) {
-            answerType = 'test';
-        }
-        
-        if (answerType) {
-            setupAutoSave(textarea, currentSubmoduleId, answerType);
-        }
-    });
-    
-    // Также настраиваем автосохранение для radio buttons
-    const radioGroups = document.querySelectorAll('input[type="radio"]');
-    radioGroups.forEach(radio => {
-        radio.addEventListener('change', function() {
-            const groupName = this.name;
-            const group = document.querySelectorAll(`input[name="${groupName}"]:checked`);
-            if (group.length > 0) {
-                saveRadioGroupState(currentSubmoduleId, groupName, group[0].value);
-            }
-        });
-    });
-    
-    console.log("✅ Автосохранение настроено");
-}
-
-function setupAutoSave(element, submoduleId, answerType = 'main') {
-    if (!uiState.settings.autoSave || !isAuthenticated) return;
-    
-    let saveTimeout = null;
-    
-    element.addEventListener('input', function() {
-        if (saveTimeout) clearTimeout(saveTimeout);
-        
-        element.classList.add('auto-saving');
-        element.classList.remove('draft-saved');
-        
-        saveTimeout = setTimeout(() => {
-            let formData = null;
-            
-            if (answerType === 'extra') {
-                // Для дополнительных заданий собираем все поля
-                const extraFields = document.querySelectorAll(`textarea[id^="extra${submoduleId.replace('.', '_')}"]`);
-                if (extraFields.length > 1) {
-                    formData = {};
-                    extraFields.forEach(field => {
-                        formData[field.id] = field.value;
-                    });
-                }
-            }
-            
-            saveAnswerDraft(submoduleId, element.value, answerType, formData);
-            
-            element.classList.remove('auto-saving');
-            element.classList.add('draft-saved');
-            
-        }, uiState.settings.autoSaveInterval || 3000);
-    });
-    
-    element.addEventListener('blur', function() {
-        if (saveTimeout) clearTimeout(saveTimeout);
-        
-        let formData = null;
-        if (answerType === 'extra') {
-            const extraFields = document.querySelectorAll(`textarea[id^="extra${submoduleId.replace('.', '_')}"]`);
-            if (extraFields.length > 1) {
-                formData = {};
-                extraFields.forEach(field => {
-                    formData[field.id] = field.value;
-                });
-            }
-        }
-        
-        saveAnswerDraft(submoduleId, element.value, answerType, formData);
-        
-        element.classList.remove('auto-saving');
-        element.classList.add('draft-saved');
-    });
-}
-
-async function saveAnswerDraft(submoduleId, answerText, answerType = 'main', formData = null) {
-    if (!isAuthenticated || !currentUserId) {
-        // В гостевом режиме сохраняем в localStorage
-        const guestDrafts = JSON.parse(localStorage.getItem('guestAnswerDrafts') || '{}');
-        const key = `${submoduleId}_${answerType}`;
-        guestDrafts[key] = { text: answerText, formData: formData };
-        localStorage.setItem('guestAnswerDrafts', JSON.stringify(guestDrafts));
-        return;
-    }
-    
-    try {
-        const key = `${submoduleId}_${answerType}`;
-        answerDraftsCache.set(key, {
-            text: answerText,
-            formData: formData
-        });
-        
-        const draftData = {
-            user_id: currentUserId,
-            submodule_id: submoduleId,
-            answer_type: answerType,
-            answer_text: answerText,
-            updated_at: new Date().toISOString()
-        };
-        
-        if (formData) {
-            draftData.form_data = formData;
-        }
-        
-        const { error } = await supabase
-            .from('answer_drafts')
-            .upsert(draftData, {
-                onConflict: 'user_id,submodule_id,answer_type'
-            });
-        
-        if (error) throw error;
-        
-        showAutoSaveIndicator();
-        
-        console.log(`💾 Черновик сохранен: ${submoduleId} (${answerType})`);
-        
-    } catch (error) {
-        console.error("❌ Ошибка сохранения:", error);
-    }
-}
-
-async function saveRadioGroupState(submoduleId, groupName, value) {
-    if (!isAuthenticated || !currentUserId) return;
-    
-    try {
-        const key = `${submoduleId}_radio_${groupName}`;
-        answerDraftsCache.set(key, value);
-        
-        await supabase
-            .from('answer_drafts')
-            .upsert({
-                user_id: currentUserId,
-                submodule_id: submoduleId,
-                answer_type: `radio_${groupName}`,
-                answer_text: value,
-                updated_at: new Date().toISOString()
-            }, {
-                onConflict: 'user_id,submodule_id,answer_type'
-            });
-        
-    } catch (error) {
-        console.error("Ошибка сохранения радио-группы:", error);
-    }
-}
-
-async function saveProgress() {
-    if (!isAuthenticated || !currentUserId) {
-        localStorage.setItem('empathyCourseProgress', JSON.stringify(userProgress));
-        return;
-    }
-    
-    try {
-        const { error } = await supabase
-            .from('users')
-            .update({
-                current_module: userProgress.currentModule,
-                current_submodule: userProgress.currentSubmodule,
-                course_progress: {
-                    completedModules: userProgress.completedModules,
-                    completedSubmodules: userProgress.completedSubmodules,
-                    testResults: userProgress.testResults,
-                    assignmentResults: userProgress.assignmentResults,
-                    finalExamCompleted: userProgress.finalExamCompleted,
-                    finalExamScore: userProgress.finalExamScore
-                },
-                last_active: new Date().toISOString()
-            })
-            .eq('id', currentUserId);
-        
-        if (error) throw error;
-        console.log("💾 Прогресс сохранен");
-        
-    } catch (error) {
-        console.error("❌ Ошибка сохранения:", error);
-    }
-}
-
-async function saveUIState() {
-    if (!isAuthenticated || !currentUserId) return;
-    
-    try {
-        const { error } = await supabase
-            .from('ui_state')
-            .upsert({
-                user_id: currentUserId,
-                open_tabs: uiState.openTabs,
-                scroll_positions: uiState.scrollPositions,
-                theme: uiState.theme,
-                settings: uiState.settings,
-                updated_at: new Date().toISOString()
-            }, {
-                onConflict: 'user_id'
-            });
-        
-        if (error) throw error;
-        console.log("💾 UI сохранено");
-        
-    } catch (error) {
-        console.error("❌ Ошибка сохранения UI:", error);
-    }
-}
-
-function showAutoSaveIndicator() {
-    const existing = document.querySelector('.auto-save-indicator');
-    if (existing) existing.remove();
-    
-    const indicator = document.createElement('div');
-    indicator.className = 'auto-save-indicator';
-    indicator.innerHTML = '<i class="fas fa-check"></i> Автосохранено';
-    
-    document.body.appendChild(indicator);
-    
-    setTimeout(() => {
-        if (indicator.parentNode) {
-            indicator.style.animation = 'slideOutDown 0.3s ease';
-            setTimeout(() => indicator.remove(), 300);
-        }
-    }, 2000);
-}
-
-function showMessage(type, message) {
-    const existing = document.querySelector('.message-notification');
-    if (existing) existing.remove();
-    
-    const notification = document.createElement('div');
-    notification.className = `message-notification message-${type}`;
-    
-    let icon = 'fa-info-circle';
-    let bgColor = '#3498db';
-    
-    switch(type) {
-        case 'success':
-            icon = 'fa-check-circle';
-            bgColor = '#2ecc71';
-            break;
-        case 'error':
-            icon = 'fa-exclamation-circle';
-            bgColor = '#e74c3c';
-            break;
-        case 'warning':
-            icon = 'fa-exclamation-triangle';
-            bgColor = '#f39c12';
-            break;
-        case 'info':
-            icon = 'fa-info-circle';
-            bgColor = '#3498db';
-            break;
-    }
-    
-    notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: ${bgColor};
-        color: white;
-        padding: 15px 25px;
-        border-radius: 8px;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-        z-index: 10000;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        font-size: 0.95rem;
-        animation: slideInRight 0.3s ease;
-        max-width: 400px;
-    `;
-    
-    notification.innerHTML = `<i class="fas ${icon}"></i><span>${message}</span>`;
-    
-    document.body.appendChild(notification);
-    
-    setTimeout(() => {
-        if (notification.parentNode) {
-            notification.style.animation = 'slideOutRight 0.3s ease';
-            setTimeout(() => notification.remove(), 300);
-        }
-    }, 4000);
-}
-
-// Додаємо анімації для повідомлень
-const messageStyles = document.createElement('style');
-messageStyles.textContent = `
-    @keyframes slideInRight {
-        from {
-            opacity: 0;
-            transform: translateX(100px);
-        }
-        to {
-            opacity: 1;
-            transform: translateX(0);
-        }
-    }
-    
-    @keyframes slideOutRight {
-        from {
-            opacity: 1;
-            transform: translateX(0);
-        }
-        to {
-            opacity: 0;
-            transform: translateX(100px);
-        }
-    }
-`;
-document.head.appendChild(messageStyles);
-
-// ========== ФУНКЦИИ АУТЕНТИФИКАЦИИ ==========
-
-function showAuthModal() {
-    const modalTitle = document.getElementById('modalTitle');
-    const modalBody = document.getElementById('modalBody');
-    
-    modalTitle.textContent = 'Вход в систему';
-    modalBody.innerHTML = `
-        <div style="padding: 20px;">
-            <div style="text-align: center; margin-bottom: 20px;">
-                <h3 style="color: #3498db;">Добро пожаловать в курс эмпатии!</h3>
-                <p>Войдите, чтобы сохранять прогресс на всех устройствах.</p>
-            </div>
-            
-            <div id="authContainer">
-                <div class="auth-tabs" style="display: flex; margin-bottom: 20px; border-bottom: 2px solid #2c3e50;">
-                    <button class="auth-tab active" onclick="showAuthTab('login')" style="flex: 1; padding: 10px; background: none; border: none; color: white; border-bottom: 2px solid #3498db;">Вход</button>
-                    <button class="auth-tab" onclick="showAuthTab('register')" style="flex: 1; padding: 10px; background: none; border: none; color: white;">Регистрация</button>
-                </div>
-                
-                <div id="loginTab">
-                    <div style="margin-bottom: 15px;">
-                        <label style="display: block; margin-bottom: 5px; color: #ecf0f1;">Email</label>
-                        <input type="email" id="loginEmail" placeholder="ваш@email.com" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #34495e; background: #2c3e50; color: white;">
-                    </div>
-                    <div style="margin-bottom: 15px;">
-                        <label style="display: block; margin-bottom: 5px; color: #ecf0f1;">Пароль</label>
-                        <input type="password" id="loginPassword" placeholder="Ваш пароль" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #34495e; background: #2c3e50; color: white;">
-                    </div>
-                    <button onclick="handleLogin()" class="btn-primary" style="width: 100%; padding: 12px;">
-                        <i class="fas fa-sign-in-alt"></i> Войти
-                    </button>
-                </div>
-                
-                <div id="registerTab" style="display: none;">
-                    <div style="margin-bottom: 15px;">
-                        <label style="display: block; margin-bottom: 5px; color: #ecf0f1;">Имя для сертификата</label>
-                        <input type="text" id="registerName" placeholder="Иван Иванов" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #34495e; background: #2c3e50; color: white;">
-                    </div>
-                    <div style="margin-bottom: 15px;">
-                        <label style="display: block; margin-bottom: 5px; color: #ecf0f1;">Email</label>
-                        <input type="email" id="registerEmail" placeholder="ваш@email.com" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #34495e; background: #2c3e50; color: white;">
-                    </div>
-                    <div style="margin-bottom: 15px;">
-                        <label style="display: block; margin-bottom: 5px; color: #ecf0f1;">Пароль</label>
-                        <input type="password" id="registerPassword" placeholder="Не менее 6 символов" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #34495e; background: #2c3e50; color: white;">
-                    </div>
-                    <button onclick="handleRegister()" class="btn-primary" style="width: 100%; padding: 12px;">
-                        <i class="fas fa-user-plus"></i> Зарегистрироваться
-                    </button>
-                </div>
-                
-                <div style="margin-top: 20px; text-align: center;">
-                    <button onclick="continueAsGuest()" class="btn-secondary" style="width: 100%; padding: 10px;">
-                        Продолжить как гость
-                    </button>
-                    <p style="margin-top: 10px; font-size: 0.9em; color: #95a5a6;">
-                        В гостевом режиме прогресс сохраняется только в этом браузере
-                    </p>
-                </div>
-            </div>
-        </div>
-    `;
-    
-    document.getElementById('modalOverlay').style.display = 'flex';
-}
-
-async function handleLogin() {
-    const email = document.getElementById('loginEmail').value.trim();
-    const password = document.getElementById('loginPassword').value;
-    
-    if (!email || !password) {
-        alert('Заполните все поля');
-        return;
-    }
-    
-    try {
-        const { data, error } = await supabase.auth.signInWithPassword({
-            email,
-            password
-        });
-        
-        if (error) throw error;
-        
-        document.getElementById('modalOverlay').style.display = 'none';
-        showMessage('success', 'Вход выполнен!');
-        setTimeout(() => location.reload(), 1000);
-        
-    } catch (error) {
-        console.error('Ошибка входа:', error);
-        showMessage('error', error.message || 'Ошибка входа');
-    }
-}
-
-async function handleRegister() {
-    const name = document.getElementById('registerName').value.trim();
-    const email = document.getElementById('registerEmail').value.trim();
-    const password = document.getElementById('registerPassword').value;
-    
-    if (!name || !email || !password) {
-        showMessage('error', 'Заполните все поля');
-        return;
-    }
-    
-    if (password.length < 6) {
-        showMessage('error', 'Пароль минимум 6 символов');
-        return;
-    }
-    
-    // Проверка формата email
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-        showMessage('error', 'Введите корректный email');
-        return;
-    }
-    
-    // Проверяем наличие Supabase
-    if (!supabase) {
-        showMessage('error', '❌ Supabase не настроен. Настройте ключи в js/data.js');
-        console.error('❌ Supabase не инициализирован. Проверьте конфигурацию в js/data.js');
-        return;
-    }
-    
-    try {
-        showMessage('info', '⏳ Регистрация...');
-        
-        const { data: authData, error: authError } = await supabase.auth.signUp({
-            email,
-            password,
-            options: {
-                data: {
-                    full_name: name
-                },
-                emailRedirectTo: window.location.origin
-            }
-        });
-        
-        if (authError) {
-            // Проверка на уже существующий email
-            if (authError.message.includes('already registered')) {
-                throw new Error('Этот email уже зарегистрирован. Попробуйте войти.');
-            }
-            throw authError;
-        }
-        
-        if (authData.user) {
-            console.log('✅ Пользователь создан в Auth:', authData.user.id);
-            
-            // Создаем запись пользователя в таблице users
-            const { error: userError } = await supabase
-                .from('users')
-                .insert([
-                    {
-                        id: authData.user.id,
-                        email: email,
-                        name: name,
-                        telegram_id: null,
-                        current_module: 1,
-                        current_submodule: '1.1',
-                        course_progress: {
-                            completedModules: [],
-                            completedSubmodules: [],
-                            testResults: {},
-                            assignmentResults: {},
-                            finalExamCompleted: false,
-                            finalExamScore: 0
-                        },
-                        created_at: new Date().toISOString(),
-                        last_active: new Date().toISOString()
-                    }
-                ]);
-            
-            if (userError && userError.code !== '23505') { // 23505 = duplicate key
-                console.error('Ошибка создания пользователя:', userError);
-                throw userError;
-            }
-            
-            console.log('✅ Запись пользователя создана');
-            
-            // Добавляем пользователя в allowed_users для доступа к боту
-            try {
-                const { error: allowedError } = await supabase
-                    .from('allowed_users')
-                    .insert([
-                        {
-                            telegram_id: null,
-                            user_id: authData.user.id,
-                            added_by: null,
-                            added_at: new Date().toISOString()
-                        }
-                    ]);
-                
-                if (allowedError && allowedError.code !== '23505') {
-                    console.warn('Ошибка добавления в allowed_users:', allowedError);
-                }
-            } catch (err) {
-                console.warn('Не удалось добавить в allowed_users:', err);
-            }
-        }
-        
-        document.getElementById('modalOverlay').style.display = 'none';
-        
-        // Проверяем нужно ли подтверждение email
-        if (authData.user && !authData.user.confirmed_at) {
-            showMessage('success', '✅ Регистрация успешна! Проверьте почту и подтвердите email.');
-        } else {
-            showMessage('success', '✅ Регистрация успешна! Входим...');
-            setTimeout(() => location.reload(), 1500);
-        }
-        
-    } catch (error) {
-        console.error('❌ Ошибка регистрации:', error);
-        showMessage('error', error.message || 'Ошибка регистрации. Попробуйте еще раз.');
-    }
-}
-
-function continueAsGuest() {
-    document.getElementById('modalOverlay').style.display = 'none';
+function initGuestMode() {
+    console.log('🔄 Инициализация гостевого режима...');
+    loadGuestProgress();
+    renderModulesList();
     showWelcomeScreen();
 }
-
-async function handleLogout() {
-    try {
-        const { error } = await supabase.auth.signOut();
-        if (error) throw error;
-        
-        showMessage('success', 'Вы вышли');
-        location.reload();
-        
-    } catch (error) {
-        console.error('Ошибка выхода:', error);
-        showMessage('error', 'Ошибка выхода');
-    }
-}
-
-function showAuthTab(tabName) {
-    document.querySelectorAll('.auth-tab').forEach(tab => {
-        tab.classList.remove('active');
-        tab.style.borderBottom = 'none';
-    });
-    
-    const activeTab = document.querySelector(`.auth-tab[onclick*="${tabName}"]`);
-    if (activeTab) {
-        activeTab.classList.add('active');
-        activeTab.style.borderBottom = '2px solid #3498db';
-    }
-    
-    document.getElementById('loginTab').style.display = tabName === 'login' ? 'block' : 'none';
-    document.getElementById('registerTab').style.display = tabName === 'register' ? 'block' : 'none';
-}
-
-// ========== ОСНОВНЫЕ ФУНКЦИИ КУРСА ==========
 
 function getDefaultProgress() {
     return {
@@ -1198,17 +549,17 @@ function getDefaultProgress() {
     };
 }
 
-async function openModule(moduleId, submoduleId) {
+// ========== ОСНОВНЫЕ ФУНКЦИИ КУРСА ==========
+function openModule(moduleId, submoduleId) {
     console.log("Открываем модуль:", moduleId, submoduleId);
     
-    await saveUIState();
-    
+    saveUIState();
     userProgress.currentModule = moduleId;
     userProgress.currentSubmodule = submoduleId;
-    await saveProgress();
+    saveProgress();
     
     uiState.openTabs[moduleId] = submoduleId;
-    await saveUIState();
+    saveUIState();
     
     const module = courseData.modules.find(m => m.id === moduleId);
     const submodule = module.submodules.find(s => s.id === submoduleId);
@@ -1228,99 +579,7 @@ async function openModule(moduleId, submoduleId) {
     renderModulesList();
     updateModuleProgress();
     
-    // Настраиваем автосохранение после рендеринга
     setTimeout(() => setupAutoSaveForModule(), 100);
-}
-
-function setTheme(theme) {
-    document.documentElement.setAttribute('data-theme', theme);
-}
-
-function updateProgressUI() {
-    const totalSubmodules = courseData.modules.reduce((sum, module) => {
-        return sum + (module.submodules ? module.submodules.length : 0);
-    }, 0);
-    
-    const completed = userProgress.completedSubmodules.length;
-    const percent = totalSubmodules > 0 ? Math.round((completed / totalSubmodules) * 100) : 0;
-    
-    const progressFill = document.getElementById('progressFill');
-    const progressText = document.getElementById('progressText');
-    const mobileProgressText = document.querySelector('#mobileProgressText');
-    
-    if (progressFill) progressFill.style.width = percent + '%';
-    if (progressText) progressText.textContent = `Прогресс: ${percent}%`;
-    if (mobileProgressText) mobileProgressText.textContent = `${percent}%`;
-    
-    const userNameElements = document.querySelectorAll('#userName');
-    userNameElements.forEach(el => {
-        if (el) {
-            el.textContent = userProgress.userName || "Гость";
-        }
-    });
-    
-    const finalExamBtn = document.getElementById('finalExamBtn');
-    if (finalExamBtn) {
-        const allModulesCompleted = userProgress.completedModules.length === courseData.modules.length;
-        if (allModulesCompleted && !userProgress.finalExamCompleted) {
-            finalExamBtn.classList.remove('disabled');
-            finalExamBtn.onclick = openFinalExam;
-        } else {
-            finalExamBtn.classList.add('disabled');
-            finalExamBtn.onclick = function(e) {
-                e.preventDefault();
-                if (!allModulesCompleted) {
-                    alert(`Завершите все модули! Вы прошли ${userProgress.completedModules.length} из ${courseData.modules.length}.`);
-                } else {
-                    alert('Итоговый экзамен уже пройден!');
-                }
-            };
-        }
-    }
-    
-    const certBtn = document.getElementById('certificateBtn');
-    if (certBtn) {
-        if (userProgress.finalExamCompleted) {
-            certBtn.classList.remove('disabled');
-            certBtn.onclick = showCertificate;
-        } else {
-            certBtn.classList.add('disabled');
-            certBtn.onclick = function(e) {
-                e.preventDefault();
-                alert('Сначала пройдите итоговый экзамен!');
-            };
-        }
-    }
-    
-    updateModuleProgress();
-}
-
-function updateModuleProgress() {
-    const moduleId = userProgress.currentModule;
-    const module = courseData.modules.find(m => m.id === moduleId);
-    
-    if (!module || !module.submodules) return;
-    
-    const totalSubmodules = module.submodules.length;
-    const completedInModule = module.submodules.filter(sub => 
-        userProgress.completedSubmodules.includes(sub.id)
-    ).length;
-    
-    const percent = totalSubmodules > 0 ? Math.round((completedInModule / totalSubmodules) * 100) : 0;
-    
-    const indicator = document.getElementById('moduleProgressIndicator');
-    const progressFill = document.getElementById('moduleProgressFill');
-    const progressPercent = document.getElementById('moduleProgressPercent');
-    
-    if (indicator && progressFill && progressPercent) {
-        if (percent > 0 && percent < 100) {
-            indicator.style.display = 'flex';
-            progressFill.style.width = percent + '%';
-            progressPercent.textContent = `${percent}%`;
-        } else {
-            indicator.style.display = 'none';
-        }
-    }
 }
 
 function renderModulesList() {
@@ -1331,7 +590,6 @@ function renderModulesList() {
     if (!container) {
         container = document.createElement('div');
         container.className = 'modules-container';
-        
         const progressContainer = modulesList.querySelector('.progress-container');
         if (progressContainer) {
             modulesList.insertBefore(container, progressContainer);
@@ -1486,8 +744,6 @@ function showTabContent(tabName, submodule) {
 }
 
 function initCheckButtons() {
-    console.log("Инициализация кнопок проверки...");
-    
     const buttons = document.querySelectorAll('#contentDisplay .btn-primary');
     buttons.forEach(button => {
         const onclickAttr = button.getAttribute('onclick');
@@ -1500,7 +756,6 @@ function initCheckButtons() {
                 newButton.addEventListener('click', function() {
                     checkAssignment(match[1]);
                 });
-                console.log("Кнопка настроена для подмодуля:", match[1]);
             }
         }
     });
@@ -1522,56 +777,24 @@ function initCheckButtons() {
     });
 }
 
-// ОБНОВЛЕННАЯ ФУНКЦИЯ checkAssignment
-async function checkAssignment(submoduleId) {
+function checkAssignment(submoduleId) {
     console.log("=== НАЧАЛО ПРОВЕРКИ ===");
-    console.log("Подмодуль для проверки:", submoduleId);
     
     const moduleId = userProgress.currentModule;
-    console.log("Текущий модуль:", moduleId);
-    
     const module = courseData.modules.find(m => m.id === moduleId);
-    if (!module) {
-        console.error("Модуль не найден:", moduleId);
-        return;
-    }
     
-    console.log("Найден модуль:", module.title);
+    if (!module) return;
     
     const submodule = module.submodules.find(s => s.id === submoduleId);
-    if (!submodule) {
-        console.error("Подмодуль не найден:", submoduleId);
-        return;
-    }
-    
-    console.log("Найден подмодуль:", submodule.title);
-    
-    if (!submodule.tabs || !submodule.tabs.assignment) {
-        console.error("У подмодуля нет задания:", submoduleId);
-        return;
-    }
-    
-    console.log("Задание найдено");
+    if (!submodule || !submodule.tabs || !submodule.tabs.assignment) return;
     
     const answerId = 'answer' + submoduleId.replace('.', '_');
     const feedbackId = 'feedback' + submoduleId.replace('.', '_');
     
-    console.log("Ищем элементы:", answerId, feedbackId);
-    
     const answerElement = document.getElementById(answerId);
     const feedbackElement = document.getElementById(feedbackId);
     
-    if (!answerElement) {
-        console.error("Не найден textarea с id:", answerId);
-        return;
-    }
-    
-    if (!feedbackElement) {
-        console.error("Не найден feedback с id:", feedbackId);
-        return;
-    }
-    
-    console.log("Элементы найдены!");
+    if (!answerElement || !feedbackElement) return;
     
     const answer = answerElement.value.trim();
     
@@ -1586,13 +809,8 @@ async function checkAssignment(submoduleId) {
         return;
     }
     
-    console.log("Ответ пользователя (первые 100 символов):", answer.substring(0, 100) + "...");
-    console.log("Количество слов:", wordCount);
-    
     try {
         const result = submodule.tabs.assignment.check(answer);
-        
-        console.log("Результат проверки:", result);
         
         showFeedback(feedbackElement, result.message, result.correct);
         
@@ -1613,25 +831,20 @@ async function checkAssignment(submoduleId) {
                     assignmentHeader.appendChild(checkIcon);
                 }
                 
-                await saveProgress();
-                
+                saveProgress();
                 checkIfModuleCompleted(moduleId);
             }
             
-            // УДАЛЯЕМ ЧЕРНОВИК ПОСЛЕ УСПЕШНОЙ ПРОВЕРКИ
             if (isAuthenticated && currentUserId) {
                 const key = `${submoduleId}_main`;
                 answerDraftsCache.delete(key);
                 
-                // Удаляем из базы данных
-                await supabase
+                supabase
                     .from('answer_drafts')
                     .delete()
                     .eq('user_id', currentUserId)
                     .eq('submodule_id', submoduleId)
                     .eq('answer_type', 'main');
-                    
-                console.log("✅ Черновик удален после успешной проверки");
             }
             
         } else {
@@ -1643,31 +856,14 @@ async function checkAssignment(submoduleId) {
         console.error("Ошибка при проверке задания:", error);
         showFeedback(feedbackElement, "❌ Произошла ошибка при проверке. Попробуйте еще раз.", false);
     }
-    
-    console.log("=== КОНЕЦ ПРОВЕРКИ ===");
-}
-
-function showFeedback(element, message, isCorrect) {
-    element.textContent = message;
-    element.className = `feedback ${isCorrect ? 'correct' : 'incorrect'}`;
-    element.style.display = "block";
-    
-    element.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
 function checkExtraAssignment(submoduleId) {
-    console.log("=== НАЧАЛО ПРОВЕРКИ ДОПОЛНИТЕЛЬНОГО ЗАДАНИЯ ===");
-    
     const moduleId = userProgress.currentModule;
     const module = courseData.modules.find(m => m.id === moduleId);
     const submodule = module.submodules.find(s => s.id === submoduleId);
     
-    if (!module || !submodule) {
-        console.error("Не найден модуль или подмодуль");
-        return;
-    }
-    
-    console.log("Проверка дополнительного задания для:", submoduleId);
+    if (!module || !submodule) return;
     
     const textareas = document.querySelectorAll(`textarea[id^="extra${submoduleId.replace('.', '_')}"]`);
     
@@ -1708,7 +904,6 @@ function checkExtraAssignment(submoduleId) {
         return;
     }
     
-    // Простая проверка - если все поля заполнены, считаем успешным
     const allValid = answers.every(answer => answer.trim().length > 10);
     
     if (allValid) {
@@ -1720,6 +915,13 @@ function checkExtraAssignment(submoduleId) {
     } else {
         alert("❌ Некоторые ответы слишком короткие. Пожалуйста, напишите более развернутые ответы (минимум 10 символов).");
     }
+}
+
+function showFeedback(element, message, isCorrect) {
+    element.textContent = message;
+    element.className = `feedback ${isCorrect ? 'correct' : 'incorrect'}`;
+    element.style.display = "block";
+    element.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
 function checkIfModuleCompleted(moduleId) {
@@ -1758,6 +960,7 @@ function checkIfModuleCompleted(moduleId) {
     }
 }
 
+// ========== ТЕСТЫ И ЭКЗАМЕНЫ ==========
 function showTestInfo(moduleId) {
     const module = courseData.modules.find(m => m.id === moduleId);
     if (!module || !module.test) return;
@@ -1815,76 +1018,6 @@ function showTestInfo(moduleId) {
     document.getElementById('modalOverlay').style.display = 'flex';
 }
 
-function showTestResultModal(moduleId) {
-    const module = courseData.modules.find(m => m.id === moduleId);
-    const result = userProgress.testResults[moduleId];
-    
-    if (!module || !result) return;
-    
-    const modalTitle = document.getElementById('modalTitle');
-    const modalBody = document.getElementById('modalBody');
-    
-    modalTitle.textContent = `Результаты: ${module.test.title}`;
-    modalBody.innerHTML = `
-        <div style="padding: 20px;">
-            <div style="text-align: center; margin-bottom: 20px;">
-                <h3 style="color: ${result.passed ? '#2ecc71' : '#e74c3c'};">${result.passed ? '✅ Тест пройден' : '❌ Тест не пройден'}</h3>
-                <p>Модуль: <strong>${module.title}</strong></p>
-            </div>
-            
-            <div class="exam-stats" style="margin: 20px 0;">
-                <div class="exam-stat">
-                    <strong>${result.score || 0}/${result.total || 0}</strong>
-                    <span>Теоретические вопросы</span>
-                </div>
-                <div class="exam-stat">
-                    <strong>${result.practicalScore || 0}</strong>
-                    <span>Практические задания</span>
-                </div>
-                <div class="exam-stat">
-                    <strong>${result.additionalScore || 0}</strong>
-                    <span>Доп. задания</span>
-                </div>
-                <div class="exam-stat">
-                    <strong>${result.totalPoints || 0}/${result.maxPoints || 0}</strong>
-                    <span>Итого баллов</span>
-                </div>
-            </div>
-            
-            <div style="background: ${result.passed ? 'rgba(46, 204, 113, 0.1)' : 'rgba(231, 76, 60, 0.1)'}; 
-                     padding: 20px; border-radius: 10px; text-align: center; margin: 20px 0; border-left: 4px solid ${result.passed ? '#2ecc71' : '#e74c3c'}">
-                <h4 style="color: ${result.passed ? '#2ecc71' : '#e74c3c'}; margin-top: 0;">Итоговый результат</h4>
-                <div style="font-size: 2em; font-weight: bold; color: ${result.passed ? '#2ecc71' : '#e74c3c'}">
-                    ${result.totalPoints || 0}/${result.maxPoints || 0} баллов
-                </div>
-                <p style="margin-top: 10px; color: #95a5a6;">
-                    Проходной балл: ${module.test.passingScore || 35}
-                </p>
-            </div>
-            
-            ${!result.passed ? `
-                <div style="margin-top: 20px; padding: 15px; background: rgba(231, 76, 60, 0.1); border-radius: 8px;">
-                    <h4 style="color: #e74c3c; margin-bottom: 10px;">Рекомендации:</h4>
-                    <ul style="margin-left: 20px; color: #ccc;">
-                        <li>Повторите теоретический материал модуля</li>
-                        <li>Проработайте практические задания еще раз</li>
-                        <li>Обратите внимание на объяснения к вопросам</li>
-                        <li>Попробуйте пройти тест через 1-2 дня</li>
-                    </ul>
-                </div>
-            ` : ''}
-            
-            <div style="margin-top: 25px; text-align: center;">
-                <button class="btn-primary" onclick="document.getElementById('modalOverlay').style.display='none'">
-                    <i class="fas fa-check"></i> Понятно
-                </button>
-            </div>
-        </div>
-    `;
-    
-    document.getElementById('modalOverlay').style.display = 'flex';
-}
-
 function openTest(moduleId) {
     const module = courseData.modules.find(m => m.id === moduleId);
     if (!module || !module.test) return;
@@ -1928,10 +1061,7 @@ function openTest(moduleId) {
         module.test.sections.forEach((section, sectionIndex) => {
             const sectionDiv = document.createElement('div');
             sectionDiv.className = 'test-section';
-            
-            sectionDiv.innerHTML = `
-                <h3 class="test-section-title">${section.title}</h3>
-            `;
+            sectionDiv.innerHTML = `<h3 class="test-section-title">${section.title}</h3>`;
             
             if (section.type === 'theory' && section.questions) {
                 section.questions.forEach((question, questionIndex) => {
@@ -2017,10 +1147,11 @@ function openTest(moduleId) {
         </button>
     `;
     testContent.appendChild(submitBtn);
+    
+    document.getElementById('submitTestBtn').addEventListener('click', () => submitTest(moduleId));
 }
 
-function submitTest() {
-    const moduleId = userProgress.currentModule;
+function submitTest(moduleId) {
     const module = courseData.modules.find(m => m.id === moduleId);
     
     if (!module || !module.test) return;
@@ -2184,6 +1315,77 @@ function showTestResult(moduleId, result) {
     document.getElementById('modalOverlay').style.display = 'flex';
 }
 
+function showTestResultModal(moduleId) {
+    const module = courseData.modules.find(m => m.id === moduleId);
+    const result = userProgress.testResults[moduleId];
+    
+    if (!module || !result) return;
+    
+    const modalTitle = document.getElementById('modalTitle');
+    const modalBody = document.getElementById('modalBody');
+    
+    modalTitle.textContent = `Результаты: ${module.test.title}`;
+    modalBody.innerHTML = `
+        <div style="padding: 20px;">
+            <div style="text-align: center; margin-bottom: 20px;">
+                <h3 style="color: ${result.passed ? '#2ecc71' : '#e74c3c'};">${result.passed ? '✅ Тест пройден' : '❌ Тест не пройден'}</h3>
+                <p>Модуль: <strong>${module.title}</strong></p>
+            </div>
+            
+            <div class="exam-stats" style="margin: 20px 0;">
+                <div class="exam-stat">
+                    <strong>${result.score || 0}/${result.total || 0}</strong>
+                    <span>Теоретические вопросы</span>
+                </div>
+                <div class="exam-stat">
+                    <strong>${result.practicalScore || 0}</strong>
+                    <span>Практические задания</span>
+                </div>
+                <div class="exam-stat">
+                    <strong>${result.additionalScore || 0}</strong>
+                    <span>Доп. задания</span>
+                </div>
+                <div class="exam-stat">
+                    <strong>${result.totalPoints || 0}/${result.maxPoints || 0}</strong>
+                    <span>Итого баллов</span>
+                </div>
+            </div>
+            
+            <div style="background: ${result.passed ? 'rgba(46, 204, 113, 0.1)' : 'rgba(231, 76, 60, 0.1)'}; 
+                     padding: 20px; border-radius: 10px; text-align: center; margin: 20px 0; border-left: 4px solid ${result.passed ? '#2ecc71' : '#e74c3c'}">
+                <h4 style="color: ${result.passed ? '#2ecc71' : '#e74c3c'}; margin-top: 0;">Итоговый результат</h4>
+                <div style="font-size: 2em; font-weight: bold; color: ${result.passed ? '#2ecc71' : '#e74c3c'}">
+                    ${result.totalPoints || 0}/${result.maxPoints || 0} баллов
+                </div>
+                <p style="margin-top: 10px; color: #95a5a6;">
+                    Проходной балл: ${module.test.passingScore || 35}
+                </p>
+            </div>
+            
+            ${!result.passed ? `
+                <div style="margin-top: 20px; padding: 15px; background: rgba(231, 76, 60, 0.1); border-radius: 8px;">
+                    <h4 style="color: #e74c3c; margin-bottom: 10px;">Рекомендации:</h4>
+                    <ul style="margin-left: 20px; color: #ccc;">
+                        <li>Повторите теоретический материал модуля</li>
+                        <li>Проработайте практические задания еще раз</li>
+                        <li>Обратите внимание на объяснения к вопросам</li>
+                        <li>Попробуйте пройти тест через 1-2 дня</li>
+                    </ul>
+                </div>
+            ` : ''}
+            
+            <div style="margin-top: 25px; text-align: center;">
+                <button class="btn-primary" onclick="document.getElementById('modalOverlay').style.display='none'">
+                    <i class="fas fa-check"></i> Понятно
+                </button>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('modalOverlay').style.display = 'flex';
+}
+
+// ========== ИТОГОВЫЙ ЭКЗАМЕН ==========
 function openFinalExam() {
     const exam = courseData.finalExam;
     
@@ -2354,6 +1556,16 @@ function openFinalExam() {
         `;
         examContent.appendChild(taskDiv);
     });
+    
+    const submitBtn = document.createElement('div');
+    submitBtn.style.marginTop = '30px';
+    submitBtn.style.textAlign = 'center';
+    submitBtn.innerHTML = `
+        <button class="btn-primary" onclick="submitFinalExam()" style="padding: 15px 40px; font-size: 1.1rem;">
+            <i class="fas fa-paper-plane"></i> Отправить экзамен
+        </button>
+    `;
+    examContent.appendChild(submitBtn);
 }
 
 function submitFinalExam() {
@@ -2498,56 +1710,7 @@ function submitFinalExam() {
     updateProgressUI();
 }
 
-function showWelcomeScreen() {
-    const contentDisplay = document.getElementById('contentDisplay');
-    contentDisplay.innerHTML = `
-        <div class="welcome-screen">
-            <div class="welcome-icon">
-                <i class="fas fa-hands-helping"></i>
-            </div>
-            <h1>Полный курс: «Эмпатия и поддержка в общении»</h1>
-            <p>Развивайте эмоциональный интеллект, учитесь слушать и поддерживать других.</p>
-            
-            <div class="features">
-                <div class="feature">
-                    <i class="fas fa-book-open"></i>
-                    <h3>5 модулей</h3>
-                    <p>Теория, цитаты, практические задания</p>
-                </div>
-                <div class="feature">
-                    <i class="fas fa-check-circle"></i>
-                    <h3>Контрольные работы</h3>
-                    <p>Тесты и практика после каждого модуля</p>
-                </div>
-                <div class="feature">
-                    <i class="fas fa-graduation-cap"></i>
-                    <h3>Итоговый экзамен</h3>
-                    <p>Комплексная проверка знаний</p>
-                </div>
-                <div class="feature">
-                    <i class="fas fa-award"></i>
-                    <h3>Именной сертификат</h3>
-                    <p>Получите сертификат с вашим именем</p>
-                </div>
-            </div>
-            
-            <div class="module-test-button" style="margin-top: 40px;">
-                <h3>Структура курса</h3>
-                <p>Курс состоит из 5 модулей, каждый содержит:</p>
-                <ul style="text-align: left; max-width: 600px; margin: 15px auto;">
-                    <li>Теоретический материал с примерами</li>
-                    <li>Практические задания с проверкой</li>
-                    <li>Контрольную работу по модулю</li>
-                    <li>Итоговый экзамен по всему курсу</li>
-                </ul>
-                <button onclick="openModule(1, '1.1')" class="btn-primary" style="margin-top: 20px; padding: 15px 30px; font-size: 1.1rem;">
-                    <i class="fas fa-play-circle"></i> Начать обучение
-                </button>
-            </div>
-        </div>
-    `;
-}
-
+// ========== СЕРТИФИКАТ ==========
 function showCertificate() {
     if (!userProgress.finalExamCompleted) {
         alert('Сначала пройдите итоговый экзамен!');
@@ -2750,79 +1913,658 @@ function shareCertificate() {
     }
 }
 
-function resetProgress() {
-    if (confirm("Вы уверены, что хотите сбросить весь прогресс?\nВсе данные будут удалены, включая результаты тестов и экзамена.")) {
-        userProgress = getDefaultProgress();
+// ========== АВТОСОХРАНЕНИЕ ==========
+function setupAutoSaveForModule() {
+    const currentSubmoduleId = userProgress.currentSubmodule;
+    if (!currentSubmoduleId) return;
+    
+    const textareas = document.querySelectorAll('#contentDisplay textarea');
+    
+    textareas.forEach(textarea => {
+        const id = textarea.id;
+        let answerType = '';
         
-        courseData.modules.forEach(module => {
-            module.completed = false;
+        if (id.startsWith('answer')) {
+            answerType = 'main';
+        } else if (id.includes('extra')) {
+            answerType = 'extra';
+        } else if (id.includes('test') || id.includes('exam')) {
+            answerType = 'test';
+        }
+        
+        if (answerType) {
+            setupAutoSave(textarea, currentSubmoduleId, answerType);
+        }
+    });
+    
+    const radioGroups = document.querySelectorAll('input[type="radio"]');
+    radioGroups.forEach(radio => {
+        radio.addEventListener('change', function() {
+            const groupName = this.name;
+            const group = document.querySelectorAll(`input[name="${groupName}"]:checked`);
+            if (group.length > 0) {
+                saveRadioGroupState(currentSubmoduleId, groupName, group[0].value);
+            }
+        });
+    });
+}
+
+function setupAutoSave(element, submoduleId, answerType = 'main') {
+    if (!uiState.settings.autoSave || !isAuthenticated) return;
+    
+    let saveTimeout = null;
+    
+    element.addEventListener('input', function() {
+        if (saveTimeout) clearTimeout(saveTimeout);
+        
+        element.classList.add('auto-saving');
+        element.classList.remove('draft-saved');
+        
+        saveTimeout = setTimeout(() => {
+            let formData = null;
+            
+            if (answerType === 'extra') {
+                const extraFields = document.querySelectorAll(`textarea[id^="extra${submoduleId.replace('.', '_')}"]`);
+                if (extraFields.length > 1) {
+                    formData = {};
+                    extraFields.forEach(field => {
+                        formData[field.id] = field.value;
+                    });
+                }
+            }
+            
+            saveAnswerDraft(submoduleId, element.value, answerType, formData);
+            
+            element.classList.remove('auto-saving');
+            element.classList.add('draft-saved');
+            
+        }, uiState.settings.autoSaveInterval || 3000);
+    });
+    
+    element.addEventListener('blur', function() {
+        if (saveTimeout) clearTimeout(saveTimeout);
+        
+        let formData = null;
+        if (answerType === 'extra') {
+            const extraFields = document.querySelectorAll(`textarea[id^="extra${submoduleId.replace('.', '_')}"]`);
+            if (extraFields.length > 1) {
+                formData = {};
+                extraFields.forEach(field => {
+                    formData[field.id] = field.value;
+                });
+            }
+        }
+        
+        saveAnswerDraft(submoduleId, element.value, answerType, formData);
+        
+        element.classList.remove('auto-saving');
+        element.classList.add('draft-saved');
+    });
+}
+
+async function saveAnswerDraft(submoduleId, answerText, answerType = 'main', formData = null) {
+    if (!isAuthenticated || !currentUserId) {
+        const guestDrafts = JSON.parse(localStorage.getItem('guestAnswerDrafts') || '{}');
+        const key = `${submoduleId}_${answerType}`;
+        guestDrafts[key] = { text: answerText, formData: formData };
+        localStorage.setItem('guestAnswerDrafts', JSON.stringify(guestDrafts));
+        return;
+    }
+    
+    try {
+        const key = `${submoduleId}_${answerType}`;
+        answerDraftsCache.set(key, {
+            text: answerText,
+            formData: formData
         });
         
-        localStorage.removeItem('empathyCourseProgress');
+        const draftData = {
+            user_id: currentUserId,
+            submodule_id: submoduleId,
+            answer_type: answerType,
+            answer_text: answerText,
+            updated_at: new Date().toISOString()
+        };
+        
+        if (formData) {
+            draftData.form_data = formData;
+        }
+        
+        const { error } = await supabase
+            .from('answer_drafts')
+            .upsert(draftData, {
+                onConflict: 'user_id,submodule_id,answer_type'
+            });
+        
+        if (error) throw error;
+        
+        showAutoSaveIndicator();
+        console.log(`💾 Черновик сохранен: ${submoduleId} (${answerType})`);
+        
+    } catch (error) {
+        console.error("❌ Ошибка сохранения:", error);
+    }
+}
+
+async function saveRadioGroupState(submoduleId, groupName, value) {
+    if (!isAuthenticated || !currentUserId) return;
+    
+    try {
+        const key = `${submoduleId}_radio_${groupName}`;
+        answerDraftsCache.set(key, value);
+        
+        await supabase
+            .from('answer_drafts')
+            .upsert({
+                user_id: currentUserId,
+                submodule_id: submoduleId,
+                answer_type: `radio_${groupName}`,
+                answer_text: value,
+                updated_at: new Date().toISOString()
+            }, {
+                onConflict: 'user_id,submodule_id,answer_type'
+            });
+        
+    } catch (error) {
+        console.error("Ошибка сохранения радио-группы:", error);
+    }
+}
+
+async function saveProgress() {
+    if (!isAuthenticated || !currentUserId) {
+        localStorage.setItem('empathyCourseProgress', JSON.stringify(userProgress));
+        return;
+    }
+    
+    try {
+        const { error } = await supabase
+            .from('users')
+            .update({
+                current_module: userProgress.currentModule,
+                current_submodule: userProgress.currentSubmodule,
+                course_progress: {
+                    completedModules: userProgress.completedModules,
+                    completedSubmodules: userProgress.completedSubmodules,
+                    testResults: userProgress.testResults,
+                    assignmentResults: userProgress.assignmentResults,
+                    finalExamCompleted: userProgress.finalExamCompleted,
+                    finalExamScore: userProgress.finalExamScore
+                },
+                last_active: new Date().toISOString()
+            })
+            .eq('id', currentUserId);
+        
+        if (error) throw error;
+        console.log("💾 Прогресс сохранен");
+        
+    } catch (error) {
+        console.error("❌ Ошибка сохранения:", error);
+    }
+}
+
+async function saveUIState() {
+    if (!isAuthenticated || !currentUserId) return;
+    
+    try {
+        const { error } = await supabase
+            .from('ui_state')
+            .upsert({
+                user_id: currentUserId,
+                open_tabs: uiState.openTabs,
+                scroll_positions: uiState.scrollPositions,
+                theme: uiState.theme,
+                settings: uiState.settings,
+                updated_at: new Date().toISOString()
+            }, {
+                onConflict: 'user_id'
+            });
+        
+        if (error) throw error;
+        console.log("💾 UI сохранено");
+        
+    } catch (error) {
+        console.error("❌ Ошибка сохранения UI:", error);
+    }
+}
+
+function showAutoSaveIndicator() {
+    const existing = document.querySelector('.auto-save-indicator');
+    if (existing) existing.remove();
+    
+    const indicator = document.createElement('div');
+    indicator.className = 'auto-save-indicator';
+    indicator.innerHTML = '<i class="fas fa-check"></i> Автосохранено';
+    
+    document.body.appendChild(indicator);
+    
+    setTimeout(() => {
+        if (indicator.parentNode) {
+            indicator.style.animation = 'slideOutDown 0.3s ease';
+            setTimeout(() => indicator.remove(), 300);
+        }
+    }, 2000);
+}
+
+// ========== АУТЕНТИФИКАЦИЯ ==========
+function showAuthModal() {
+    const modalTitle = document.getElementById('modalTitle');
+    const modalBody = document.getElementById('modalBody');
+    
+    modalTitle.textContent = 'Вход в систему';
+    modalBody.innerHTML = `
+        <div style="padding: 20px;">
+            <div style="text-align: center; margin-bottom: 20px;">
+                <h3 style="color: #3498db;">Добро пожаловать в курс эмпатии!</h3>
+                <p>Войдите, чтобы сохранять прогресс на всех устройствах.</p>
+            </div>
+            
+            <div id="authContainer">
+                <div class="auth-tabs" style="display: flex; margin-bottom: 20px; border-bottom: 2px solid #2c3e50;">
+                    <button class="auth-tab active" onclick="showAuthTab('login')" style="flex: 1; padding: 10px; background: none; border: none; color: white; border-bottom: 2px solid #3498db;">Вход</button>
+                    <button class="auth-tab" onclick="showAuthTab('register')" style="flex: 1; padding: 10px; background: none; border: none; color: white;">Регистрация</button>
+                </div>
+                
+                <div id="loginTab">
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; margin-bottom: 5px; color: #ecf0f1;">Email</label>
+                        <input type="email" id="loginEmail" placeholder="ваш@email.com" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #34495e; background: #2c3e50; color: white;">
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; margin-bottom: 5px; color: #ecf0f1;">Пароль</label>
+                        <input type="password" id="loginPassword" placeholder="Ваш пароль" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #34495e; background: #2c3e50; color: white;">
+                    </div>
+                    <button onclick="handleLogin()" class="btn-primary" style="width: 100%; padding: 12px;">
+                        <i class="fas fa-sign-in-alt"></i> Войти
+                    </button>
+                </div>
+                
+                <div id="registerTab" style="display: none;">
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; margin-bottom: 5px; color: #ecf0f1;">Имя для сертификата</label>
+                        <input type="text" id="registerName" placeholder="Иван Иванов" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #34495e; background: #2c3e50; color: white;">
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; margin-bottom: 5px; color: #ecf0f1;">Email</label>
+                        <input type="email" id="registerEmail" placeholder="ваш@email.com" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #34495e; background: #2c3e50; color: white;">
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; margin-bottom: 5px; color: #ecf0f1;">Пароль</label>
+                        <input type="password" id="registerPassword" placeholder="Не менее 6 символов" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #34495e; background: #2c3e50; color: white;">
+                    </div>
+                    <button onclick="handleRegister()" class="btn-primary" style="width: 100%; padding: 12px;">
+                        <i class="fas fa-user-plus"></i> Зарегистрироваться
+                    </button>
+                </div>
+                
+                <div style="margin-top: 20px; text-align: center;">
+                    <button onclick="continueAsGuest()" class="btn-secondary" style="width: 100%; padding: 10px;">
+                        Продолжить как гость
+                    </button>
+                    <p style="margin-top: 10px; font-size: 0.9em; color: #95a5a6;">
+                        В гостевом режиме прогресс сохраняется только в этом браузере
+                    </p>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('modalOverlay').style.display = 'flex';
+}
+
+async function handleRegister() {
+    const email = document.getElementById('registerEmail').value.trim();
+    const password = document.getElementById('registerPassword').value;
+    const name = document.getElementById('registerName').value.trim();
+    
+    if (!email || !password || !name) {
+        showMessage('error', 'Заполните все поля');
+        return;
+    }
+    
+    if (password.length < 6) {
+        showMessage('error', 'Пароль минимум 6 символов');
+        return;
+    }
+    
+    if (!supabase) {
+        showMessage('error', 'Supabase не инициализирован');
+        return;
+    }
+    
+    console.log('📝 Регистрация пользователя:', email);
+    
+    try {
+        const { data, error } = await supabase.auth.signUp({
+            email: email,
+            password: password,
+            options: {
+                data: {
+                    full_name: name
+                }
+            }
+        });
+        
+        if (error) {
+            console.error('❌ Ошибка регистрации:', error);
+            
+            if (error.message.includes('already registered')) {
+                showMessage('error', 'Этот email уже зарегистрирован');
+            } else {
+                showMessage('error', 'Ошибка регистрации: ' + error.message);
+            }
+            return;
+        }
+        
+        if (data.user) {
+            console.log('✅ Пользователь создан:', data.user.id);
+            showMessage('success', 'Регистрация успешна! Проверьте почту.');
+            
+            setTimeout(() => {
+                document.getElementById('modalOverlay').style.display = 'none';
+                location.reload();
+            }, 2000);
+        }
+        
+    } catch (error) {
+        console.error('❌ Критическая ошибка регистрации:', error);
+        showMessage('error', 'Неизвестная ошибка');
+    }
+}
+
+async function handleLogin() {
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    
+    if (!email || !password) {
+        showMessage('error', 'Заполните все поля');
+        return;
+    }
+    
+    if (!supabase) {
+        showMessage('error', 'Supabase не инициализирован');
+        return;
+    }
+    
+    console.log('🔐 Вход пользователя:', email);
+    
+    try {
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email: email,
+            password: password
+        });
+        
+        if (error) {
+            console.error('❌ Ошибка входа:', error);
+            showMessage('error', 'Неверный email или пароль');
+            return;
+        }
+        
+        if (data.user) {
+            console.log('✅ Вход успешен:', data.user.email);
+            showMessage('success', 'Вход выполнен!');
+            
+            document.getElementById('modalOverlay').style.display = 'none';
+            location.reload();
+        }
+        
+    } catch (error) {
+        console.error('❌ Ошибка входа:', error);
+        showMessage('error', 'Ошибка входа');
+    }
+}
+
+function showAuthTab(tabName) {
+    document.querySelectorAll('.auth-tab').forEach(tab => {
+        tab.classList.remove('active');
+        tab.style.borderBottom = 'none';
+    });
+    
+    const activeTab = document.querySelector(`.auth-tab[onclick*="${tabName}"]`);
+    if (activeTab) {
+        activeTab.classList.add('active');
+        activeTab.style.borderBottom = '2px solid #3498db';
+    }
+    
+    document.getElementById('loginTab').style.display = tabName === 'login' ? 'block' : 'none';
+    document.getElementById('registerTab').style.display = tabName === 'register' ? 'block' : 'none';
+}
+
+function continueAsGuest() {
+    document.getElementById('modalOverlay').style.display = 'none';
+    showWelcomeScreen();
+}
+
+async function handleLogout() {
+    try {
+        const { error } = await supabase.auth.signOut();
+        if (error) throw error;
+        
+        showMessage('success', 'Вы вышли');
         location.reload();
+        
+    } catch (error) {
+        console.error('Ошибка выхода:', error);
+        showMessage('error', 'Ошибка выхода');
+    }
+}
+
+function setupAuthListener() {
+    if (!supabase) return;
+    
+    supabase.auth.onAuthStateChange((event, session) => {
+        console.log("Событие авторизации:", event);
+        
+        switch (event) {
+            case 'SIGNED_IN':
+                location.reload();
+                break;
+            case 'SIGNED_OUT':
+                currentUserId = null;
+                isAuthenticated = false;
+                answerDraftsCache.clear();
+                showAuthModal();
+                break;
+        }
+    });
+}
+
+// ========== UI ФУНКЦИИ ==========
+function updateProgressUI() {
+    const totalSubmodules = courseData.modules.reduce((sum, module) => {
+        return sum + (module.submodules ? module.submodules.length : 0);
+    }, 0);
+    
+    const completed = userProgress.completedSubmodules.length;
+    const percent = totalSubmodules > 0 ? Math.round((completed / totalSubmodules) * 100) : 0;
+    
+    const progressFill = document.getElementById('progressFill');
+    const progressText = document.getElementById('progressText');
+    const mobileProgressText = document.querySelector('#mobileProgressText');
+    
+    if (progressFill) progressFill.style.width = percent + '%';
+    if (progressText) progressText.textContent = `Прогресс: ${percent}%`;
+    if (mobileProgressText) mobileProgressText.textContent = `${percent}%`;
+    
+    const userNameElements = document.querySelectorAll('#userName');
+    userNameElements.forEach(el => {
+        if (el) {
+            el.textContent = userProgress.userName || "Гость";
+        }
+    });
+    
+    const finalExamBtn = document.getElementById('finalExamBtn');
+    if (finalExamBtn) {
+        const allModulesCompleted = userProgress.completedModules.length === courseData.modules.length;
+        if (allModulesCompleted && !userProgress.finalExamCompleted) {
+            finalExamBtn.classList.remove('disabled');
+            finalExamBtn.onclick = openFinalExam;
+        } else {
+            finalExamBtn.classList.add('disabled');
+            finalExamBtn.onclick = function(e) {
+                e.preventDefault();
+                if (!allModulesCompleted) {
+                    alert(`Завершите все модули! Вы прошли ${userProgress.completedModules.length} из ${courseData.modules.length}.`);
+                } else {
+                    alert('Итоговый экзамен уже пройден!');
+                }
+            };
+        }
+    }
+    
+    const certBtn = document.getElementById('certificateBtn');
+    if (certBtn) {
+        if (userProgress.finalExamCompleted) {
+            certBtn.classList.remove('disabled');
+            certBtn.onclick = showCertificate;
+        } else {
+            certBtn.classList.add('disabled');
+            certBtn.onclick = function(e) {
+                e.preventDefault();
+                alert('Сначала пройдите итоговый экзамен!');
+            };
+        }
+    }
+    
+    updateModuleProgress();
+}
+
+function updateModuleProgress() {
+    const moduleId = userProgress.currentModule;
+    const module = courseData.modules.find(m => m.id === moduleId);
+    
+    if (!module || !module.submodules) return;
+    
+    const totalSubmodules = module.submodules.length;
+    const completedInModule = module.submodules.filter(sub => 
+        userProgress.completedSubmodules.includes(sub.id)
+    ).length;
+    
+    const percent = totalSubmodules > 0 ? Math.round((completedInModule / totalSubmodules) * 100) : 0;
+    
+    const indicator = document.getElementById('moduleProgressIndicator');
+    const progressFill = document.getElementById('moduleProgressFill');
+    const progressPercent = document.getElementById('moduleProgressPercent');
+    
+    if (indicator && progressFill && progressPercent) {
+        if (percent > 0 && percent < 100) {
+            indicator.style.display = 'flex';
+            progressFill.style.width = percent + '%';
+            progressPercent.textContent = `${percent}%`;
+        } else {
+            indicator.style.display = 'none';
+        }
     }
 }
 
 function updateUserUI(user) {
+    if (!user) return;
+    
     const userNameElements = document.querySelectorAll('#userName');
+    const displayName = user.user_metadata?.full_name || user.email?.split('@')[0] || 'Пользователь';
+    
     userNameElements.forEach(el => {
         if (el) {
-            el.textContent = user?.user_metadata?.full_name || user?.email || "Гость";
+            el.textContent = displayName;
+            el.style.cursor = 'default';
+            el.onclick = null;
         }
     });
     
-    const authButtons = document.getElementById('authButtons');
-    if (authButtons) {
-        if (isAuthenticated) {
-            authButtons.innerHTML = `
-                <button class="btn-secondary" onclick="handleLogout()">
-                    <i class="fas fa-sign-out-alt"></i> Выйти
-                </button>
-            `;
-        } else {
-            authButtons.innerHTML = `
-                <button class="btn-primary" onclick="showAuthModal()">
-                    <i class="fas fa-sign-in-alt"></i> Войти
-                </button>
-            `;
-        }
+    const userProfile = document.querySelector('.user-profile');
+    if (userProfile && isAuthenticated) {
+        userProfile.innerHTML = `
+            <div class="user-menu">
+                <div class="user-info">
+                    <i class="fas fa-user-circle"></i>
+                    <span id="userName">${displayName}</span>
+                </div>
+                <div class="user-menu-content">
+                    <a href="#" class="user-menu-item" onclick="event.preventDefault(); showProfile()">
+                        <i class="fas fa-user"></i> Профиль
+                    </a>
+                    <a href="#" class="user-menu-item" onclick="event.preventDefault(); handleLogout()">
+                        <i class="fas fa-sign-out-alt"></i> Выйти
+                    </a>
+                </div>
+            </div>
+        `;
     }
 }
 
-function showMessage(type, text) {
-    const existingMessages = document.querySelectorAll('.system-message');
-    existingMessages.forEach(msg => msg.remove());
+function showProfile() {
+    const modalTitle = document.getElementById('modalTitle');
+    const modalBody = document.getElementById('modalBody');
     
-    const message = document.createElement('div');
-    message.className = `system-message ${type}`;
-    message.innerHTML = `
-        <div style="padding: 15px 20px; border-radius: 8px; margin: 10px; display: flex; align-items: center; gap: 10px;">
-            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
-            <span>${text}</span>
+    modalTitle.textContent = 'Профиль пользователя';
+    modalBody.innerHTML = `
+        <div style="padding: 20px;">
+            <h3><i class="fas fa-user-circle"></i> Информация о профиле</h3>
+            <p><strong>Имя:</strong> ${userProgress.userName}</p>
+            <p><strong>Email:</strong> ${currentUserId ? 'Скрыт' : 'Гость'}</p>
+            <p><strong>Статус:</strong> ${isAuthenticated ? '✅ Авторизован' : '❌ Гость'}</p>
+            <p><strong>Прогресс:</strong> ${userProgress.completedSubmodules.length} подмодулей завершено</p>
+            ${userProgress.finalExamCompleted ? '<p><strong>Экзамен:</strong> ✅ Завершен</p>' : ''}
         </div>
     `;
     
-    message.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        z-index: 10000;
-        background: ${type === 'success' ? 'rgba(46, 204, 113, 0.9)' : 'rgba(231, 76, 60, 0.9)'};
-        color: white;
-        border-left: 4px solid ${type === 'success' ? '#27ae60' : '#c0392b'};
-        animation: slideInRight 0.3s ease;
-    `;
-    
-    document.body.appendChild(message);
-    
-    setTimeout(() => {
-        if (message.parentNode) {
-            message.style.animation = 'slideOutRight 0.3s ease';
-            setTimeout(() => message.remove(), 300);
-        }
-    }, 5000);
+    document.getElementById('modalOverlay').style.display = 'flex';
 }
 
+function setTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+}
+
+function showWelcomeScreen() {
+    const contentDisplay = document.getElementById('contentDisplay');
+    contentDisplay.innerHTML = `
+        <div class="welcome-screen">
+            <div class="welcome-icon">
+                <i class="fas fa-hands-helping"></i>
+            </div>
+            <h1>Полный курс: «Эмпатия и поддержка в общении»</h1>
+            <p>Развивайте эмоциональный интеллект, учитесь слушать и поддерживать других.</p>
+            
+            <div class="features">
+                <div class="feature">
+                    <i class="fas fa-book-open"></i>
+                    <h3>5 модулей</h3>
+                    <p>Теория, цитаты, практические задания</p>
+                </div>
+                <div class="feature">
+                    <i class="fas fa-check-circle"></i>
+                    <h3>Контрольные работы</h3>
+                    <p>Тесты и практика после каждого модуля</p>
+                </div>
+                <div class="feature">
+                    <i class="fas fa-graduation-cap"></i>
+                    <h3>Итоговый экзамен</h3>
+                    <p>Комплексная проверка знаний</p>
+                </div>
+                <div class="feature">
+                    <i class="fas fa-award"></i>
+                    <h3>Именной сертификат</h3>
+                    <p>Получите сертификат с вашим именем</p>
+                </div>
+            </div>
+            
+            <div class="module-test-button" style="margin-top: 40px;">
+                <h3>Структура курса</h3>
+                <p>Курс состоит из 5 модулей, каждый содержит:</p>
+                <ul style="text-align: left; max-width: 600px; margin: 15px auto;">
+                    <li>Теоретический материал с примерами</li>
+                    <li>Практические задания с проверкой</li>
+                    <li>Контрольную работу по модулю</li>
+                    <li>Итоговый экзамен по всему курсу</li>
+                </ul>
+                <button onclick="openModule(1, '1.1')" class="btn-primary" style="margin-top: 20px; padding: 15px 30px; font-size: 1.1rem;">
+                    <i class="fas fa-play-circle"></i> Начать обучение
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+// ========== СОБЫТИЯ ==========
 function setupEventListeners() {
     const closeModal = document.getElementById('closeModalBtn');
     const modalOverlay = document.getElementById('modalOverlay');
@@ -2851,8 +2593,82 @@ function setupEventListeners() {
     }
 }
 
-// ========== ЭКСПОРТ ФУНКЦИЙ ==========
+// ========== УТИЛИТЫ ==========
+function showMessage(type, text) {
+    console.log(`📢 ${type.toUpperCase()}: ${text}`);
+    
+    const existing = document.querySelector('.message-notification');
+    if (existing) existing.remove();
+    
+    const notification = document.createElement('div');
+    notification.className = `message-notification message-${type}`;
+    
+    let icon = 'fa-info-circle';
+    let bgColor = '#3498db';
+    
+    switch(type) {
+        case 'success':
+            icon = 'fa-check-circle';
+            bgColor = '#2ecc71';
+            break;
+        case 'error':
+            icon = 'fa-exclamation-circle';
+            bgColor = '#e74c3c';
+            break;
+        case 'warning':
+            icon = 'fa-exclamation-triangle';
+            bgColor = '#f39c12';
+            break;
+        case 'info':
+            icon = 'fa-info-circle';
+            bgColor = '#3498db';
+            break;
+    }
+    
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${bgColor};
+        color: white;
+        padding: 15px 25px;
+        border-radius: 8px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        z-index: 10000;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.95rem;
+        animation: slideInRight 0.3s ease;
+        max-width: 400px;
+    `;
+    
+    notification.innerHTML = `<i class="fas ${icon}"></i><span>${text}</span>`;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.style.animation = 'slideOutRight 0.3s ease';
+            setTimeout(() => notification.remove(), 300);
+        }
+    }, 4000);
+}
 
+function resetProgress() {
+    if (confirm("Вы уверены, что хотите сбросить весь прогресс?\nВсе данные будут удалены, включая результаты тестов и экзамена.")) {
+        userProgress = getDefaultProgress();
+        
+        courseData.modules.forEach(module => {
+            module.completed = false;
+        });
+        
+        localStorage.removeItem('empathyCourseProgress');
+        location.reload();
+    }
+}
+
+// ========== ЭКСПОРТ ФУНКЦИЙ ==========
 window.checkAssignment = checkAssignment;
 window.checkExtraAssignment = checkExtraAssignment;
 window.openModule = openModule;
@@ -2867,12 +2683,13 @@ window.submitFinalExam = submitFinalExam;
 window.openTest = openTest;
 window.submitTest = submitTest;
 window.showTestInfo = showTestInfo;
-
+window.showTestResultModal = showTestResultModal;
 window.showAuthModal = showAuthModal;
 window.showAuthTab = showAuthTab;
 window.handleLogin = handleLogin;
 window.handleRegister = handleRegister;
 window.continueAsGuest = continueAsGuest;
 window.handleLogout = handleLogout;
+window.showProfile = showProfile;
 
-console.log("✅ Курс эмпатии загружен!");
+console.log('✅ script.js загружен');
