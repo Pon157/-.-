@@ -2,19 +2,13 @@
 // Настройки для подключения к Supabase
 if (typeof window !== 'undefined' && !window.ENV) {
     window.ENV = {
-        // ВАЖНО: Замените эти значения на ваши реальные ключи из Supabase Dashboard
-        // Project Settings -> API -> Project URL и anon/public key
-        SUPABASE_URL: 'https://your-project.supabase.co',
-        SUPABASE_ANON_KEY: 'your-anon-key-here'
+        // Конфигурация Supabase из вашего проекта
+        SUPABASE_URL: 'https://homxdvtanuqxmdayvmib.supabase.co',
+        SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhvbXhkdnRhbnVxeG1kYXl2bWliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzM3NDE3NzcsImV4cCI6MjA0OTMxNzc3N30.Jlk-w3iBdQlgTzL_fApzvxZ0R2J6Ot8lQ9GwM9rL3kk'
     };
     
-    console.log('⚠️ Используются тестовые ENV переменные. Настройте их в js/data.js');
-    console.log('📝 Инструкция:');
-    console.log('1. Откройте https://supabase.com/dashboard');
-    console.log('2. Выберите ваш проект');
-    console.log('3. Перейдите в Settings -> API');
-    console.log('4. Скопируйте Project URL и anon public key');
-    console.log('5. Замените значения в js/data.js');
+    console.log('✅ Supabase конфигурация загружена');
+    console.log('🔗 URL:', window.ENV.SUPABASE_URL);
 }
 
 function checkAssignment(submoduleId) {
