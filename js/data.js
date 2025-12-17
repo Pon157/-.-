@@ -1,60 +1,47 @@
 // ========== КОНФИГУРАЦИЯ SUPABASE ENV ==========
-// Настройки для подключения к Supabase
-if (typeof window !== 'undefined' && !window.ENV) {
-    window.ENV = {
-        // Конфигурация Supabase из вашего проекта
-        SUPABASE_URL: 'https://homxdvtanuqxmdayvmib.supabase.co',
-        SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhvbXhkdnRhbnVxeG1kYXl2bWliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzM3NDE3NzcsImV4cCI6MjA0OTMxNzc3N30.Jlk-w3iBdQlgTzL_fApzvxZ0R2J6Ot8lQ9GwM9rL3kk'
-    };
-    
-    console.log('✅ Supabase конфигурация загружена');
-    console.log('🔗 URL:', window.ENV.SUPABASE_URL);
+// Этот файл не должен содержать секретных ключей!
+// Ключи должны загружаться из внешнего источника или через ENV на сервере
+
+// Проверяем, есть ли конфигурация от сервера
+if (typeof window !== 'undefined') {
+    // Ждем, пока сервер вставит конфигурацию
+    // Если конфигурации нет, показываем предупреждение
+    setTimeout(() => {
+        if (!window.ENV) {
+            console.warn('⚠️ Конфигурация Supabase не загружена');
+            console.warn('ℹ️ Создайте config.js файл с конфигурацией или настройте серверную часть');
+            
+            // Для разработки можно использовать заглушку (но не в продакшене!)
+            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                console.warn('⚠️ Разработческий режим: используем fallback конфигурацию');
+                window.ENV = {
+                    SUPABASE_URL: 'https://your-project.supabase.co',
+                    SUPABASE_ANON_KEY: 'your-anon-key-here'
+                };
+                console.warn('⚠️ Замените значения в ENV на реальные!');
+            }
+        } else {
+            console.log('✅ Конфигурация загружена из внешнего источника');
+        }
+    }, 100);
 }
 
-function checkAssignment(submoduleId) {
-    console.log("=== НАЧАЛО ПРОВЕРКИ ===");
-    
-    // Находим текущий модуль и подмодуль
-    const moduleId = userProgress.currentModule;
-    const module = courseData.modules.find(m => m.id === moduleId);
-    const submodule = module.submodules.find(s => s.id === submoduleId);
-    
-    if (!module || !submodule) {
-        console.error("Модуль или подмодуль не найдены");
-        return;
+// Глобальная переменная для Supabase клиента
+var supabase = null;
+
+// ========== ДАННЫЕ КУРСА ==========
+window.courseData = {
+    title: "Полный курс: «Эмпатия и поддержка в общении»",
+    description: "Развивайте эмоциональный интеллект, учитесь слушать и поддерживать других",
+    modules: [
+        // ... ваши модули здесь
+    ],
+    finalExam: {
+        // ... данные экзамена
     }
-    
-    // ID элементов
-    const answerId = 'answer' + submoduleId.replace('.', '_');
-    const feedbackId = 'feedback' + submoduleId.replace('.', '_');
-    
-    const answerElement = document.getElementById(answerId);
-    const feedbackElement = document.getElementById(feedbackId);
-    
-    if (!answerElement || !feedbackElement) return;
-    
-    const answer = answerElement.value.trim();
-    
-    if (!answer) {
-        showFeedback(feedbackElement, "❌ Пожалуйста, напишите ответ перед проверкой.", false);
-        return;
-    }
-    
-    // После успешной проверки можно очистить черновик
-    if (isAuthenticated && currentUserId) {
-        // Очищаем черновик после успешной проверки
-        const key = `${submoduleId}_main`;
-        answerDraftsCache.delete(key);
-        
-        // Удаляем из базы данных
-        supabase
-            .from('answer_drafts')
-            .delete()
-            .eq('user_id', currentUserId)
-            .eq('submodule_id', submoduleId)
-            .eq('answer_type', 'main');
-    }
-}
+};
+
+console.log('✅ Данные курса загружены');
 // Данные курса: модули, подмодули, задания  
 const courseData = {
     title: "Эмпатия и поддержка в общении",
