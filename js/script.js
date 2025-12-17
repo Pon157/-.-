@@ -2,16 +2,15 @@
 
 // ========== КОНФИГУРАЦИЯ SUPABASE ==========
 const SUPABASE_CONFIG = {
-    url: window.ENV?.VITE_SUPABASE_URL || import.meta.env?.VITE_SUPABASE_URL,
-    anonKey: window.ENV?.VITE_SUPABASE_ANON_KEY || import.meta.env?.VITE_SUPABASE_ANON_KEY
+    url: window.ENV?.VITE_SUPABASE_URL,
+    anonKey: window.ENV?.VITE_SUPABASE_ANON_KEY
 };
 
-// Проверяем конфигурацию
+// Проверка наличия конфигурации
 if (!SUPABASE_CONFIG.url || !SUPABASE_CONFIG.anonKey) {
-    console.error('❌ Supabase конфигурация не найдена!');
-    console.error('Добавьте в .env:');
-    console.error('VITE_SUPABASE_URL=https://your-project.supabase.co');
-    console.error('VITE_SUPABASE_ANON_KEY=your-anon-key');
+    console.error('Отсутствуют конфигурационные данные Supabase');
+    console.log('URL:', SUPABASE_CONFIG.url);
+    console.log('Key:', SUPABASE_CONFIG.anonKey);
 }
 
 // Инициализируем Supabase клиент
