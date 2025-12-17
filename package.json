@@ -2,10 +2,10 @@
   "name": "telegram-certificate-bot",
   "version": "1.0.0",
   "description": "Telegram bot for empathy course certificate verification",
-  "main": "telegram-bot.js",
+  "main": "js/telegram-bot.js",
   "scripts": {
-    "start": "node telegram-bot.js",
-    "dev": "nodemon telegram-bot.js"
+    "start": "node js/telegram-bot.js",
+    "dev": "nodemon js/telegram-bot.js"
   },
   "dependencies": {
     "telegraf": "^4.15.3",
