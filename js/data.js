@@ -1,3 +1,22 @@
+// ========== КОНФІГУРАЦІЯ SUPABASE ENV ==========
+// Налаштування для підключення до Supabase
+if (typeof window !== 'undefined' && !window.ENV) {
+    window.ENV = {
+        // ВАЖЛИВО: Замініть ці значення на ваші реальні ключі з Supabase Dashboard
+        // Project Settings -> API -> Project URL та anon/public key
+        SUPABASE_URL: 'https://your-project.supabase.co',
+        SUPABASE_ANON_KEY: 'your-anon-key-here'
+    };
+    
+    console.log('⚠️ Використовуються тестові ENV змінні. Налаштуйте їх в js/data.js');
+    console.log('📝 Інструкція:');
+    console.log('1. Відкрийте https://supabase.com/dashboard');
+    console.log('2. Оберіть ваш проект');
+    console.log('3. Перейдіть в Settings -> API');
+    console.log('4. Скопіюйте Project URL та anon public key');
+    console.log('5. Замініть значення в js/data.js');
+}
+
 function checkAssignment(submoduleId) {
     console.log("=== НАЧАЛО ПРОВЕРКИ ===");
     

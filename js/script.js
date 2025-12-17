@@ -231,52 +231,91 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 async function initApp() {
     try {
-        if (supabase) {
+        // Спочатку ініціалізуємо Supabase
+        const supabaseInitialized = initSupabase();
+        
+        if (supabase && supabaseInitialized) {
+            console.log('🔄 Перевірка сесії...');
+            
             const { data: { session }, error: sessionError } = await supabase.auth.getSession();
             
             if (sessionError) {
-                console.error("Ошибка получения сессии:", sessionError);
-                await loadGuestProgress();
-                showAuthModal();
-                return;
+                console.error("❌ Помилка отримання сесії:", sessionError);
+                
+                // Спробуємо оновити токен
+                try {
+                    const { data: { session: refreshedSession }, error: refreshError } = await supabase.auth.refreshSession();
+                    
+                    if (refreshError || !refreshedSession) {
+                        console.log("⚠️ Не вдалося оновити сесію, переходимо в гостьовий режим");
+                        await loadGuestProgress();
+                        renderModulesList();
+                        showWelcomeScreen();
+                        return;
+                    }
+                    
+                    // Якщо оновлення успішне, продовжуємо з новою сесією
+                    console.log("✅ Сесія оновлена");
+                    return initApp(); // Рекурсивно викликаємо ще раз
+                    
+                } catch (refreshError) {
+                    console.error("❌ Помилка оновлення сесії:", refreshError);
+                    await loadGuestProgress();
+                    renderModulesList();
+                    showWelcomeScreen();
+                    return;
+                }
             }
             
             if (session) {
                 currentUserId = session.user.id;
                 isAuthenticated = true;
-                console.log("✅ Пользователь авторизован:", session.user.email);
+                console.log("✅ Користувач авторизований:", session.user.email);
                 
-                await loadUserProgress();
-                await loadAnswerDrafts();
-                await loadUIState();
-                
-                updateUserUI(session.user);
-                
-                if (userProgress.currentModule && userProgress.currentSubmodule) {
-                    setTimeout(() => {
-                        openModule(userProgress.currentModule, userProgress.currentSubmodule);
-                    }, 500);
-                } else {
+                try {
+                    await loadUserProgress();
+                    await loadAnswerDrafts();
+                    await loadUIState();
+                    
+                    updateUserUI(session.user);
+                    
+                    if (userProgress.currentModule && userProgress.currentSubmodule) {
+                        setTimeout(() => {
+                            openModule(userProgress.currentModule, userProgress.currentSubmodule);
+                        }, 500);
+                    } else {
+                        showWelcomeScreen();
+                    }
+                    
+                    setupAuthListener();
+                    
+                } catch (loadError) {
+                    console.error("❌ Помилка завантаження даних:", loadError);
+                    showMessage('error', 'Помилка завантаження даних. Спробуйте оновити сторінку.');
+                    await loadGuestProgress();
+                    renderModulesList();
                     showWelcomeScreen();
                 }
                 
-                setupAuthListener();
-                
             } else {
-                console.log("👤 Гостевой режим");
+                console.log("👤 Гостьовий режим - сесія відсутня");
                 await loadGuestProgress();
-                showAuthModal();
+                renderModulesList();
+                showWelcomeScreen();
             }
         } else {
-            console.log("🔄 Работа в гостевом режиме (Supabase не настроен)");
+            console.log("🔄 Робота в гостьовому режимі (Supabase не налаштовано)");
             await loadGuestProgress();
+            renderModulesList();
             showWelcomeScreen();
         }
         
     } catch (error) {
-        console.error("❌ Ошибка инициализации:", error);
+        console.error("❌ Критична помилка ініціалізації:", error);
         await loadGuestProgress();
+        renderModulesList();
         showWelcomeScreen();
+        showMessage('error', 'Помилка ініціалізації додатку');
     }
 }
 
@@ -465,6 +504,63 @@ async function loadGuestProgress() {
     
     updateProgressUI();
     renderModulesList();
+}
+
+function updateUserUI(user) {
+    if (!user) return;
+    
+    const userNameElements = document.querySelectorAll('#userName');
+    const displayName = user.user_metadata?.full_name || user.email?.split('@')[0] || 'Користувач';
+    
+    userNameElements.forEach(el => {
+        if (el) {
+            el.textContent = displayName;
+            el.style.cursor = 'default';
+            el.onclick = null;
+        }
+    });
+    
+    // Додаємо меню користувача
+    const userProfile = document.querySelector('.user-profile');
+    if (userProfile && isAuthenticated) {
+        userProfile.innerHTML = `
+            <div class="user-menu">
+                <div class="user-info">
+                    <i class="fas fa-user-circle"></i>
+                    <span id="userName">${displayName}</span>
+                </div>
+                <div class="user-menu-content">
+                    <a href="#" class="user-menu-item" onclick="event.preventDefault(); showProfile()">
+                        <i class="fas fa-user"></i> Профіль
+                    </a>
+                    <a href="#" class="user-menu-item" onclick="event.preventDefault(); handleLogout()">
+                        <i class="fas fa-sign-out-alt"></i> Вийти
+                    </a>
+                </div>
+            </div>
+        `;
+    }
+    
+    console.log('✅ UI користувача оновлено:', displayName);
+}
+
+function showProfile() {
+    const modalTitle = document.getElementById('modalTitle');
+    const modalBody = document.getElementById('modalBody');
+    
+    modalTitle.textContent = 'Профіль користувача';
+    modalBody.innerHTML = `
+        <div style="padding: 20px;">
+            <h3><i class="fas fa-user-circle"></i> Інформація про профіль</h3>
+            <p><strong>Ім'я:</strong> ${userProgress.userName}</p>
+            <p><strong>Email:</strong> ${currentUserId ? 'Прихований' : 'Гість'}</p>
+            <p><strong>Статус:</strong> ${isAuthenticated ? '✅ Авторизовано' : '❌ Гість'}</p>
+            <p><strong>Прогрес:</strong> ${userProgress.completedSubmodules.length} підмодулів завершено</p>
+            ${userProgress.finalExamCompleted ? '<p><strong>Іспит:</strong> ✅ Завершено</p>' : ''}
+        </div>
+    `;
+    
+    document.getElementById('modalOverlay').style.display = 'flex';
 }
 
 function setupAuthListener() {
@@ -726,6 +822,92 @@ function showAutoSaveIndicator() {
     }, 2000);
 }
 
+function showMessage(type, message) {
+    const existing = document.querySelector('.message-notification');
+    if (existing) existing.remove();
+    
+    const notification = document.createElement('div');
+    notification.className = `message-notification message-${type}`;
+    
+    let icon = 'fa-info-circle';
+    let bgColor = '#3498db';
+    
+    switch(type) {
+        case 'success':
+            icon = 'fa-check-circle';
+            bgColor = '#2ecc71';
+            break;
+        case 'error':
+            icon = 'fa-exclamation-circle';
+            bgColor = '#e74c3c';
+            break;
+        case 'warning':
+            icon = 'fa-exclamation-triangle';
+            bgColor = '#f39c12';
+            break;
+        case 'info':
+            icon = 'fa-info-circle';
+            bgColor = '#3498db';
+            break;
+    }
+    
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${bgColor};
+        color: white;
+        padding: 15px 25px;
+        border-radius: 8px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        z-index: 10000;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.95rem;
+        animation: slideInRight 0.3s ease;
+        max-width: 400px;
+    `;
+    
+    notification.innerHTML = `<i class="fas ${icon}"></i><span>${message}</span>`;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.style.animation = 'slideOutRight 0.3s ease';
+            setTimeout(() => notification.remove(), 300);
+        }
+    }, 4000);
+}
+
+// Додаємо анімації для повідомлень
+const messageStyles = document.createElement('style');
+messageStyles.textContent = `
+    @keyframes slideInRight {
+        from {
+            opacity: 0;
+            transform: translateX(100px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    
+    @keyframes slideOutRight {
+        from {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        to {
+            opacity: 0;
+            transform: translateX(100px);
+        }
+    }
+`;
+document.head.appendChild(messageStyles);
+
 // ========== ФУНКЦИИ АУТЕНТИФИКАЦИИ ==========
 
 function showAuthModal() {
@@ -826,29 +1008,48 @@ async function handleRegister() {
     const password = document.getElementById('registerPassword').value;
     
     if (!name || !email || !password) {
-        alert('Заполните все поля');
+        showMessage('error', 'Заповніть всі поля');
         return;
     }
     
     if (password.length < 6) {
-        alert('Пароль минимум 6 символов');
+        showMessage('error', 'Пароль мінімум 6 символів');
+        return;
+    }
+    
+    // Перевірка формату email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        showMessage('error', 'Введіть коректний email');
         return;
     }
     
     try {
+        showMessage('info', '⏳ Реєстрація...');
+        
         const { data: authData, error: authError } = await supabase.auth.signUp({
             email,
             password,
             options: {
                 data: {
                     full_name: name
-                }
+                },
+                emailRedirectTo: window.location.origin
             }
         });
         
-        if (authError) throw authError;
+        if (authError) {
+            // Перевірка на вже існуючий email
+            if (authError.message.includes('already registered')) {
+                throw new Error('Цей email вже зареєстрований. Спробуйте увійти.');
+            }
+            throw authError;
+        }
         
         if (authData.user) {
+            console.log('✅ Користувач створений в Auth:', authData.user.id);
+            
+            // Створюємо запис користувача в таблиці users
             const { error: userError } = await supabase
                 .from('users')
                 .insert([
@@ -866,19 +1067,53 @@ async function handleRegister() {
                             assignmentResults: {},
                             finalExamCompleted: false,
                             finalExamScore: 0
-                        }
+                        },
+                        created_at: new Date().toISOString(),
+                        last_active: new Date().toISOString()
                     }
                 ]);
             
-            if (userError) throw userError;
+            if (userError && userError.code !== '23505') { // 23505 = duplicate key
+                console.error('Помилка створення користувача:', userError);
+                throw userError;
+            }
+            
+            console.log('✅ Запис користувача створено');
+            
+            // Додаємо користувача до allowed_users для доступу до бота
+            try {
+                const { error: allowedError } = await supabase
+                    .from('allowed_users')
+                    .insert([
+                        {
+                            telegram_id: null,
+                            user_id: authData.user.id,
+                            added_by: null,
+                            added_at: new Date().toISOString()
+                        }
+                    ]);
+                
+                if (allowedError && allowedError.code !== '23505') {
+                    console.warn('Помилка додавання до allowed_users:', allowedError);
+                }
+            } catch (err) {
+                console.warn('Не вдалося додати до allowed_users:', err);
+            }
         }
         
         document.getElementById('modalOverlay').style.display = 'none';
-        showMessage('success', 'Регистрация успешна! Проверьте почту.');
+        
+        // Перевіряємо чи потрібне підтвердження email
+        if (authData.user && !authData.user.confirmed_at) {
+            showMessage('success', '✅ Реєстрація успішна! Перевірте пошту та підтвердіть email.');
+        } else {
+            showMessage('success', '✅ Реєстрація успішна! Входимо...');
+            setTimeout(() => location.reload(), 1500);
+        }
         
     } catch (error) {
-        console.error('Ошибка регистрации:', error);
-        showMessage('error', error.message || 'Ошибка регистрации');
+        console.error('❌ Помилка реєстрації:', error);
+        showMessage('error', error.message || 'Помилка реєстрації. Спробуйте ще раз.');
     }
 }
 
