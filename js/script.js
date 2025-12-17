@@ -1,30 +1,45 @@
-// script.js - Полный код курса эмпатии с Supabase и автосохранением
-
 // ========== КОНФИГУРАЦИЯ SUPABASE ==========
-const SUPABASE_CONFIG = {
-    url: window.ENV?.VITE_SUPABASE_URL,
-    anonKey: window.ENV?.VITE_SUPABASE_ANON_KEY
-};
+// Если переменная supabase уже объявлена (например в data.js), используем её
+// Если нет - объявляем здесь
 
-// Проверка наличия конфигурации
-if (!SUPABASE_CONFIG.url || !SUPABASE_CONFIG.anonKey) {
-    console.error('Отсутствуют конфигурационные данные Supabase');
-    console.log('URL:', SUPABASE_CONFIG.url);
-    console.log('Key:', SUPABASE_CONFIG.anonKey);
+// Проверяем, объявлена ли уже переменная supabase
+if (typeof supabase === 'undefined') {
+    var supabase; // Объявляем только если не существует
 }
 
-// Инициализируем Supabase клиент
-const supabase = window.supabase.createClient(
-    SUPABASE_CONFIG.url,
-    SUPABASE_CONFIG.anonKey,
-    {
-        auth: {
-            persistSession: true,
-            autoRefreshToken: true,
-            detectSessionInUrl: false
+const SUPABASE_CONFIG = {
+    // Получаем конфигурацию только из window.ENV (для браузера)
+    url: window.ENV?.SUPABASE_URL,
+    anonKey: window.ENV?.SUPABASE_ANON_KEY
+};
+
+console.log('🔧 Конфигурация Supabase:', SUPABASE_CONFIG.url ? 'Найдена' : 'Не найдена');
+
+// Инициализируем Supabase клиент если есть конфигурация
+function initSupabase() {
+    try {
+        if (!supabase && window.supabase && SUPABASE_CONFIG.url && SUPABASE_CONFIG.anonKey) {
+            supabase = window.supabase.createClient(
+                SUPABASE_CONFIG.url,
+                SUPABASE_CONFIG.anonKey,
+                {
+                    auth: {
+                        persistSession: true,
+                        autoRefreshToken: true,
+                        detectSessionInUrl: false
+                    }
+                }
+            );
+            console.log('✅ Supabase инициализирован');
+            return true;
         }
+        console.warn('⚠️ Supabase не инициализирован. Работа в гостевом режиме.');
+        return false;
+    } catch (error) {
+        console.error('❌ Ошибка инициализации Supabase:', error);
+        return false;
     }
-);
+}
 
 // ========== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ==========
 let userProgress = {
@@ -53,6 +68,8 @@ let uiState = {
         notifications: true
     }
 };
+
+
 
 // ========== СТИЛИ ==========
 const enhancedStyles = `
@@ -214,51 +231,98 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 async function initApp() {
     try {
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        // Сначала инициализируем Supabase
+        const supabaseInitialized = initSupabase();
         
-        if (sessionError) {
-            console.error("Ошибка получения сессии:", sessionError);
-            await loadGuestProgress();
-            showAuthModal();
-            return;
-        }
-        
-        if (session) {
-            currentUserId = session.user.id;
-            isAuthenticated = true;
-            console.log("✅ Пользователь авторизован:", session.user.email);
+        if (supabase && supabaseInitialized) {
+            console.log('🔄 Проверка сессии...');
             
-            await loadUserProgress();
-            await loadAnswerDrafts();
-            await loadUIState();
+            const { data: { session }, error: sessionError } = await supabase.auth.getSession();
             
-            updateUserUI(session.user);
-            
-            if (userProgress.currentModule && userProgress.currentSubmodule) {
-                setTimeout(() => {
-                    openModule(userProgress.currentModule, userProgress.currentSubmodule);
-                }, 500);
-            } else {
-                showWelcomeScreen();
+            if (sessionError) {
+                console.error("❌ Ошибка получения сессии:", sessionError);
+                
+                // Пробуем обновить токен
+                try {
+                    const { data: { session: refreshedSession }, error: refreshError } = await supabase.auth.refreshSession();
+                    
+                    if (refreshError || !refreshedSession) {
+                        console.log("⚠️ Не удалось обновить сессию, переходим в гостевой режим");
+                        await loadGuestProgress();
+                        renderModulesList();
+                        showWelcomeScreen();
+                        return;
+                    }
+                    
+                    // Если обновление успешно, продолжаем с новой сессией
+                    console.log("✅ Сессия обновлена");
+                    return initApp(); // Рекурсивно вызываем еще раз
+                    
+                } catch (refreshError) {
+                    console.error("❌ Ошибка обновления сессии:", refreshError);
+                    await loadGuestProgress();
+                    renderModulesList();
+                    showWelcomeScreen();
+                    return;
+                }
             }
             
+            if (session) {
+                currentUserId = session.user.id;
+                isAuthenticated = true;
+                console.log("✅ Пользователь авторизован:", session.user.email);
+                
+                try {
+                    await loadUserProgress();
+                    await loadAnswerDrafts();
+                    await loadUIState();
+                    
+                    updateUserUI(session.user);
+                    
+                    if (userProgress.currentModule && userProgress.currentSubmodule) {
+                        setTimeout(() => {
+                            openModule(userProgress.currentModule, userProgress.currentSubmodule);
+                        }, 500);
+                    } else {
+                        showWelcomeScreen();
+                    }
+                    
+                    setupAuthListener();
+                    
+                } catch (loadError) {
+                    console.error("❌ Ошибка загрузки данных:", loadError);
+                    showMessage('error', 'Ошибка загрузки данных. Попробуйте обновить страницу.');
+                    await loadGuestProgress();
+                    renderModulesList();
+                    showWelcomeScreen();
+                }
+                
+            } else {
+                console.log("👤 Гостевой режим - сессия отсутствует");
+                await loadGuestProgress();
+                renderModulesList();
+                showWelcomeScreen();
+            }
         } else {
-            console.log("👤 Гостевой режим");
+            console.log("🔄 Работа в гостевом режиме (Supabase не настроен)");
             await loadGuestProgress();
-            showAuthModal();
+            renderModulesList();
+            showWelcomeScreen();
         }
         
-        setupAuthListener();
-        
     } catch (error) {
-        console.error("❌ Ошибка инициализации:", error);
+        console.error("❌ Критическая ошибка инициализации:", error);
         await loadGuestProgress();
+        renderModulesList();
         showWelcomeScreen();
+        showMessage('error', 'Ошибка инициализации приложения');
     }
 }
 
 async function loadUserProgress() {
     try {
+        if (!supabase || !currentUserId) return;
+        
         const { data: userData, error: userError } = await supabase
             .from('users')
             .select('current_module, current_submodule, course_progress, name')
@@ -298,6 +362,8 @@ async function loadUserProgress() {
 
 async function createUserProgressRecord() {
     try {
+        if (!supabase || !currentUserId) return;
+        
         const { error } = await supabase
             .from('users')
             .update({
@@ -325,6 +391,8 @@ async function createUserProgressRecord() {
 
 async function loadAnswerDrafts() {
     try {
+        if (!supabase || !currentUserId) return;
+        
         const { data: drafts, error } = await supabase
             .from('answer_drafts')
             .select('submodule_id, answer_type, answer_text, form_data')
@@ -391,6 +459,8 @@ function restoreAnswerDrafts() {
 
 async function loadUIState() {
     try {
+        if (!supabase || !currentUserId) return;
+        
         const { data, error } = await supabase
             .from('ui_state')
             .select('open_tabs, scroll_positions, theme, settings')
@@ -436,7 +506,66 @@ async function loadGuestProgress() {
     renderModulesList();
 }
 
+function updateUserUI(user) {
+    if (!user) return;
+    
+    const userNameElements = document.querySelectorAll('#userName');
+    const displayName = user.user_metadata?.full_name || user.email?.split('@')[0] || 'Пользователь';
+    
+    userNameElements.forEach(el => {
+        if (el) {
+            el.textContent = displayName;
+            el.style.cursor = 'default';
+            el.onclick = null;
+        }
+    });
+    
+    // Добавляем меню пользователя
+    const userProfile = document.querySelector('.user-profile');
+    if (userProfile && isAuthenticated) {
+        userProfile.innerHTML = `
+            <div class="user-menu">
+                <div class="user-info">
+                    <i class="fas fa-user-circle"></i>
+                    <span id="userName">${displayName}</span>
+                </div>
+                <div class="user-menu-content">
+                    <a href="#" class="user-menu-item" onclick="event.preventDefault(); showProfile()">
+                        <i class="fas fa-user"></i> Профиль
+                    </a>
+                    <a href="#" class="user-menu-item" onclick="event.preventDefault(); handleLogout()">
+                        <i class="fas fa-sign-out-alt"></i> Выйти
+                    </a>
+                </div>
+            </div>
+        `;
+    }
+    
+    console.log('✅ UI пользователя обновлено:', displayName);
+}
+
+function showProfile() {
+    const modalTitle = document.getElementById('modalTitle');
+    const modalBody = document.getElementById('modalBody');
+    
+    modalTitle.textContent = 'Профиль пользователя';
+    modalBody.innerHTML = `
+        <div style="padding: 20px;">
+            <h3><i class="fas fa-user-circle"></i> Информация о профиле</h3>
+            <p><strong>Имя:</strong> ${userProgress.userName}</p>
+            <p><strong>Email:</strong> ${currentUserId ? 'Скрыт' : 'Гость'}</p>
+            <p><strong>Статус:</strong> ${isAuthenticated ? '✅ Авторизован' : '❌ Гость'}</p>
+            <p><strong>Прогресс:</strong> ${userProgress.completedSubmodules.length} подмодулей завершено</p>
+            ${userProgress.finalExamCompleted ? '<p><strong>Экзамен:</strong> ✅ Завершен</p>' : ''}
+        </div>
+    `;
+    
+    document.getElementById('modalOverlay').style.display = 'flex';
+}
+
 function setupAuthListener() {
+    if (!supabase) return;
+    
     supabase.auth.onAuthStateChange((event, session) => {
         console.log("Событие авторизации:", event);
         
@@ -693,6 +822,92 @@ function showAutoSaveIndicator() {
     }, 2000);
 }
 
+function showMessage(type, message) {
+    const existing = document.querySelector('.message-notification');
+    if (existing) existing.remove();
+    
+    const notification = document.createElement('div');
+    notification.className = `message-notification message-${type}`;
+    
+    let icon = 'fa-info-circle';
+    let bgColor = '#3498db';
+    
+    switch(type) {
+        case 'success':
+            icon = 'fa-check-circle';
+            bgColor = '#2ecc71';
+            break;
+        case 'error':
+            icon = 'fa-exclamation-circle';
+            bgColor = '#e74c3c';
+            break;
+        case 'warning':
+            icon = 'fa-exclamation-triangle';
+            bgColor = '#f39c12';
+            break;
+        case 'info':
+            icon = 'fa-info-circle';
+            bgColor = '#3498db';
+            break;
+    }
+    
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${bgColor};
+        color: white;
+        padding: 15px 25px;
+        border-radius: 8px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        z-index: 10000;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.95rem;
+        animation: slideInRight 0.3s ease;
+        max-width: 400px;
+    `;
+    
+    notification.innerHTML = `<i class="fas ${icon}"></i><span>${message}</span>`;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.style.animation = 'slideOutRight 0.3s ease';
+            setTimeout(() => notification.remove(), 300);
+        }
+    }, 4000);
+}
+
+// Додаємо анімації для повідомлень
+const messageStyles = document.createElement('style');
+messageStyles.textContent = `
+    @keyframes slideInRight {
+        from {
+            opacity: 0;
+            transform: translateX(100px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    
+    @keyframes slideOutRight {
+        from {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        to {
+            opacity: 0;
+            transform: translateX(100px);
+        }
+    }
+`;
+document.head.appendChild(messageStyles);
+
 // ========== ФУНКЦИИ АУТЕНТИФИКАЦИИ ==========
 
 function showAuthModal() {
@@ -793,29 +1008,55 @@ async function handleRegister() {
     const password = document.getElementById('registerPassword').value;
     
     if (!name || !email || !password) {
-        alert('Заполните все поля');
+        showMessage('error', 'Заполните все поля');
         return;
     }
     
     if (password.length < 6) {
-        alert('Пароль минимум 6 символов');
+        showMessage('error', 'Пароль минимум 6 символов');
+        return;
+    }
+    
+    // Проверка формата email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        showMessage('error', 'Введите корректный email');
+        return;
+    }
+    
+    // Проверяем наличие Supabase
+    if (!supabase) {
+        showMessage('error', '❌ Supabase не настроен. Настройте ключи в js/data.js');
+        console.error('❌ Supabase не инициализирован. Проверьте конфигурацию в js/data.js');
         return;
     }
     
     try {
+        showMessage('info', '⏳ Регистрация...');
+        
         const { data: authData, error: authError } = await supabase.auth.signUp({
             email,
             password,
             options: {
                 data: {
                     full_name: name
-                }
+                },
+                emailRedirectTo: window.location.origin
             }
         });
         
-        if (authError) throw authError;
+        if (authError) {
+            // Проверка на уже существующий email
+            if (authError.message.includes('already registered')) {
+                throw new Error('Этот email уже зарегистрирован. Попробуйте войти.');
+            }
+            throw authError;
+        }
         
         if (authData.user) {
+            console.log('✅ Пользователь создан в Auth:', authData.user.id);
+            
+            // Создаем запись пользователя в таблице users
             const { error: userError } = await supabase
                 .from('users')
                 .insert([
@@ -833,19 +1074,53 @@ async function handleRegister() {
                             assignmentResults: {},
                             finalExamCompleted: false,
                             finalExamScore: 0
-                        }
+                        },
+                        created_at: new Date().toISOString(),
+                        last_active: new Date().toISOString()
                     }
                 ]);
             
-            if (userError) throw userError;
+            if (userError && userError.code !== '23505') { // 23505 = duplicate key
+                console.error('Ошибка создания пользователя:', userError);
+                throw userError;
+            }
+            
+            console.log('✅ Запись пользователя создана');
+            
+            // Добавляем пользователя в allowed_users для доступа к боту
+            try {
+                const { error: allowedError } = await supabase
+                    .from('allowed_users')
+                    .insert([
+                        {
+                            telegram_id: null,
+                            user_id: authData.user.id,
+                            added_by: null,
+                            added_at: new Date().toISOString()
+                        }
+                    ]);
+                
+                if (allowedError && allowedError.code !== '23505') {
+                    console.warn('Ошибка добавления в allowed_users:', allowedError);
+                }
+            } catch (err) {
+                console.warn('Не удалось добавить в allowed_users:', err);
+            }
         }
         
         document.getElementById('modalOverlay').style.display = 'none';
-        showMessage('success', 'Регистрация успешна! Проверьте почту.');
+        
+        // Проверяем нужно ли подтверждение email
+        if (authData.user && !authData.user.confirmed_at) {
+            showMessage('success', '✅ Регистрация успешна! Проверьте почту и подтвердите email.');
+        } else {
+            showMessage('success', '✅ Регистрация успешна! Входим...');
+            setTimeout(() => location.reload(), 1500);
+        }
         
     } catch (error) {
-        console.error('Ошибка регистрации:', error);
-        showMessage('error', error.message || 'Ошибка регистрации');
+        console.error('❌ Ошибка регистрации:', error);
+        showMessage('error', error.message || 'Ошибка регистрации. Попробуйте еще раз.');
     }
 }
 
@@ -884,7 +1159,7 @@ function showAuthTab(tabName) {
     document.getElementById('registerTab').style.display = tabName === 'register' ? 'block' : 'none';
 }
 
-// ========== ОСНОВНЫЕ ФУНКЦИИ КУРСА (твои оригинальные функции) ==========
+// ========== ОСНОВНЫЕ ФУНКЦИИ КУРСА ==========
 
 function getDefaultProgress() {
     return {
@@ -934,18 +1209,8 @@ async function openModule(moduleId, submoduleId) {
     setTimeout(() => setupAutoSaveForModule(), 100);
 }
 
-function initTheme() {
-    const savedTheme = localStorage.getItem('empathyCourseTheme') || 'dark';
-    setTheme(savedTheme);
-}
-
 function setTheme(theme) {
     document.documentElement.setAttribute('data-theme', theme);
-}
-
-function saveProgress() {
-    localStorage.setItem('empathyCourseProgress', JSON.stringify(userProgress));
-    updateProgressUI();
 }
 
 function updateProgressUI() {
@@ -1234,8 +1499,8 @@ function initCheckButtons() {
     });
 }
 
-// ТВОЯ ОБНОВЛЕННАЯ ФУНКЦИЯ checkAssignment
-function checkAssignment(submoduleId) {
+// ОБНОВЛЕННАЯ ФУНКЦИЯ checkAssignment
+async function checkAssignment(submoduleId) {
     console.log("=== НАЧАЛО ПРОВЕРКИ ===");
     console.log("Подмодуль для проверки:", submoduleId);
     
@@ -1325,7 +1590,7 @@ function checkAssignment(submoduleId) {
                     assignmentHeader.appendChild(checkIcon);
                 }
                 
-                await saveProgress(); // Добавляем await
+                await saveProgress();
                 
                 checkIfModuleCompleted(moduleId);
             }
@@ -1420,7 +1685,18 @@ function checkExtraAssignment(submoduleId) {
         return;
     }
     
-    // ... остальная логика проверки extra заданий ...
+    // Простая проверка - если все поля заполнены, считаем успешным
+    const allValid = answers.every(answer => answer.trim().length > 10);
+    
+    if (allValid) {
+        alert("✅ Все дополнительные задания выполнены правильно!");
+        textareas.forEach(textarea => {
+            textarea.style.borderColor = '#2ecc71';
+            textarea.style.boxShadow = '0 0 0 2px rgba(46, 204, 113, 0.2)';
+        });
+    } else {
+        alert("❌ Некоторые ответы слишком короткие. Пожалуйста, напишите более развернутые ответы (минимум 10 символов).");
+    }
 }
 
 function checkIfModuleCompleted(moduleId) {
@@ -2560,8 +2836,6 @@ window.openModule = openModule;
 window.resetProgress = resetProgress;
 window.showCertificate = showCertificate;
 window.showWelcomeScreen = showWelcomeScreen;
-window.showNameInput = showNameInput;
-window.submitName = submitName;
 window.printCertificate = printCertificate;
 window.saveCertificateAsImage = saveCertificateAsImage;
 window.shareCertificate = shareCertificate;
@@ -2578,4 +2852,4 @@ window.handleRegister = handleRegister;
 window.continueAsGuest = continueAsGuest;
 window.handleLogout = handleLogout;
 
-console.log("✅ Курс эмпатии загружен с Supabase и автосохранением!");
+console.log("✅ Курс эмпатии загружен!");
