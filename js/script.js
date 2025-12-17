@@ -319,21 +319,33 @@ async function initApp() {
     }
 }
 
+// Заменяем loadUserProgress
 async function loadUserProgress() {
     try {
         if (!supabase || !currentUserId) return;
         
+        // Пробуем найти пользователя по email из сессии
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        if (!user || !user.email) {
+            console.log('Пользователь не найден в сессии');
+            return;
+        }
+        
+        // Ищем в новой таблице course_users
         const { data: userData, error: userError } = await supabase
-            .from('users')
-            .select('current_module, current_submodule, course_progress, name')
-            .eq('id', currentUserId)
+            .from('course_users')
+            .select('*')
+            .eq('email', user.email)
             .single();
         
         if (userError && userError.code !== 'PGRST116') {
-            throw userError;
+            console.error('Ошибка поиска пользователя:', userError);
+            return;
         }
         
         if (userData) {
+            // Загружаем прогресс из новой таблицы
             userProgress.currentModule = userData.current_module || 1;
             userProgress.currentSubmodule = userData.current_submodule || "1.1";
             
@@ -344,11 +356,12 @@ async function loadUserProgress() {
             userProgress.assignmentResults = progressData.assignmentResults || {};
             userProgress.finalExamCompleted = progressData.finalExamCompleted || false;
             userProgress.finalExamScore = progressData.finalExamScore || 0;
-            userProgress.userName = userData.name || "Гость";
+            userProgress.userName = progressData.userName || userData.name || "Гость";
             
-            console.log("✅ Прогресс загружен из Supabase");
+            console.log("✅ Прогресс загружен из course_users");
         } else {
-            await createUserProgressRecord();
+            // Создаем нового пользователя
+            await createUserInCourseTable(user);
         }
         
         updateProgressUI();
@@ -356,36 +369,46 @@ async function loadUserProgress() {
         
     } catch (error) {
         console.error("❌ Ошибка загрузки прогресса:", error);
-        throw error;
+        // При ошибке загружаем гостевой режим
+        await loadGuestProgress();
     }
 }
 
-async function createUserProgressRecord() {
+async function createUserInCourseTable(authUser) {
     try {
-        if (!supabase || !currentUserId) return;
+        if (!supabase || !authUser) return;
         
-        const { error } = await supabase
-            .from('users')
-            .update({
-                current_module: 1,
-                current_submodule: '1.1',
-                course_progress: {
-                    completedModules: [],
-                    completedSubmodules: [],
-                    testResults: {},
-                    assignmentResults: {},
-                    finalExamCompleted: false,
-                    finalExamScore: 0
-                },
-                last_active: new Date().toISOString()
-            })
-            .eq('id', currentUserId);
+        const newUser = {
+            email: authUser.email,
+            name: authUser.user_metadata?.full_name || authUser.email?.split('@')[0] || 'Пользователь',
+            auth_user_id: authUser.id,
+            current_module: 1,
+            current_submodule: '1.1',
+            course_progress: {
+                completedModules: [],
+                completedSubmodules: [],
+                testResults: {},
+                assignmentResults: {},
+                finalExamCompleted: false,
+                finalExamScore: 0,
+                userName: authUser.user_metadata?.full_name || authUser.email?.split('@')[0] || 'Пользователь'
+            }
+        };
+        
+        const { data, error } = await supabase
+            .from('course_users')
+            .insert([newUser])
+            .select()
+            .single();
         
         if (error) throw error;
-        console.log("✅ Запись прогресса создана");
+        
+        console.log("✅ Пользователь создан в course_users");
+        return data;
         
     } catch (error) {
-        console.error("❌ Ошибка создания записи:", error);
+        console.error("❌ Ошибка создания пользователя:", error);
+        throw error;
     }
 }
 
