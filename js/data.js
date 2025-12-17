@@ -1,4 +1,3 @@
-\
 function checkAssignment(submoduleId) {
     console.log("=== НАЧАЛО ПРОВЕРКИ ===");
     
