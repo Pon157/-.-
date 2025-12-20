@@ -1055,7 +1055,7 @@ async function handleRegister() {
     } catch (error) {
         showMessage('error', error.message);
     }
-} 
+} // <--- КОНЕЦ ФУНКЦИИ (только одна закрывающая скобка в самом конце)
 
         if (error) throw error;
 
