@@ -1,16 +1,7 @@
 // ========== КОНФИГУРАЦИЯ SUPABASE ==========
-// Если переменная supabase уже объявлена (например в data.js), используем её
-// Если нет - объявляем здесь
-
-// Проверяем, объявлена ли уже переменная supabase
-if (typeof supabase === 'undefined') {
-    var supabase; // Объявляем только если не существует
-}
-
 const SUPABASE_CONFIG = {
-    // Получаем конфигурацию только из window.ENV (для браузера)
-    url: window.ENV?.SUPABASE_URL,
-    anonKey: window.ENV?.SUPABASE_ANON_KEY
+    url: window.ENV?.VITE_SUPABASE_URL || import.meta.env?.VITE_SUPABASE_URL,
+    anonKey: window.ENV?.VITE_SUPABASE_ANON_KEY || import.meta.env?.VITE_SUPABASE_ANON_KEY
 };
 
 console.log('🔧 Конфигурация Supabase:', SUPABASE_CONFIG.url ? 'Найдена' : 'Не найдена');
@@ -18,7 +9,12 @@ console.log('🔧 Конфигурация Supabase:', SUPABASE_CONFIG.url ? 'Н
 // Инициализируем Supabase клиент если есть конфигурация
 function initSupabase() {
     try {
-        if (!supabase && window.supabase && SUPABASE_CONFIG.url && SUPABASE_CONFIG.anonKey) {
+        if (SUPABASE_CONFIG.url && SUPABASE_CONFIG.anonKey) {
+            if (!window.supabase) {
+                console.error('Supabase SDK не загружен!');
+                return false;
+            }
+            
             supabase = window.supabase.createClient(
                 SUPABASE_CONFIG.url,
                 SUPABASE_CONFIG.anonKey,
@@ -42,6 +38,7 @@ function initSupabase() {
 }
 
 // ========== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ==========
+let supabase = null;
 let userProgress = {
     currentModule: 1,
     currentSubmodule: "1.1",
@@ -69,41 +66,280 @@ let uiState = {
     }
 };
 
-
-
 // ========== СТИЛИ ==========
 const enhancedStyles = `
 <style>
-    /* Все твои оригинальные стили остаются */
-    .module-test { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); }
-    .quote-box { background: linear-gradient(135deg, rgba(155, 89, 182, 0.1) 0%, rgba(142, 68, 173, 0.1) 100%); }
-    .definition-box { background: linear-gradient(135deg, rgba(155, 89, 182, 0.1) 0%, rgba(142, 68, 173, 0.1) 100%); }
-    .source-box { background: linear-gradient(135deg, rgba(46, 204, 113, 0.1) 0%, rgba(39, 174, 96, 0.1) 100%); }
-    .check-question { background: rgba(52, 152, 219, 0.1); }
-    .practical-tip { background: linear-gradient(135deg, rgba(231, 76, 60, 0.1) 0%, rgba(192, 57, 43, 0.1) 100%); }
-    .test-question { background: rgba(255, 255, 255, 0.05); }
-    .test-option:hover { background: rgba(52, 152, 219, 0.1); }
-    .practical-task { background: rgba(46, 204, 113, 0.1); }
-    .exam-stat:hover { transform: translateY(-5px); background: rgba(52, 152, 219, 0.1); }
-    .option-correct { background: rgba(46, 204, 113, 0.15) !important; border-color: #2ecc71 !important; }
-    .option-incorrect { background: rgba(231, 76, 60, 0.15) !important; border-color: #e74c3c !important; }
-    .test-result { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); }
-    .assignment { background: linear-gradient(135deg, rgba(41, 128, 185, 0.1) 0%, rgba(52, 152, 219, 0.1) 100%); }
-    .additional-task { background: rgba(255, 255, 255, 0.05); }
-    .feedback.correct { background: rgba(46, 204, 113, 0.15); border-left: 4px solid #2ecc71; }
-    .feedback.incorrect { background: rgba(231, 76, 60, 0.15); border-left: 4px solid #e74c3c; }
-    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4); }
-    .btn-secondary:hover { background: rgba(255, 255, 255, 0.15); transform: translateY(-2px); }
-    textarea:focus { outline: none; border-color: #3498db; box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2); }
+    /* Основные стили */
+    :root {
+        --primary-color: #3498db;
+        --secondary-color: #2ecc71;
+        --danger-color: #e74c3c;
+        --warning-color: #f39c12;
+        --dark-bg: #1a1a2e;
+        --darker-bg: #16213e;
+        --light-text: #ecf0f1;
+        --gray-text: #95a5a6;
+        --border-radius: 12px;
+        --box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        --transition: all 0.3s ease;
+    }
     
-    /* Новые стили для автосохранения */
+    [data-theme="light"] {
+        --dark-bg: #f8f9fa;
+        --darker-bg: #e9ecef;
+        --light-text: #2c3e50;
+        --gray-text: #7f8c8d;
+    }
+    
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: var(--dark-bg);
+        color: var(--light-text);
+        line-height: 1.6;
+        min-height: 100vh;
+    }
+    
+    /* Контейнеры */
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+    
+    /* Кнопки */
+    .btn-primary, .btn-secondary {
+        padding: 12px 24px;
+        border: none;
+        border-radius: var(--border-radius);
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: 600;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary-color), #2980b9);
+        color: white;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(52, 152, 219, 0.4);
+    }
+    
+    .btn-secondary {
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--light-text);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .btn-secondary:hover {
+        background: rgba(255, 255, 255, 0.15);
+        transform: translateY(-2px);
+    }
+    
+    /* Карточки и блоки */
+    .module-card {
+        background: var(--darker-bg);
+        border-radius: var(--border-radius);
+        padding: 25px;
+        margin-bottom: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transition: var(--transition);
+    }
+    
+    .module-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--box-shadow);
+    }
+    
+    /* Цитаты */
+    .quote-box {
+        background: linear-gradient(135deg, rgba(155, 89, 182, 0.15), rgba(142, 68, 173, 0.15));
+        border-left: 4px solid #9b59b6;
+        padding: 20px;
+        border-radius: 0 var(--border-radius) var(--border-radius) 0;
+        margin: 20px 0;
+        position: relative;
+    }
+    
+    .quote-box::before {
+        content: "❝";
+        font-size: 3rem;
+        color: #9b59b6;
+        opacity: 0.3;
+        position: absolute;
+        top: 10px;
+        left: 10px;
+    }
+    
+    .quote-author {
+        text-align: right;
+        font-style: italic;
+        color: var(--gray-text);
+        margin-top: 10px;
+    }
+    
+    /* Определения */
+    .definition-box {
+        background: linear-gradient(135deg, rgba(52, 152, 219, 0.15), rgba(41, 128, 185, 0.15));
+        border-left: 4px solid var(--primary-color);
+        padding: 20px;
+        border-radius: 0 var(--border-radius) var(--border-radius) 0;
+        margin: 20px 0;
+    }
+    
+    /* Источники */
+    .source-box {
+        background: linear-gradient(135deg, rgba(46, 204, 113, 0.15), rgba(39, 174, 96, 0.15));
+        border-left: 4px solid var(--secondary-color);
+        padding: 15px;
+        border-radius: 0 var(--border-radius) var(--border-radius) 0;
+        margin: 20px 0;
+        font-size: 0.9rem;
+    }
+    
+    /* Практические советы */
+    .practical-tip {
+        background: linear-gradient(135deg, rgba(243, 156, 18, 0.15), rgba(230, 126, 34, 0.15));
+        border-left: 4px solid var(--warning-color);
+        padding: 20px;
+        border-radius: 0 var(--border-radius) var(--border-radius) 0;
+        margin: 20px 0;
+    }
+    
+    /* Задания */
+    .assignment {
+        background: linear-gradient(135deg, rgba(41, 128, 185, 0.1), rgba(52, 152, 219, 0.1));
+        border-radius: var(--border-radius);
+        padding: 25px;
+        margin: 25px 0;
+        border: 1px solid rgba(52, 152, 219, 0.3);
+    }
+    
+    .assignment h4 {
+        color: var(--primary-color);
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    /* Текстовые поля */
+    textarea {
+        width: 100%;
+        padding: 15px;
+        border-radius: 8px;
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        background: rgba(0, 0, 0, 0.2);
+        color: var(--light-text);
+        font-size: 1rem;
+        resize: vertical;
+        min-height: 120px;
+        font-family: inherit;
+        transition: var(--transition);
+    }
+    
+    textarea:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+    }
+    
+    /* Фидбэк */
+    .feedback {
+        padding: 15px;
+        border-radius: 8px;
+        margin: 15px 0;
+        display: none;
+    }
+    
+    .feedback.correct {
+        background: rgba(46, 204, 113, 0.15);
+        border-left: 4px solid var(--secondary-color);
+        color: #2ecc71;
+    }
+    
+    .feedback.incorrect {
+        background: rgba(231, 76, 60, 0.15);
+        border-left: 4px solid var(--danger-color);
+        color: #e74c3c;
+    }
+    
+    /* Тесты */
+    .test-question {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: var(--border-radius);
+        padding: 20px;
+        margin: 15px 0;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .test-option {
+        padding: 12px 15px;
+        margin: 8px 0;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        cursor: pointer;
+        transition: var(--transition);
+    }
+    
+    .test-option:hover {
+        background: rgba(52, 152, 219, 0.1);
+        border-color: var(--primary-color);
+    }
+    
+    .test-option input[type="radio"] {
+        margin-right: 10px;
+    }
+    
+    /* Статистика */
+    .exam-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin: 25px 0;
+    }
+    
+    .exam-stat {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: var(--border-radius);
+        padding: 20px;
+        text-align: center;
+        transition: var(--transition);
+    }
+    
+    .exam-stat:hover {
+        transform: translateY(-5px);
+        background: rgba(52, 152, 219, 0.1);
+    }
+    
+    .exam-stat strong {
+        display: block;
+        font-size: 2rem;
+        color: var(--primary-color);
+        margin-bottom: 5px;
+    }
+    
+    /* Автосохранение */
     .draft-saved {
-        border: 2px solid #2ecc71 !important;
+        border-color: var(--secondary-color) !important;
         background: rgba(46, 204, 113, 0.05) !important;
     }
     
     .auto-saving {
-        border: 2px solid #f39c12 !important;
+        border-color: var(--warning-color) !important;
         background: rgba(243, 156, 18, 0.05) !important;
     }
     
@@ -111,11 +347,11 @@ const enhancedStyles = `
         position: fixed;
         bottom: 20px;
         right: 20px;
-        background: #2ecc71;
+        background: var(--secondary-color);
         color: white;
-        padding: 10px 20px;
-        border-radius: 8px;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        padding: 12px 24px;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
         z-index: 10000;
         display: flex;
         align-items: center;
@@ -124,6 +360,115 @@ const enhancedStyles = `
         animation: slideInUp 0.3s ease;
     }
     
+    /* Модальные окна */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.95);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        backdrop-filter: blur(5px);
+    }
+    
+    .modal {
+        background: var(--darker-bg);
+        border-radius: var(--border-radius);
+        width: 90%;
+        max-width: 500px;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: var(--box-shadow);
+        animation: modalFadeIn 0.3s ease;
+    }
+    
+    .modal-header {
+        padding: 20px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .modal-body {
+        padding: 20px;
+    }
+    
+    /* Вкладки */
+    .tabs {
+        display: flex;
+        gap: 5px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: var(--border-radius);
+        padding: 5px;
+        margin-bottom: 20px;
+    }
+    
+    .tab {
+        flex: 1;
+        text-align: center;
+        padding: 12px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+    
+    .tab.active {
+        background: rgba(52, 152, 219, 0.2);
+        color: var(--primary-color);
+        font-weight: bold;
+    }
+    
+    /* Прогресс бар */
+    .progress-container {
+        height: 8px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
+        overflow: hidden;
+        margin: 20px 0;
+    }
+    
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        border-radius: 4px;
+        transition: width 0.5s ease;
+    }
+    
+    /* Сертификат */
+    .certificate {
+        background: linear-gradient(135deg, #fff9e6 0%, #fff 100%);
+        border: 20px solid #f8d7da;
+        padding: 40px;
+        border-radius: 20px;
+        color: #333333;
+        max-width: 800px;
+        margin: 0 auto;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+    
+    .certificate-border {
+        border: 2px solid #e74c3c;
+        padding: 30px;
+        position: relative;
+    }
+    
+    .certificate-name {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #2c3e50;
+        text-align: center;
+        margin: 20px 0;
+        padding: 10px;
+        background: linear-gradient(135deg, transparent 0%, rgba(52, 152, 219, 0.1) 100%);
+        border-radius: 10px;
+    }
+    
+    /* Анимации */
     @keyframes slideInUp {
         from {
             opacity: 0;
@@ -146,69 +491,138 @@ const enhancedStyles = `
         }
     }
     
-    .auth-modal {
-        background: rgba(0, 0, 0, 0.95) !important;
+    @keyframes modalFadeIn {
+        from {
+            opacity: 0;
+            transform: scale(0.9) translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
     }
     
-    .auth-tab {
-        cursor: pointer;
-        padding: 12px 20px;
-        border: none;
-        background: none;
-        color: #95a5a6;
-        font-size: 1rem;
-        border-bottom: 2px solid transparent;
-        transition: all 0.3s;
+    @keyframes scaleIn {
+        from {
+            transform: scale(0);
+        }
+        to {
+            transform: scale(1);
+        }
     }
     
-    .auth-tab.active {
-        color: #3498db;
-        border-bottom: 2px solid #3498db;
+    /* Адаптивность */
+    @media (max-width: 768px) {
+        .container {
+            padding: 0 15px;
+        }
+        
+        .module-card {
+            padding: 20px;
+        }
+        
+        .exam-stats {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .certificate {
+            padding: 20px;
+            border-width: 10px;
+        }
+        
+        .certificate-name {
+            font-size: 1.8rem;
+        }
+        
+        .tabs {
+            flex-wrap: wrap;
+        }
+        
+        .tab {
+            flex: 1 0 calc(50% - 10px);
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .exam-stats {
+            grid-template-columns: 1fr;
+        }
+        
+        .btn-primary, .btn-secondary {
+            padding: 10px 16px;
+            font-size: 0.9rem;
+        }
+        
+        .tab {
+            flex: 1 0 100%;
+        }
+    }
+    
+    /* Сноски и примечания */
+    .footnote {
+        font-size: 0.85rem;
+        color: var(--gray-text);
+        margin-top: 10px;
+        padding-left: 15px;
+        border-left: 2px solid var(--warning-color);
+    }
+    
+    .highlight {
+        background: rgba(243, 156, 18, 0.2);
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-weight: 600;
+    }
+    
+    .key-term {
+        color: var(--primary-color);
+        font-weight: bold;
+        border-bottom: 1px dotted var(--primary-color);
+        cursor: help;
+    }
+    
+    /* Списки */
+    .enhanced-list {
+        margin: 15px 0;
+        padding-left: 25px;
+    }
+    
+    .enhanced-list li {
+        margin: 8px 0;
+        position: relative;
+    }
+    
+    .enhanced-list li::before {
+        content: "✓";
+        color: var(--secondary-color);
+        position: absolute;
+        left: -25px;
         font-weight: bold;
     }
     
-    .user-menu {
-        position: relative;
+    /* Бейджи */
+    .badge {
         display: inline-block;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        margin: 0 5px;
     }
     
-    .user-menu-content {
-        display: none;
-        position: absolute;
-        right: 0;
-        top: 100%;
-        background: #2c3e50;
-        min-width: 200px;
-        box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-        z-index: 1000;
-        border-radius: 8px;
-        overflow: hidden;
+    .badge-primary {
+        background: rgba(52, 152, 219, 0.2);
+        color: var(--primary-color);
     }
     
-    .user-menu:hover .user-menu-content {
-        display: block;
+    .badge-success {
+        background: rgba(46, 204, 113, 0.2);
+        color: var(--secondary-color);
     }
     
-    .user-menu-item {
-        display: block;
-        padding: 12px 20px;
-        color: white;
-        text-decoration: none;
-        border-bottom: 1px solid rgba(255,255,255,0.1);
-        transition: background 0.3s;
-    }
-    
-    .user-menu-item:hover {
-        background: #3498db;
-    }
-    
-    .guest-warning {
-        background: rgba(243, 156, 18, 0.1);
-        border-left: 4px solid #f39c12;
-        padding: 15px;
-        margin: 15px 0;
-        border-radius: 0 8px 8px 0;
-        color: #f39c12;
+    .badge-warning {
+        background: rgba(243, 156, 18, 0.2);
+        color: var(--warning-color);
     }
 </style>
 `;
@@ -241,30 +655,10 @@ async function initApp() {
             
             if (sessionError) {
                 console.error("❌ Ошибка получения сессии:", sessionError);
-                
-                // Пробуем обновить токен
-                try {
-                    const { data: { session: refreshedSession }, error: refreshError } = await supabase.auth.refreshSession();
-                    
-                    if (refreshError || !refreshedSession) {
-                        console.log("⚠️ Не удалось обновить сессию, переходим в гостевой режим");
-                        await loadGuestProgress();
-                        renderModulesList();
-                        showWelcomeScreen();
-                        return;
-                    }
-                    
-                    // Если обновление успешно, продолжаем с новой сессией
-                    console.log("✅ Сессия обновлена");
-                    return initApp(); // Рекурсивно вызываем еще раз
-                    
-                } catch (refreshError) {
-                    console.error("❌ Ошибка обновления сессии:", refreshError);
-                    await loadGuestProgress();
-                    renderModulesList();
-                    showWelcomeScreen();
-                    return;
-                }
+                await loadGuestProgress();
+                renderModulesList();
+                showWelcomeScreen();
+                return;
             }
             
             if (session) {
@@ -515,30 +909,35 @@ function updateUserUI(user) {
     userNameElements.forEach(el => {
         if (el) {
             el.textContent = displayName;
-            el.style.cursor = 'default';
-            el.onclick = null;
         }
     });
     
-    // Добавляем меню пользователя
-    const userProfile = document.querySelector('.user-profile');
-    if (userProfile && isAuthenticated) {
-        userProfile.innerHTML = `
-            <div class="user-menu">
-                <div class="user-info">
-                    <i class="fas fa-user-circle"></i>
-                    <span id="userName">${displayName}</span>
+    // Обновляем кнопки авторизации
+    const authButtons = document.getElementById('authButtons');
+    if (authButtons) {
+        if (isAuthenticated) {
+            authButtons.innerHTML = `
+                <div class="user-menu">
+                    <button class="btn-secondary" style="position: relative;">
+                        <i class="fas fa-user-circle"></i> ${displayName}
+                    </button>
+                    <div class="user-menu-content">
+                        <a href="#" class="user-menu-item" onclick="event.preventDefault(); showProfile()">
+                            <i class="fas fa-user"></i> Профиль
+                        </a>
+                        <a href="#" class="user-menu-item" onclick="event.preventDefault(); handleLogout()">
+                            <i class="fas fa-sign-out-alt"></i> Выйти
+                        </a>
+                    </div>
                 </div>
-                <div class="user-menu-content">
-                    <a href="#" class="user-menu-item" onclick="event.preventDefault(); showProfile()">
-                        <i class="fas fa-user"></i> Профиль
-                    </a>
-                    <a href="#" class="user-menu-item" onclick="event.preventDefault(); handleLogout()">
-                        <i class="fas fa-sign-out-alt"></i> Выйти
-                    </a>
-                </div>
-            </div>
-        `;
+            `;
+        } else {
+            authButtons.innerHTML = `
+                <button class="btn-primary" onclick="showAuthModal()">
+                    <i class="fas fa-sign-in-alt"></i> Войти
+                </button>
+            `;
+        }
     }
     
     console.log('✅ UI пользователя обновлено:', displayName);
@@ -551,16 +950,53 @@ function showProfile() {
     modalTitle.textContent = 'Профиль пользователя';
     modalBody.innerHTML = `
         <div style="padding: 20px;">
-            <h3><i class="fas fa-user-circle"></i> Информация о профиле</h3>
-            <p><strong>Имя:</strong> ${userProgress.userName}</p>
-            <p><strong>Email:</strong> ${currentUserId ? 'Скрыт' : 'Гость'}</p>
-            <p><strong>Статус:</strong> ${isAuthenticated ? '✅ Авторизован' : '❌ Гость'}</p>
-            <p><strong>Прогресс:</strong> ${userProgress.completedSubmodules.length} подмодулей завершено</p>
-            ${userProgress.finalExamCompleted ? '<p><strong>Экзамен:</strong> ✅ Завершен</p>' : ''}
+            <div style="text-align: center; margin-bottom: 20px;">
+                <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #3498db, #2ecc71); 
+                     border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px;">
+                    <i class="fas fa-user" style="font-size: 2rem; color: white;"></i>
+                </div>
+                <h3>${userProgress.userName}</h3>
+                <p style="color: var(--gray-text);">${isAuthenticated ? '✅ Авторизован' : '👤 Гость'}</p>
+            </div>
+            
+            <div class="module-card" style="margin-bottom: 15px;">
+                <h4><i class="fas fa-chart-line"></i> Статистика прогресса</h4>
+                <p><strong>Завершено модулей:</strong> ${userProgress.completedModules.length} из ${courseData.modules.length}</p>
+                <p><strong>Завершено подмодулей:</strong> ${userProgress.completedSubmodules.length}</p>
+                <p><strong>Итоговый экзамен:</strong> ${userProgress.finalExamCompleted ? `✅ ${userProgress.finalExamScore} баллов` : '❌ Не пройден'}</p>
+            </div>
+            
+            ${isAuthenticated ? `
+                <div class="module-card">
+                    <h4><i class="fas fa-cog"></i> Настройки</h4>
+                    <div style="margin-top: 10px;">
+                        <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                            <input type="checkbox" id="autoSaveToggle" ${uiState.settings.autoSave ? 'checked' : ''} onchange="toggleAutoSave(this.checked)">
+                            <span>Автосохранение</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                            <input type="checkbox" id="notificationsToggle" ${uiState.settings.notifications ? 'checked' : ''} onchange="toggleNotifications(this.checked)">
+                            <span>Уведомления</span>
+                        </label>
+                    </div>
+                </div>
+            ` : ''}
         </div>
     `;
     
     document.getElementById('modalOverlay').style.display = 'flex';
+}
+
+function toggleAutoSave(enabled) {
+    uiState.settings.autoSave = enabled;
+    saveUIState();
+    showMessage('success', `Автосохранение ${enabled ? 'включено' : 'выключено'}`);
+}
+
+function toggleNotifications(enabled) {
+    uiState.settings.notifications = enabled;
+    saveUIState();
+    showMessage('success', `Уведомления ${enabled ? 'включены' : 'выключены'}`);
 }
 
 function setupAuthListener() {
@@ -577,7 +1013,8 @@ function setupAuthListener() {
                 currentUserId = null;
                 isAuthenticated = false;
                 answerDraftsCache.clear();
-                showAuthModal();
+                showMessage('info', 'Вы вышли из системы');
+                setTimeout(() => location.reload(), 1000);
                 break;
         }
     });
@@ -624,7 +1061,7 @@ function setupAutoSaveForModule() {
 }
 
 function setupAutoSave(element, submoduleId, answerType = 'main') {
-    if (!uiState.settings.autoSave || !isAuthenticated) return;
+    if (!uiState.settings.autoSave) return;
     
     let saveTimeout = null;
     
@@ -823,11 +1260,11 @@ function showAutoSaveIndicator() {
 }
 
 function showMessage(type, message) {
-    const existing = document.querySelector('.message-notification');
+    const existing = document.querySelector('.system-message');
     if (existing) existing.remove();
     
     const notification = document.createElement('div');
-    notification.className = `message-notification message-${type}`;
+    notification.className = `system-message ${type}`;
     
     let icon = 'fa-info-circle';
     let bgColor = '#3498db';
@@ -867,6 +1304,7 @@ function showMessage(type, message) {
         font-size: 0.95rem;
         animation: slideInRight 0.3s ease;
         max-width: 400px;
+        border-left: 4px solid ${bgColor}99;
     `;
     
     notification.innerHTML = `<i class="fas ${icon}"></i><span>${message}</span>`;
@@ -881,33 +1319,6 @@ function showMessage(type, message) {
     }, 4000);
 }
 
-// Додаємо анімації для повідомлень
-const messageStyles = document.createElement('style');
-messageStyles.textContent = `
-    @keyframes slideInRight {
-        from {
-            opacity: 0;
-            transform: translateX(100px);
-        }
-        to {
-            opacity: 1;
-            transform: translateX(0);
-        }
-    }
-    
-    @keyframes slideOutRight {
-        from {
-            opacity: 1;
-            transform: translateX(0);
-        }
-        to {
-            opacity: 0;
-            transform: translateX(100px);
-        }
-    }
-`;
-document.head.appendChild(messageStyles);
-
 // ========== ФУНКЦИИ АУТЕНТИФИКАЦИИ ==========
 
 function showAuthModal() {
@@ -918,54 +1329,67 @@ function showAuthModal() {
     modalBody.innerHTML = `
         <div style="padding: 20px;">
             <div style="text-align: center; margin-bottom: 20px;">
-                <h3 style="color: #3498db;">Добро пожаловать в курс эмпатии!</h3>
-                <p>Войдите, чтобы сохранять прогресс на всех устройствах.</p>
+                <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #3498db, #2ecc71); 
+                     border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px;">
+                    <i class="fas fa-hands-helping" style="font-size: 1.5rem; color: white;"></i>
+                </div>
+                <h3 style="color: var(--primary-color);">Добро пожаловать!</h3>
+                <p style="color: var(--gray-text);">Войдите, чтобы сохранять прогресс на всех устройствах.</p>
             </div>
             
             <div id="authContainer">
-                <div class="auth-tabs" style="display: flex; margin-bottom: 20px; border-bottom: 2px solid #2c3e50;">
-                    <button class="auth-tab active" onclick="showAuthTab('login')" style="flex: 1; padding: 10px; background: none; border: none; color: white; border-bottom: 2px solid #3498db;">Вход</button>
-                    <button class="auth-tab" onclick="showAuthTab('register')" style="flex: 1; padding: 10px; background: none; border: none; color: white;">Регистрация</button>
+                <div class="tabs" style="margin-bottom: 20px;">
+                    <div class="tab active" onclick="showAuthTab('login')">
+                        Вход
+                    </div>
+                    <div class="tab" onclick="showAuthTab('register')">
+                        Регистрация
+                    </div>
                 </div>
                 
                 <div id="loginTab">
                     <div style="margin-bottom: 15px;">
-                        <label style="display: block; margin-bottom: 5px; color: #ecf0f1;">Email</label>
-                        <input type="email" id="loginEmail" placeholder="ваш@email.com" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #34495e; background: #2c3e50; color: white;">
+                        <label style="display: block; margin-bottom: 5px; color: var(--light-text);">Email</label>
+                        <input type="email" id="loginEmail" placeholder="ваш@email.com" 
+                               style="width: 100%; padding: 12px; border-radius: 8px; border: 2px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); color: white;">
                     </div>
-                    <div style="margin-bottom: 15px;">
-                        <label style="display: block; margin-bottom: 5px; color: #ecf0f1;">Пароль</label>
-                        <input type="password" id="loginPassword" placeholder="Ваш пароль" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #34495e; background: #2c3e50; color: white;">
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 5px; color: var(--light-text);">Пароль</label>
+                        <input type="password" id="loginPassword" placeholder="Ваш пароль" 
+                               style="width: 100%; padding: 12px; border-radius: 8px; border: 2px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); color: white;">
                     </div>
-                    <button onclick="handleLogin()" class="btn-primary" style="width: 100%; padding: 12px;">
+                    <button onclick="handleLogin()" class="btn-primary" style="width: 100%; padding: 14px;">
                         <i class="fas fa-sign-in-alt"></i> Войти
                     </button>
                 </div>
                 
                 <div id="registerTab" style="display: none;">
                     <div style="margin-bottom: 15px;">
-                        <label style="display: block; margin-bottom: 5px; color: #ecf0f1;">Имя для сертификата</label>
-                        <input type="text" id="registerName" placeholder="Иван Иванов" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #34495e; background: #2c3e50; color: white;">
+                        <label style="display: block; margin-bottom: 5px; color: var(--light-text);">Имя для сертификата</label>
+                        <input type="text" id="registerName" placeholder="Иван Иванов" 
+                               style="width: 100%; padding: 12px; border-radius: 8px; border: 2px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); color: white;">
                     </div>
                     <div style="margin-bottom: 15px;">
-                        <label style="display: block; margin-bottom: 5px; color: #ecf0f1;">Email</label>
-                        <input type="email" id="registerEmail" placeholder="ваш@email.com" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #34495e; background: #2c3e50; color: white;">
+                        <label style="display: block; margin-bottom: 5px; color: var(--light-text);">Email</label>
+                        <input type="email" id="registerEmail" placeholder="ваш@email.com" 
+                               style="width: 100%; padding: 12px; border-radius: 8px; border: 2px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); color: white;">
                     </div>
-                    <div style="margin-bottom: 15px;">
-                        <label style="display: block; margin-bottom: 5px; color: #ecf0f1;">Пароль</label>
-                        <input type="password" id="registerPassword" placeholder="Не менее 6 символов" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #34495e; background: #2c3e50; color: white;">
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 5px; color: var(--light-text);">Пароль</label>
+                        <input type="password" id="registerPassword" placeholder="Не менее 6 символов" 
+                               style="width: 100%; padding: 12px; border-radius: 8px; border: 2px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); color: white;">
                     </div>
-                    <button onclick="handleRegister()" class="btn-primary" style="width: 100%; padding: 12px;">
+                    <button onclick="handleRegister()" class="btn-primary" style="width: 100%; padding: 14px;">
                         <i class="fas fa-user-plus"></i> Зарегистрироваться
                     </button>
                 </div>
                 
-                <div style="margin-top: 20px; text-align: center;">
-                    <button onclick="continueAsGuest()" class="btn-secondary" style="width: 100%; padding: 10px;">
+                <div style="margin-top: 25px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+                    <button onclick="continueAsGuest()" class="btn-secondary" style="width: 100%; padding: 12px; margin-bottom: 10px;">
                         Продолжить как гость
                     </button>
-                    <p style="margin-top: 10px; font-size: 0.9em; color: #95a5a6;">
-                        В гостевом режиме прогресс сохраняется только в этом браузере
+                    <p style="text-align: center; font-size: 0.85rem; color: var(--gray-text);">
+                        <i class="fas fa-info-circle"></i> В гостевом режиме прогресс сохраняется только в этом браузере
                     </p>
                 </div>
             </div>
@@ -980,7 +1404,7 @@ async function handleLogin() {
     const password = document.getElementById('loginPassword').value;
     
     if (!email || !password) {
-        alert('Заполните все поля');
+        showMessage('error', 'Заполните все поля');
         return;
     }
     
@@ -998,7 +1422,7 @@ async function handleLogin() {
         
     } catch (error) {
         console.error('Ошибка входа:', error);
-        showMessage('error', error.message || 'Ошибка входа');
+        showMessage('error', error.message || 'Ошибка входа. Проверьте email и пароль.');
     }
 }
 
@@ -1013,7 +1437,7 @@ async function handleRegister() {
     }
     
     if (password.length < 6) {
-        showMessage('error', 'Пароль минимум 6 символов');
+        showMessage('error', 'Пароль должен содержать минимум 6 символов');
         return;
     }
     
@@ -1026,8 +1450,8 @@ async function handleRegister() {
     
     // Проверяем наличие Supabase
     if (!supabase) {
-        showMessage('error', '❌ Supabase не настроен. Настройте ключи в js/data.js');
-        console.error('❌ Supabase не инициализирован. Проверьте конфигурацию в js/data.js');
+        showMessage('error', '❌ Supabase не настроен. Обратитесь к администратору.');
+        console.error('❌ Supabase не инициализирован.');
         return;
     }
     
@@ -1039,7 +1463,8 @@ async function handleRegister() {
             password,
             options: {
                 data: {
-                    full_name: name
+                    full_name: name,
+                    name: name
                 },
                 emailRedirectTo: window.location.origin
             }
@@ -1087,7 +1512,7 @@ async function handleRegister() {
             
             console.log('✅ Запись пользователя создана');
             
-            // Добавляем пользователя в allowed_users для доступа к боту
+            // Добавляем пользователя в allowed_users
             try {
                 const { error: allowedError } = await supabase
                     .from('allowed_users')
@@ -1112,7 +1537,7 @@ async function handleRegister() {
         
         // Проверяем нужно ли подтверждение email
         if (authData.user && !authData.user.confirmed_at) {
-            showMessage('success', '✅ Регистрация успешна! Проверьте почту и подтвердите email.');
+            showMessage('success', '✅ Регистрация успешна! Проверьте почту и подтвердите email, затем войдите.');
         } else {
             showMessage('success', '✅ Регистрация успешна! Входим...');
             setTimeout(() => location.reload(), 1500);
@@ -1134,8 +1559,8 @@ async function handleLogout() {
         const { error } = await supabase.auth.signOut();
         if (error) throw error;
         
-        showMessage('success', 'Вы вышли');
-        location.reload();
+        showMessage('success', 'Вы вышли из системы');
+        setTimeout(() => location.reload(), 1000);
         
     } catch (error) {
         console.error('Ошибка выхода:', error);
@@ -1144,15 +1569,13 @@ async function handleLogout() {
 }
 
 function showAuthTab(tabName) {
-    document.querySelectorAll('.auth-tab').forEach(tab => {
+    document.querySelectorAll('.tab').forEach(tab => {
         tab.classList.remove('active');
-        tab.style.borderBottom = 'none';
     });
     
-    const activeTab = document.querySelector(`.auth-tab[onclick*="${tabName}"]`);
+    const activeTab = document.querySelector(`.tab[onclick*="${tabName}"]`);
     if (activeTab) {
         activeTab.classList.add('active');
-        activeTab.style.borderBottom = '2px solid #3498db';
     }
     
     document.getElementById('loginTab').style.display = tabName === 'login' ? 'block' : 'none';
@@ -1321,20 +1744,20 @@ function renderModulesList() {
     
     courseData.modules.forEach(module => {
         const moduleItem = document.createElement('div');
-        moduleItem.className = `module-item ${userProgress.currentModule === module.id ? 'active' : ''}`;
+        moduleItem.className = `module-card ${userProgress.currentModule === module.id ? 'active' : ''}`;
         
         const completedIcon = userProgress.completedModules.includes(module.id) ? 
-            '<i class="fas fa-check-circle" style="color: #2ecc71; margin-right: 8px;"></i>' : 
-            '<i class="far fa-circle" style="color: #ccc; margin-right: 8px;"></i>';
+            '<i class="fas fa-check-circle" style="color: var(--secondary-color); margin-right: 8px;"></i>' : 
+            '<i class="far fa-circle" style="color: var(--gray-text); margin-right: 8px;"></i>';
         
         moduleItem.innerHTML = `
             <h3>${completedIcon} ${module.title}</h3>
             <p>${module.description}</p>
-            ${module.completed ? '<span class="module-completed">✓ Завершен</span>' : ''}
+            ${module.completed ? '<span class="badge badge-success" style="margin-top: 10px;">✓ Завершен</span>' : ''}
         `;
         
         moduleItem.addEventListener('click', () => {
-            document.querySelectorAll('.module-item').forEach(item => {
+            document.querySelectorAll('.module-card').forEach(item => {
                 item.classList.remove('active');
             });
             moduleItem.classList.add('active');
@@ -1352,8 +1775,8 @@ function renderModulesList() {
                 submoduleItem.className = `submodule-item ${userProgress.currentSubmodule === submodule.id ? 'active' : ''}`;
                 
                 const subCompletedIcon = userProgress.completedSubmodules.includes(submodule.id) ? 
-                    '<i class="fas fa-check" style="color: #2ecc71; margin-right: 8px; font-size: 0.8rem;"></i>' : 
-                    '<i class="far fa-circle" style="color: #ccc; margin-right: 8px; font-size: 0.8rem;"></i>';
+                    '<i class="fas fa-check" style="color: var(--secondary-color); margin-right: 8px; font-size: 0.8rem;"></i>' : 
+                    '<i class="far fa-circle" style="color: var(--gray-text); margin-right: 8px; font-size: 0.8rem;"></i>';
                 
                 submoduleItem.innerHTML = `<h4>${subCompletedIcon} ${submodule.title}</h4>`;
                 
@@ -1446,12 +1869,18 @@ function showTabContent(tabName, submodule) {
     
     let content = submodule.tabs[tabName].content;
     
-    if (tabName === 'quote') {
-        content = content.replace('class="quote"', 'class="quote-box"')
-                        .replace('class="author"', 'class="quote-author"');
-    } else if (tabName === 'source') {
-        content = content.replace('class="source"', 'class="source-box"');
-    }
+    // Улучшаем форматирование контента
+    content = content
+        .replace(/<h3>/g, '<h3 class="module-heading">')
+        .replace(/<h4>/g, '<h4 class="sub-heading">')
+        .replace(/<p>/g, '<p class="text-paragraph">')
+        .replace(/<ul>/g, '<ul class="enhanced-list">')
+        .replace(/<ol>/g, '<ol class="enhanced-list">')
+        .replace(/class="quote"/g, 'class="quote-box"')
+        .replace(/class="author"/g, 'class="quote-author"')
+        .replace(/class="source"/g, 'class="source-box"')
+        .replace(/class="definition"/g, 'class="definition-box"')
+        .replace(/class="practical-tip"/g, 'class="practical-tip"');
     
     contentDisplay.innerHTML = `
         <div class="tab-content active">
@@ -1499,7 +1928,6 @@ function initCheckButtons() {
     });
 }
 
-// ОБНОВЛЕННАЯ ФУНКЦИЯ checkAssignment
 async function checkAssignment(submoduleId) {
     console.log("=== НАЧАЛО ПРОВЕРКИ ===");
     console.log("Подмодуль для проверки:", submoduleId);
@@ -1577,14 +2005,14 @@ async function checkAssignment(submoduleId) {
             if (!userProgress.completedSubmodules.includes(submoduleId)) {
                 userProgress.completedSubmodules.push(submoduleId);
                 
-                answerElement.style.borderColor = '#2ecc71';
+                answerElement.style.borderColor = 'var(--secondary-color)';
                 answerElement.style.boxShadow = '0 0 0 2px rgba(46, 204, 113, 0.2)';
                 
                 const assignmentHeader = answerElement.closest('.assignment')?.querySelector('h4');
                 if (assignmentHeader && !assignmentHeader.querySelector('.fa-check-circle')) {
                     const checkIcon = document.createElement('i');
                     checkIcon.className = 'fas fa-check-circle';
-                    checkIcon.style.color = '#2ecc71';
+                    checkIcon.style.color = 'var(--secondary-color)';
                     checkIcon.style.marginLeft = '10px';
                     checkIcon.style.animation = 'scaleIn 0.3s ease';
                     assignmentHeader.appendChild(checkIcon);
@@ -1612,7 +2040,7 @@ async function checkAssignment(submoduleId) {
             }
             
         } else {
-            answerElement.style.borderColor = '#e74c3c';
+            answerElement.style.borderColor = 'var(--danger-color)';
             answerElement.style.boxShadow = '0 0 0 2px rgba(231, 76, 60, 0.2)';
         }
         
@@ -1662,7 +2090,7 @@ function checkExtraAssignment(submoduleId) {
         
         if (!answer) {
             allFilled = false;
-            textarea.style.borderColor = '#e74c3c';
+            textarea.style.borderColor = 'var(--danger-color)';
             textarea.style.boxShadow = '0 0 0 2px rgba(231, 76, 60, 0.2)';
             
             textarea.animate([
@@ -1675,7 +2103,7 @@ function checkExtraAssignment(submoduleId) {
                 iterations: 1
             });
         } else {
-            textarea.style.borderColor = '#2ecc71';
+            textarea.style.borderColor = 'var(--secondary-color)';
             textarea.style.boxShadow = '0 0 0 2px rgba(46, 204, 113, 0.2)';
         }
     });
@@ -1691,7 +2119,7 @@ function checkExtraAssignment(submoduleId) {
     if (allValid) {
         alert("✅ Все дополнительные задания выполнены правильно!");
         textareas.forEach(textarea => {
-            textarea.style.borderColor = '#2ecc71';
+            textarea.style.borderColor = 'var(--secondary-color)';
             textarea.style.boxShadow = '0 0 0 2px rgba(46, 204, 113, 0.2)';
         });
     } else {
@@ -1715,11 +2143,15 @@ function checkIfModuleCompleted(moduleId) {
             modalTitle.textContent = '🎉 Модуль завершен!';
             modalBody.innerHTML = `
                 <div style="text-align: center; padding: 20px;">
-                    <h3 style="color: #2ecc71;">Поздравляем!</h3>
+                    <div style="width: 80px; height: 80px; background: linear-gradient(135deg, var(--secondary-color), #27ae60); 
+                         border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+                        <i class="fas fa-trophy" style="font-size: 2rem; color: white;"></i>
+                    </div>
+                    <h3 style="color: var(--secondary-color); margin-bottom: 10px;">Поздравляем!</h3>
                     <p>Вы успешно завершили модуль:</p>
-                    <p style="font-size: 1.2rem; font-weight: bold; margin: 15px 0;">«${module.title}»</p>
+                    <p style="font-size: 1.2rem; font-weight: bold; margin: 15px 0; color: var(--light-text);">«${module.title}»</p>
                     <p>Теперь вы можете пройти контрольную работу модуля.</p>
-                    <div style="margin-top: 20px;">
+                    <div style="margin-top: 25px;">
                         <button class="btn-primary" onclick="showTestInfo(${moduleId}); document.getElementById('modalOverlay').style.display='none';" style="margin-right: 10px;">
                             Пройти контрольную
                         </button>
@@ -1746,32 +2178,32 @@ function showTestInfo(moduleId) {
     modalBody.innerHTML = `
         <div style="padding: 20px;">
             <div style="text-align: center; margin-bottom: 20px;">
-                <h3 style="color: #3498db;">${module.test.title}</h3>
-                <p>${module.test.description}</p>
+                <h3 style="color: var(--primary-color);">${module.test.title}</h3>
+                <p style="color: var(--gray-text);">${module.test.description}</p>
             </div>
             
-            <div class="test-stats">
-                <div class="test-stat">
+            <div class="exam-stats">
+                <div class="exam-stat">
                     <strong>${module.test.sections ? module.test.sections[0].questions.length : 0}</strong>
                     <span>теоретических вопросов</span>
                 </div>
-                <div class="test-stat">
+                <div class="exam-stat">
                     <strong>${module.test.timeLimit || 30}</strong>
                     <span>минут на выполнение</span>
                 </div>
-                <div class="test-stat">
+                <div class="exam-stat">
                     <strong>${module.test.passingScore || 35}</strong>
                     <span>проходной балл</span>
                 </div>
-                <div class="test-stat">
+                <div class="exam-stat">
                     <strong>${module.test.totalPoints || 50}</strong>
                     <span>баллов всего</span>
                 </div>
             </div>
             
-            <div style="margin: 25px 0; padding: 20px; background: rgba(52, 152, 219, 0.1); border-radius: 10px;">
-                <h4 style="color: #3498db; margin-bottom: 10px;">Структура работы:</h4>
-                <ul style="margin-left: 20px; color: #e0e0e0;">
+            <div class="module-card" style="margin: 25px 0;">
+                <h4 style="color: var(--primary-color); margin-bottom: 10px;">Структура работы:</h4>
+                <ul class="enhanced-list" style="color: var(--light-text);">
                     ${module.test.sections ? module.test.sections.map(section => 
                         `<li>${section.title}</li>`
                     ).join('') : ''}
@@ -1805,8 +2237,8 @@ function showTestResultModal(moduleId) {
     modalBody.innerHTML = `
         <div style="padding: 20px;">
             <div style="text-align: center; margin-bottom: 20px;">
-                <h3 style="color: ${result.passed ? '#2ecc71' : '#e74c3c'};">${result.passed ? '✅ Тест пройден' : '❌ Тест не пройден'}</h3>
-                <p>Модуль: <strong>${module.title}</strong></p>
+                <h3 style="color: ${result.passed ? 'var(--secondary-color)' : 'var(--danger-color)'};">${result.passed ? '✅ Тест пройден' : '❌ Тест не пройден'}</h3>
+                <p style="color: var(--gray-text);">Модуль: <strong style="color: var(--light-text);">${module.title}</strong></p>
             </div>
             
             <div class="exam-stats" style="margin: 20px 0;">
@@ -1828,21 +2260,21 @@ function showTestResultModal(moduleId) {
                 </div>
             </div>
             
-            <div style="background: ${result.passed ? 'rgba(46, 204, 113, 0.1)' : 'rgba(231, 76, 60, 0.1)'}; 
-                     padding: 20px; border-radius: 10px; text-align: center; margin: 20px 0; border-left: 4px solid ${result.passed ? '#2ecc71' : '#e74c3c'}">
-                <h4 style="color: ${result.passed ? '#2ecc71' : '#e74c3c'}; margin-top: 0;">Итоговый результат</h4>
-                <div style="font-size: 2em; font-weight: bold; color: ${result.passed ? '#2ecc71' : '#e74c3c'}">
+            <div class="module-card" style="background: ${result.passed ? 'rgba(46, 204, 113, 0.1)' : 'rgba(231, 76, 60, 0.1)'}; 
+                     border-left: 4px solid ${result.passed ? 'var(--secondary-color)' : 'var(--danger-color)'}">
+                <h4 style="color: ${result.passed ? 'var(--secondary-color)' : 'var(--danger-color)'}; margin-top: 0;">Итоговый результат</h4>
+                <div style="font-size: 2em; font-weight: bold; color: ${result.passed ? 'var(--secondary-color)' : 'var(--danger-color)'}">
                     ${result.totalPoints || 0}/${result.maxPoints || 0} баллов
                 </div>
-                <p style="margin-top: 10px; color: #95a5a6;">
+                <p style="margin-top: 10px; color: var(--gray-text);">
                     Проходной балл: ${module.test.passingScore || 35}
                 </p>
             </div>
             
             ${!result.passed ? `
-                <div style="margin-top: 20px; padding: 15px; background: rgba(231, 76, 60, 0.1); border-radius: 8px;">
-                    <h4 style="color: #e74c3c; margin-bottom: 10px;">Рекомендации:</h4>
-                    <ul style="margin-left: 20px; color: #ccc;">
+                <div class="module-card" style="margin-top: 20px; background: rgba(231, 76, 60, 0.1); border-left: 4px solid var(--danger-color);">
+                    <h4 style="color: var(--danger-color); margin-bottom: 10px;">Рекомендации:</h4>
+                    <ul class="enhanced-list" style="color: var(--light-text);">
                         <li>Повторите теоретический материал модуля</li>
                         <li>Проработайте практические задания еще раз</li>
                         <li>Обратите внимание на объяснения к вопросам</li>
@@ -1961,7 +2393,8 @@ function openTest(moduleId) {
                                 ${task.situations ? task.situations.map((situation, i) => `
                                     <div style="margin: 10px 0; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 5px;">
                                         <p><strong>Ситуация ${i + 1}:</strong> ${situation.text}</p>
-                                        <input type="text" placeholder="Ваш ответ" id="situation${taskIndex}_${i}" style="width: 100%; padding: 8px; border-radius: 4px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white;">
+                                        <input type="text" placeholder="Ваш ответ" id="situation${taskIndex}_${i}" 
+                                               style="width: 100%; padding: 8px; border-radius: 4px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white;">
                                     </div>
                                 `).join('') : ''}
                             </div>
@@ -1972,7 +2405,8 @@ function openTest(moduleId) {
                             <ul style="margin-left: 20px;">
                                 ${task.requirements ? task.requirements.map(req => `<li>${req}</li>`).join('') : ''}
                             </ul>
-                            <textarea id="scenario${taskIndex}" placeholder="Напишите ваш ответ..." rows="5" style="width: 100%; margin-top: 10px;"></textarea>
+                            <textarea id="scenario${taskIndex}" placeholder="Напишите ваш ответ..." rows="5" 
+                                      style="width: 100%; margin-top: 10px;"></textarea>
                         `;
                     }
                     
@@ -1989,7 +2423,7 @@ function openTest(moduleId) {
     submitBtn.style.marginTop = '30px';
     submitBtn.style.textAlign = 'center';
     submitBtn.innerHTML = `
-        <button class="btn-primary" id="submitTestBtn" style="padding: 15px 40px; font-size: 1.1rem;">
+        <button class="btn-primary" id="submitTestBtn" onclick="submitTest()" style="padding: 15px 40px; font-size: 1.1rem;">
             <i class="fas fa-paper-plane"></i> Отправить на проверку
         </button>
     `;
@@ -2106,8 +2540,10 @@ function showTestResult(moduleId, result) {
     modalBody.innerHTML = `
         <div style="padding: 20px;">
             <div style="text-align: center; margin-bottom: 20px;">
-                <h3 style="color: ${result.passed ? '#2ecc71' : '#e74c3c'};">${result.passed ? '✅ Поздравляем!' : '❌ Попробуйте еще'}</h3>
-                <p>Модуль: <strong>${module.title}</strong></p>
+                <h3 style="color: ${result.passed ? 'var(--secondary-color)' : 'var(--danger-color)'}; font-size: 1.8rem;">
+                    ${result.passed ? '✅ Поздравляем!' : '❌ Попробуйте еще'}
+                </h3>
+                <p style="color: var(--gray-text);">Модуль: <strong style="color: var(--light-text);">${module.title}</strong></p>
             </div>
             
             <div class="exam-stats" style="margin: 20px 0;">
@@ -2125,8 +2561,8 @@ function showTestResult(moduleId, result) {
                 </div>
             </div>
             
-            <div style="background: linear-gradient(135deg, ${result.passed ? '#2ecc71' : '#e74c3c'} 0%, ${result.passed ? '#27ae60' : '#c0392b'} 100%); 
-                     color: white; padding: 20px; border-radius: 12px; text-align: center; margin: 20px 0;">
+            <div class="module-card" style="background: linear-gradient(135deg, ${result.passed ? 'var(--secondary-color)' : 'var(--danger-color)'} 0%, ${result.passed ? '#27ae60' : '#c0392b'} 100%); 
+                     color: white; text-align: center; margin: 20px 0; border: none;">
                 <h2 style="margin: 0; font-size: 2.5rem;">${result.totalPoints}/${result.maxPoints}</h2>
                 <p style="margin: 10px 0 0 0; font-size: 1.1rem;">
                     ${result.passed ? 'Вы успешно прошли контрольную работу!' : `Необходимо набрать ${module.test.passingScore} баллов`}
@@ -2134,9 +2570,9 @@ function showTestResult(moduleId, result) {
             </div>
             
             ${!result.passed ? `
-                <div style="margin-top: 20px; padding: 15px; background: rgba(231, 76, 60, 0.1); border-radius: 8px;">
-                    <h4 style="color: #e74c3c; margin-bottom: 10px;">Рекомендации:</h4>
-                    <ul style="margin-left: 20px; color: #ccc;">
+                <div class="module-card" style="margin-top: 20px; background: rgba(231, 76, 60, 0.1); border-left: 4px solid var(--danger-color);">
+                    <h4 style="color: var(--danger-color); margin-bottom: 10px;">Рекомендации:</h4>
+                    <ul class="enhanced-list" style="color: var(--light-text);">
                         <li>Повторите теорию модуля</li>
                         <li>Пройдите практические задания еще раз</li>
                         <li>Обратите внимание на объяснения к вопросам</li>
@@ -2227,22 +2663,22 @@ function openFinalExam() {
     const instruction = document.createElement('div');
     instruction.className = 'test-question';
     instruction.innerHTML = `
-        <h4>Инструкция к итоговому экзамену</h4>
+        <h4><i class="fas fa-info-circle" style="color: var(--primary-color); margin-right: 10px;"></i>Инструкция к итоговому экзамену</h4>
         <p>Итоговый экзамен проверяет ваши знания по всем 5 модулям курса.</p>
         <p><strong>Время выполнения:</strong> ${exam.timeLimit} минут</p>
         <p><strong>Структура экзамена:</strong></p>
-        <ol>
+        <ol class="enhanced-list">
             <li>Теоретическая часть (${exam.sections[0].questions.length} вопросов) — ${exam.scoring.theory}</li>
             <li>Практическая часть (${exam.sections[1].tasks.length} заданий) — ${exam.scoring.practical}</li>
             <li>Ситуационный анализ (${exam.sections[2].tasks.length} кейс) — ${exam.scoring.caseStudy}</li>
         </ol>
         <p><strong>Оценка:</strong> ${exam.scoring.passing} (${Math.round(parseInt(exam.scoring.passing) / parseInt(exam.scoring.total) * 100)}%)</p>
-        <p style="color: #4a90e2; font-weight: bold;">Удачи!</p>
+        <p style="color: var(--primary-color); font-weight: bold; margin-top: 15px;"><i class="fas fa-star"></i> Удачи!</p>
     `;
     examContent.appendChild(instruction);
     
     const theorySection = document.createElement('div');
-    theorySection.innerHTML = `<h3 style="margin: 30px 0 20px 0; color: #ffffff;">Теоретическая часть</h3>`;
+    theorySection.innerHTML = `<h3 style="margin: 30px 0 20px 0; color: var(--light-text);">Теоретическая часть</h3>`;
     examContent.appendChild(theorySection);
     
     exam.sections[0].questions.forEach((question, index) => {
@@ -2284,7 +2720,7 @@ function openFinalExam() {
     });
     
     const practicalSection = document.createElement('div');
-    practicalSection.innerHTML = `<h3 style="margin: 30px 0 20px 0; color: #ffffff;">Практическая часть</h3>`;
+    practicalSection.innerHTML = `<h3 style="margin: 30px 0 20px 0; color: var(--light-text);">Практическая часть</h3>`;
     examContent.appendChild(practicalSection);
     
     exam.sections[1].tasks.forEach((task, index) => {
@@ -2298,14 +2734,16 @@ function openFinalExam() {
                 <p><strong>Ситуация:</strong> ${task.situation}</p>
                 <p><strong>Требования:</strong> ${task.requirements}</p>
                 <p><strong>Максимальный балл:</strong> ${task.maxPoints}</p>
-                <textarea id="practicalExam${index}" placeholder="Напишите ваш ответ здесь..." rows="6" style="width: 100%; margin-top: 10px;"></textarea>
+                <textarea id="practicalExam${index}" placeholder="Напишите ваш ответ здесь..." rows="6" 
+                          style="width: 100%; margin-top: 10px;"></textarea>
             `;
         } else {
             taskContent = `
                 <h4>Задание ${index + 1}: ${task.task}</h4>
                 <p><strong>Требования:</strong> ${task.requirements}</p>
                 <p><strong>Максимальный балл:</strong> ${task.maxPoints}</p>
-                <textarea id="practicalExam${index}" placeholder="Напишите ваш ответ здесь..." rows="6" style="width: 100%; margin-top: 10px;"></textarea>
+                <textarea id="practicalExam${index}" placeholder="Напишите ваш ответ здесь..." rows="6" 
+                          style="width: 100%; margin-top: 10px;"></textarea>
             `;
         }
         
@@ -2314,7 +2752,7 @@ function openFinalExam() {
     });
     
     const caseSection = document.createElement('div');
-    caseSection.innerHTML = `<h3 style="margin: 30px 0 20px 0; color: #ffffff;">Ситуационный анализ</h3>`;
+    caseSection.innerHTML = `<h3 style="margin: 30px 0 20px 0; color: var(--light-text);">Ситуационный анализ</h3>`;
     examContent.appendChild(caseSection);
     
     exam.sections[2].tasks.forEach((task, index) => {
@@ -2324,13 +2762,24 @@ function openFinalExam() {
         taskDiv.innerHTML = `
             <h4>Кейс ${index + 1}: ${task.situation}</h4>
             <p><strong>Вопросы для анализа:</strong></p>
-            <ol style="margin-left: 20px; margin-bottom: 20px;">
+            <ol class="enhanced-list" style="margin-bottom: 20px;">
                 ${task.questions.map((q, i) => `<li>${q}</li>`).join('')}
             </ol>
-            <textarea id="caseExam${index}" placeholder="Напишите ваш анализ здесь..." rows="8" style="width: 100%; margin-top: 10px;"></textarea>
+            <textarea id="caseExam${index}" placeholder="Напишите ваш анализ здесь..." rows="8" 
+                      style="width: 100%; margin-top: 10px;"></textarea>
         `;
         examContent.appendChild(taskDiv);
     });
+    
+    const submitBtn = document.createElement('div');
+    submitBtn.style.marginTop = '30px';
+    submitBtn.style.textAlign = 'center';
+    submitBtn.innerHTML = `
+        <button class="btn-primary" onclick="submitFinalExam()" style="padding: 15px 40px; font-size: 1.1rem;">
+            <i class="fas fa-paper-plane"></i> Отправить экзамен на проверку
+        </button>
+    `;
+    examContent.appendChild(submitBtn);
 }
 
 function submitFinalExam() {
@@ -2416,10 +2865,14 @@ function submitFinalExam() {
     modalBody.innerHTML = `
         <div style="padding: 20px;">
             <div style="text-align: center; margin-bottom: 30px;">
-                <h3 style="color: ${passed ? '#2ecc71' : '#e74c3c'}; font-size: 1.8rem;">
+                <div style="width: 80px; height: 80px; background: linear-gradient(135deg, ${passed ? 'var(--secondary-color)' : 'var(--danger-color)'}, ${passed ? '#27ae60' : '#c0392b'}); 
+                     border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+                    <i class="fas ${passed ? 'fa-trophy' : 'fa-redo'}" style="font-size: 2rem; color: white;"></i>
+                </div>
+                <h3 style="color: ${passed ? 'var(--secondary-color)' : 'var(--danger-color)'}; font-size: 1.8rem;">
                     ${passed ? '🎉 Поздравляем!' : '😔 Попробуйте еще раз'}
                 </h3>
-                <p style="font-size: 1.2rem; margin: 10px 0;">Итоговая оценка: <strong style="color: ${passed ? '#2ecc71' : '#e74c3c'}">${grade} (${gradeText})</strong></p>
+                <p style="font-size: 1.2rem; margin: 10px 0; color: var(--light-text);">Итоговая оценка: <strong style="color: ${passed ? 'var(--secondary-color)' : 'var(--danger-color)'}">${grade} (${gradeText})</strong></p>
             </div>
             
             <div class="exam-stats" style="margin: 20px 0;">
@@ -2437,8 +2890,8 @@ function submitFinalExam() {
                 </div>
             </div>
             
-            <div style="background: linear-gradient(135deg, ${passed ? '#2ecc71' : '#e74c3c'} 0%, ${passed ? '#27ae60' : '#c0392b'} 100%); 
-                     color: white; padding: 20px; border-radius: 12px; text-align: center; margin: 20px 0;">
+            <div class="module-card" style="background: linear-gradient(135deg, ${passed ? 'var(--secondary-color)' : 'var(--danger-color)'} 0%, ${passed ? '#27ae60' : '#c0392b'} 100%); 
+                     color: white; text-align: center; margin: 20px 0; border: none;">
                 <h2 style="margin: 0; font-size: 2.5rem;">${totalScore}/${maxScore}</h2>
                 <p style="margin: 10px 0 0 0; font-size: 1.1rem;">
                     ${passed ? 'Вы успешно прошли итоговый экзамен!' : `Необходимо набрать ${passingScore} баллов`}
@@ -2447,22 +2900,22 @@ function submitFinalExam() {
             
             ${passed ? `
                 <div style="text-align: center; margin-top: 30px;">
-                    <p style="font-size: 1.1rem; margin-bottom: 20px;">Теперь вы можете получить сертификат об окончании курса!</p>
+                    <p style="font-size: 1.1rem; margin-bottom: 20px; color: var(--light-text);">Теперь вы можете получить сертификат об окончании курса!</p>
                     <button class="btn-primary" onclick="showCertificate(); document.getElementById('modalOverlay').style.display='none';" style="font-size: 1.1rem; padding: 15px 30px;">
                         <i class="fas fa-award"></i> Получить сертификат
                     </button>
                 </div>
             ` : `
-                <div style="margin-top: 20px; padding: 20px; background: rgba(231, 76, 60, 0.1); border-radius: 8px;">
-                    <h4 style="color: #e74c3c; margin-bottom: 15px;">Рекомендации для улучшения результата:</h4>
-                    <ul style="margin-left: 20px; color: #ccc;">
+                <div class="module-card" style="margin-top: 20px; background: rgba(231, 76, 60, 0.1); border-left: 4px solid var(--danger-color);">
+                    <h4 style="color: var(--danger-color); margin-bottom: 15px;">Рекомендации для улучшения результата:</h4>
+                    <ul class="enhanced-list" style="color: var(--light-text);">
                         <li>Повторите теорию всех модулей</li>
                         <li>Отработайте практические задания</li>
                         <li>Обратите внимание на объяснения к вопросам</li>
                         <li>Попробуйте пройти экзамен через 2-3 дня</li>
                         <li>Используйте конспекты и ключевые термины</li>
                     </ul>
-                    <p style="margin-top: 15px; color: #f39c12;">
+                    <p style="margin-top: 15px; color: var(--warning-color);">
                         <i class="fas fa-info-circle"></i> Вы можете пересдать экзамен в любое время
                     </p>
                 </div>
@@ -2479,47 +2932,59 @@ function showWelcomeScreen() {
     const contentDisplay = document.getElementById('contentDisplay');
     contentDisplay.innerHTML = `
         <div class="welcome-screen">
-            <div class="welcome-icon">
-                <i class="fas fa-hands-helping"></i>
-            </div>
-            <h1>Полный курс: «Эмпатия и поддержка в общении»</h1>
-            <p>Развивайте эмоциональный интеллект, учитесь слушать и поддерживать других.</p>
-            
-            <div class="features">
-                <div class="feature">
-                    <i class="fas fa-book-open"></i>
-                    <h3>5 модулей</h3>
-                    <p>Теория, цитаты, практические задания</p>
+            <div style="text-align: center; padding: 40px 20px;">
+                <div style="width: 100px; height: 100px; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); 
+                     border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 30px;">
+                    <i class="fas fa-hands-helping" style="font-size: 3rem; color: white;"></i>
                 </div>
-                <div class="feature">
-                    <i class="fas fa-check-circle"></i>
-                    <h3>Контрольные работы</h3>
-                    <p>Тесты и практика после каждого модуля</p>
+                <h1 style="color: var(--primary-color); margin-bottom: 15px;">Полный курс: «Эмпатия и поддержка в общении»</h1>
+                <p style="font-size: 1.1rem; color: var(--gray-text); max-width: 700px; margin: 0 auto 40px;">
+                    Развивайте эмоциональный интеллект, учитесь слушать и поддерживать других. 
+                    Практический курс для всех, кто хочет улучшить качество общения.
+                </p>
+                
+                <div class="exam-stats" style="margin: 40px 0;">
+                    <div class="exam-stat">
+                        <strong>5</strong>
+                        <span>модулей</span>
+                    </div>
+                    <div class="exam-stat">
+                        <strong>15+</strong>
+                        <span>практических заданий</span>
+                    </div>
+                    <div class="exam-stat">
+                        <strong>5</strong>
+                        <span>контрольных работ</span>
+                    </div>
+                    <div class="exam-stat">
+                        <strong>1</strong>
+                        <span>итоговый экзамен</span>
+                    </div>
                 </div>
-                <div class="feature">
-                    <i class="fas fa-graduation-cap"></i>
-                    <h3>Итоговый экзамен</h3>
-                    <p>Комплексная проверка знаний</p>
+                
+                <div class="module-card" style="max-width: 800px; margin: 0 auto 30px;">
+                    <h3><i class="fas fa-list-ol" style="color: var(--primary-color); margin-right: 10px;"></i>Структура курса</h3>
+                    <p>Каждый модуль содержит:</p>
+                    <ul class="enhanced-list" style="margin: 15px 0;">
+                        <li>Теоретический материал с примерами</li>
+                        <li>Практические задания с проверкой</li>
+                        <li>Контрольную работу по модулю</li>
+                        <li>Дополнительные материалы для углубления</li>
+                    </ul>
+                    <p style="margin-top: 15px; color: var(--gray-text);">
+                        <i class="fas fa-certificate" style="color: var(--warning-color);"></i>
+                        После завершения всех модулей вас ждет итоговый экзамен и сертификат!
+                    </p>
                 </div>
-                <div class="feature">
-                    <i class="fas fa-award"></i>
-                    <h3>Именной сертификат</h3>
-                    <p>Получите сертификат с вашим именем</p>
+                
+                <div style="margin-top: 40px;">
+                    <button onclick="openModule(1, '1.1')" class="btn-primary" style="padding: 18px 40px; font-size: 1.2rem;">
+                        <i class="fas fa-play-circle"></i> Начать обучение
+                    </button>
+                    <p style="margin-top: 20px; color: var(--gray-text);">
+                        ${isAuthenticated ? '✅ Ваш прогресс сохраняется автоматически' : '👤 Работаете как гость? <a href="#" onclick="showAuthModal()" style="color: var(--primary-color);">Войдите</a>, чтобы сохранять прогресс на всех устройствах.'}
+                    </p>
                 </div>
-            </div>
-            
-            <div class="module-test-button" style="margin-top: 40px;">
-                <h3>Структура курса</h3>
-                <p>Курс состоит из 5 модулей, каждый содержит:</p>
-                <ul style="text-align: left; max-width: 600px; margin: 15px auto;">
-                    <li>Теоретический материал с примерами</li>
-                    <li>Практические задания с проверкой</li>
-                    <li>Контрольную работу по модулю</li>
-                    <li>Итоговый экзамен по всему курсу</li>
-                </ul>
-                <button onclick="openModule(1, '1.1')" class="btn-primary" style="margin-top: 20px; padding: 15px 30px; font-size: 1.1rem;">
-                    <i class="fas fa-play-circle"></i> Начать обучение
-                </button>
             </div>
         </div>
     `;
@@ -2532,35 +2997,37 @@ function showCertificate() {
     }
     
     const certificateModal = document.createElement('div');
-    certificateModal.className = 'certificate-modal-overlay';
+    certificateModal.className = 'modal-overlay';
     certificateModal.id = 'certificateModal';
     
     const exam = courseData.finalExam;
     const gradeInfo = userProgress.finalExamGrade ? exam.scoring.gradingScale[userProgress.finalExamGrade] || "Успешно завершено" : "Успешно завершено";
     
     certificateModal.innerHTML = `
-        <div class="certificate-modal">
-            <div class="certificate-modal-header">
-                <h3>🎓 Ваш сертификат об окончании курса</h3>
-                <button class="certificate-close-btn" id="closeCertificateBtn">&times;</button>
+        <div class="modal" style="max-width: 900px;">
+            <div class="modal-header">
+                <h3 style="margin: 0;">🎓 Ваш сертификат об окончании курса</h3>
+                <button class="btn-secondary" onclick="document.getElementById('certificateModal').remove()" style="padding: 8px 12px;">
+                    &times;
+                </button>
             </div>
-            <div class="certificate-modal-body">
+            <div class="modal-body">
                 <div class="certificate-container">
                     <div class="certificate">
                         <div class="certificate-border">
-                            <div class="certificate-header">
-                                <h1>СЕРТИФИКАТ</h1>
-                                <p>о прохождении курса</p>
+                            <div class="certificate-header" style="text-align: center; margin-bottom: 30px;">
+                                <h1 style="color: #e74c3c; font-size: 2.5rem; margin-bottom: 10px;">СЕРТИФИКАТ</h1>
+                                <p style="color: #7f8c8d; font-size: 1.2rem;">о прохождении курса</p>
                             </div>
                             
-                            <div class="certificate-body">
-                                <h2>«Эмпатия и поддержка в общении»</h2>
+                            <div class="certificate-body" style="text-align: center;">
+                                <h2 style="color: #2c3e50; font-size: 1.8rem; margin-bottom: 30px;">«Эмпатия и поддержка в общении»</h2>
                                 
-                                <div class="certificate-award">
-                                    <i class="fas fa-award"></i>
+                                <div style="margin: 30px 0;">
+                                    <i class="fas fa-award" style="font-size: 3rem; color: #f39c12;"></i>
                                 </div>
                                 
-                                <div class="certificate-text">
+                                <div style="font-size: 1.1rem; color: #7f8c8d; margin-bottom: 20px;">
                                     Настоящим удостоверяется, что
                                 </div>
                                 
@@ -2568,39 +3035,39 @@ function showCertificate() {
                                     ${userProgress.userName || "Ученик"}
                                 </div>
                                 
-                                <div class="certificate-text">
+                                <div style="font-size: 1.1rem; color: #7f8c8d; margin: 30px 0; line-height: 1.6;">
                                     успешно завершил(а) полный курс обучения, состоящий из 5 модулей,<br>
                                     и проявил(а) высокий уровень компетенций в области эмпатии и поддержки.
                                 </div>
                                 
-                                <div class="certificate-details">
-                                    <div class="detail">
-                                        <strong>Дата выдачи</strong>
-                                        <p>${new Date().toLocaleDateString('ru-RU', {
+                                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin: 30px 0;">
+                                    <div style="text-align: left;">
+                                        <strong style="color: #2c3e50;">Дата выдачи</strong>
+                                        <p style="color: #7f8c8d; margin-top: 5px;">${new Date().toLocaleDateString('ru-RU', {
                                             day: 'numeric',
                                             month: 'long',
                                             year: 'numeric'
                                         })}</p>
                                     </div>
-                                    <div class="detail">
-                                        <strong>Итоговая оценка</strong>
-                                        <p>${gradeInfo}</p>
+                                    <div style="text-align: left;">
+                                        <strong style="color: #2c3e50;">Итоговая оценка</strong>
+                                        <p style="color: #7f8c8d; margin-top: 5px;">${gradeInfo}</p>
                                     </div>
-                                    <div class="detail">
-                                        <strong>Результат экзамена</strong>
-                                        <p>${userProgress.finalExamScore} баллов из ${exam.scoring.total}</p>
+                                    <div style="text-align: left;">
+                                        <strong style="color: #2c3e50;">Результат экзамена</strong>
+                                        <p style="color: #7f8c8d; margin-top: 5px;">${userProgress.finalExamScore} баллов из ${exam.scoring.total}</p>
                                     </div>
-                                    <div class="detail">
-                                        <strong>ID сертификата</strong>
-                                        <p>EMP-${Date.now().toString().slice(-8)}</p>
+                                    <div style="text-align: left;">
+                                        <strong style="color: #2c3e50;">ID сертификата</strong>
+                                        <p style="color: #7f8c8d; margin-top: 5px;">EMP-${Date.now().toString().slice(-8)}</p>
                                     </div>
                                 </div>
                                 
-                                <div style="margin: 30px 0; text-align: center; padding: 20px; background: #f8f9fa; border-radius: 10px;">
+                                <div style="margin: 30px 0; padding: 20px; background: #f8f9fa; border-radius: 10px;">
                                     <h4 style="color: #2c3e50; margin-bottom: 15px;">Пройденные модули:</h4>
                                     <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;">
                                         ${courseData.modules.map(module => `
-                                            <span style="background: #e8f4fc; color: #2c3e50; padding: 5px 10px; border-radius: 15px; font-size: 0.9rem;">
+                                            <span style="background: #e8f4fc; color: #2c3e50; padding: 8px 15px; border-radius: 20px; font-size: 0.9rem;">
                                                 ${module.title.split('.')[1]}
                                             </span>
                                         `).join('')}
@@ -2608,16 +3075,22 @@ function showCertificate() {
                                 </div>
                             </div>
                             
-                            <div class="certificate-footer">
-                                <div class="signature">
-                                    <div class="signature-line"></div>
-                                    <p>Директор курса</p>
-                                    <p>Д-р псих. наук</p>
+                            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 40px; padding-top: 20px; border-top: 2px solid #eee;">
+                                <div style="text-align: left;">
+                                    <div style="width: 200px; height: 1px; background: #333; margin-bottom: 5px;"></div>
+                                    <p style="color: #7f8c8d; font-size: 0.9rem; margin: 0;">Директор курса</p>
+                                    <p style="color: #7f8c8d; font-size: 0.9rem; margin: 0;">Д-р псих. наук</p>
                                 </div>
                                 
-                                <div class="logo-cert">
-                                    <i class="fas fa-heart"></i>
-                                    <span>Курс Эмпатии</span>
+                                <div style="text-align: center;">
+                                    <div style="display: flex; align-items: center; gap: 10px; color: #e74c3c; font-weight: bold;">
+                                        <i class="fas fa-heart"></i>
+                                        <span>Курс Эмпатии</span>
+                                    </div>
+                                </div>
+                                
+                                <div style="text-align: right;">
+                                    <div style="width: 150px; height: 100px; background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text x="50" y="50" font-family="Arial" font-size="10" fill="%23999" text-anchor="middle">Печать</text></svg>') no-repeat center; opacity: 0.3;"></div>
                                 </div>
                             </div>
                         </div>
@@ -2625,44 +3098,39 @@ function showCertificate() {
                 </div>
             </div>
             
-            <div class="certificate-actions">
-                <button class="btn-primary" onclick="printCertificate()">
+            <div style="padding: 20px; border-top: 1px solid rgba(255,255,255,0.1); text-align: center;">
+                <button class="btn-primary" onclick="printCertificate()" style="margin-right: 10px;">
                     <i class="fas fa-print"></i> Распечатать
                 </button>
                 <button class="btn-secondary" onclick="saveCertificateAsImage()">
                     <i class="fas fa-download"></i> Сохранить
                 </button>
-                <button class="btn-secondary" onclick="shareCertificate()">
-                    <i class="fas fa-share-alt"></i> Поделиться
-                </button>
+                ${navigator.share ? `
+                    <button class="btn-secondary" onclick="shareCertificate()" style="margin-left: 10px;">
+                        <i class="fas fa-share-alt"></i> Поделиться
+                    </button>
+                ` : ''}
             </div>
             
-            <div class="certificate-note">
-                <p><i class="fas fa-info-circle"></i> Сертификат можно проверить по ID: EMP-${Date.now().toString().slice(-8)}</p>
+            <div style="padding: 15px; text-align: center; border-top: 1px solid rgba(255,255,255,0.1);">
+                <p style="color: var(--gray-text); font-size: 0.9rem;">
+                    <i class="fas fa-info-circle"></i> Сертификат можно проверить по ID: EMP-${Date.now().toString().slice(-8)}
+                </p>
             </div>
         </div>
     `;
     
     document.body.appendChild(certificateModal);
-    
-    document.getElementById('closeCertificateBtn').onclick = () => {
-        document.body.removeChild(certificateModal);
-    };
-    
-    certificateModal.onclick = (e) => {
-        if (e.target === certificateModal) {
-            document.body.removeChild(certificateModal);
-        }
-    };
 }
 
 function printCertificate() {
     const certificateElement = document.querySelector('.certificate');
     if (certificateElement) {
         const originalContent = document.body.innerHTML;
-        const certificateContent = certificateElement.innerHTML;
+        const certificateContent = certificateElement.outerHTML;
         
         document.body.innerHTML = `
+            <!DOCTYPE html>
             <html>
                 <head>
                     <title>Сертификат - ${userProgress.userName}</title>
@@ -2674,9 +3142,17 @@ function printCertificate() {
                                 color: black !important;
                                 border: 20px solid #f8d7da !important;
                                 box-shadow: none !important;
+                                max-width: 800px;
+                                margin: 0 auto;
                             }
                             .certificate-actions { display: none !important; }
                             .certificate-note { display: none !important; }
+                        }
+                        body { 
+                            font-family: 'Times New Roman', Times, serif;
+                            margin: 0;
+                            padding: 40px;
+                            background: #f5f5f5;
                         }
                         .certificate { 
                             background: linear-gradient(135deg, #fff9e6 0%, #fff 100%);
@@ -2686,21 +3162,35 @@ function printCertificate() {
                             color: #333333;
                             max-width: 800px;
                             margin: 0 auto;
+                            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
                         }
                         .certificate-border {
                             border: 2px solid #e74c3c;
                             padding: 30px;
                             position: relative;
                         }
+                        .certificate-name {
+                            font-size: 2.5rem;
+                            font-weight: bold;
+                            color: #2c3e50;
+                            text-align: center;
+                            margin: 20px 0;
+                            padding: 10px;
+                        }
+                        h1, h2, h3, h4 {
+                            color: #2c3e50;
+                        }
                     </style>
                 </head>
                 <body>
-                    <div class="certificate">${certificateContent}</div>
+                    ${certificateContent}
                     <script>
-                        window.print();
-                        setTimeout(() => {
-                            window.location.reload();
-                        }, 1000);
+                        window.onload = function() {
+                            window.print();
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1000);
+                        };
                     <\/script>
                 </body>
             </html>
@@ -2711,24 +3201,28 @@ function printCertificate() {
 }
 
 function saveCertificateAsImage() {
-    alert('Для сохранения сертификата как изображения:\n1. Нажмите "Распечатать"\n2. В диалоге печати выберите "Сохранить как PDF"\n3. Или сделайте скриншот сертификата');
+    alert('Для сохранения сертификата как изображения:\n\n1. Нажмите "Распечатать"\n2. В диалоге печати выберите "Сохранить как PDF"\n\nИли сделайте скриншот сертификата (Ctrl+Shift+S в Windows/Linux, Cmd+Shift+4 в Mac)');
 }
 
 function shareCertificate() {
     if (navigator.share) {
         navigator.share({
-            title: 'Мой сертификат по курсу эмпатии',
-            text: `Я завершил(а) курс "Эмпатия и поддержка в общении" с оценкой ${userProgress.finalExamGrade}!`,
+            title: `Мой сертификат по курсу эмпатии - ${userProgress.userName}`,
+            text: `Я завершил(а) курс "Эмпатия и поддержка в общении" с результатом ${userProgress.finalExamScore} баллов!`,
             url: window.location.href
         });
     } else {
-        const shareText = `Я завершил(а) курс "Эмпатия и поддержка в общении"! Результат: ${userProgress.finalExamScore} баллов, оценка: ${userProgress.finalExamGrade}.`;
-        prompt('Скопируйте эту ссылку, чтобы поделиться:', shareText);
+        const shareText = `Я завершил(а) курс "Эмпатия и поддержка в общении"!\nРезультат: ${userProgress.finalExamScore} баллов, оценка: ${userProgress.finalExamGrade}.\n\nID сертификата: EMP-${Date.now().toString().slice(-8)}`;
+        navigator.clipboard.writeText(shareText).then(() => {
+            showMessage('success', 'Текст сертификата скопирован в буфер обмена!');
+        }).catch(() => {
+            prompt('Скопируйте текст для публикации:', shareText);
+        });
     }
 }
 
 function resetProgress() {
-    if (confirm("Вы уверены, что хотите сбросить весь прогресс?\nВсе данные будут удалены, включая результаты тестов и экзамена.")) {
+    if (confirm("Вы уверены, что хотите сбросить весь прогресс?\n\nЭто действие удалит:\n• Все завершенные модули\n• Результаты тестов\n• Результат итогового экзамена\n• Все черновики ответов\n\nЭто действие нельзя отменить.")) {
         userProgress = getDefaultProgress();
         
         courseData.modules.forEach(module => {
@@ -2736,68 +3230,28 @@ function resetProgress() {
         });
         
         localStorage.removeItem('empathyCourseProgress');
+        localStorage.removeItem('guestAnswerDrafts');
+        
+        if (isAuthenticated && currentUserId) {
+            // Очищаем черновики в базе данных
+            supabase.from('answer_drafts').delete().eq('user_id', currentUserId);
+            // Сбрасываем прогресс в базе данных
+            supabase.from('users').update({
+                current_module: 1,
+                current_submodule: '1.1',
+                course_progress: {
+                    completedModules: [],
+                    completedSubmodules: [],
+                    testResults: {},
+                    assignmentResults: {},
+                    finalExamCompleted: false,
+                    finalExamScore: 0
+                }
+            }).eq('id', currentUserId);
+        }
+        
         location.reload();
     }
-}
-
-function updateUserUI(user) {
-    const userNameElements = document.querySelectorAll('#userName');
-    userNameElements.forEach(el => {
-        if (el) {
-            el.textContent = user?.user_metadata?.full_name || user?.email || "Гость";
-        }
-    });
-    
-    const authButtons = document.getElementById('authButtons');
-    if (authButtons) {
-        if (isAuthenticated) {
-            authButtons.innerHTML = `
-                <button class="btn-secondary" onclick="handleLogout()">
-                    <i class="fas fa-sign-out-alt"></i> Выйти
-                </button>
-            `;
-        } else {
-            authButtons.innerHTML = `
-                <button class="btn-primary" onclick="showAuthModal()">
-                    <i class="fas fa-sign-in-alt"></i> Войти
-                </button>
-            `;
-        }
-    }
-}
-
-function showMessage(type, text) {
-    const existingMessages = document.querySelectorAll('.system-message');
-    existingMessages.forEach(msg => msg.remove());
-    
-    const message = document.createElement('div');
-    message.className = `system-message ${type}`;
-    message.innerHTML = `
-        <div style="padding: 15px 20px; border-radius: 8px; margin: 10px; display: flex; align-items: center; gap: 10px;">
-            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
-            <span>${text}</span>
-        </div>
-    `;
-    
-    message.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        z-index: 10000;
-        background: ${type === 'success' ? 'rgba(46, 204, 113, 0.9)' : 'rgba(231, 76, 60, 0.9)'};
-        color: white;
-        border-left: 4px solid ${type === 'success' ? '#27ae60' : '#c0392b'};
-        animation: slideInRight 0.3s ease;
-    `;
-    
-    document.body.appendChild(message);
-    
-    setTimeout(() => {
-        if (message.parentNode) {
-            message.style.animation = 'slideOutRight 0.3s ease';
-            setTimeout(() => message.remove(), 300);
-        }
-    }, 5000);
 }
 
 function setupEventListeners() {
@@ -2815,6 +3269,8 @@ function setupEventListeners() {
         if (isAuthenticated) {
             await saveProgress();
             await saveUIState();
+        } else {
+            localStorage.setItem('empathyCourseProgress', JSON.stringify(userProgress));
         }
     });
     
@@ -2851,5 +3307,6 @@ window.handleLogin = handleLogin;
 window.handleRegister = handleRegister;
 window.continueAsGuest = continueAsGuest;
 window.handleLogout = handleLogout;
+window.showProfile = showProfile;
 
 console.log("✅ Курс эмпатии загружен!");
