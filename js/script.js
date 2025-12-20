@@ -1,26 +1,25 @@
-// ========== КОНФИГУРАЦИЯ SUPABASE (ИСПРАВЛЕННАЯ) ==========
-
-// Проверяем, объявлена ли уже переменная supabase
+// ========== КОНФИГУРАЦИЯ SUPABASE ==========
 if (typeof supabase === 'undefined') {
-    var supabase; 
+    var supabase = null; 
 }
 
 const SUPABASE_CONFIG = {
-    // Теперь берем данные из глобального объекта window.ENV, который мы создали в index.html
     url: window.ENV?.SUPABASE_URL,
     anonKey: window.ENV?.SUPABASE_ANON_KEY
 };
 
 console.log('🔧 Конфигурация Supabase:', SUPABASE_CONFIG.url ? 'Найдена' : 'Не найдена');
 
-// Инициализируем Supabase клиент
 function initSupabase() {
     try {
-        // Проверяем наличие конфигурации и самой библиотеки Supabase
-        // Библиотека загружается в index.html через <script src="...supabase-js@2"></script>
-        if (!supabase && window.supabase && SUPABASE_CONFIG.url && SUPABASE_CONFIG.anonKey) {
-            
-            supabase = window.supabase.createClient(
+        // Если уже инициализировано, выходим
+        if (supabase) return true;
+
+        // Ищем библиотеку (она может называться supabase или supabasejs)
+        const lib = window.supabase || window.supabasejs;
+
+        if (lib && SUPABASE_CONFIG.url && SUPABASE_CONFIG.anonKey) {
+            supabase = lib.createClient(
                 SUPABASE_CONFIG.url,
                 SUPABASE_CONFIG.anonKey,
                 {
@@ -31,25 +30,20 @@ function initSupabase() {
                     }
                 }
             );
-            console.log('✅ Supabase успешно инициализирован через window.ENV');
+            console.log('✅ Supabase успешно инициализирован!');
             return true;
         }
         
-        if (!SUPABASE_CONFIG.url || !SUPABASE_CONFIG.anonKey) {
-            console.warn('⚠️ Ошибка: Данные в window.ENV не найдены. Проверьте index.html');
-        }
-        
-        console.warn('⚠️ Supabase не инициализирован. Работа в гостевом режиме.');
+        console.warn('⚠️ Supabase не инициализирован: либо библиотека не загружена, либо нет ключей.');
         return false;
     } catch (error) {
-        console.error('❌ Критическая ошибка инициализации Supabase:', error);
+        console.error('❌ Ошибка в initSupabase:', error);
         return false;
     }
 }
 
-// Запускаем инициализацию сразу при загрузке скрипта
+// Пытаемся инициализировать немедленно
 initSupabase();
-
 // ========== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ==========
 let userProgress = {
     currentModule: 1,
