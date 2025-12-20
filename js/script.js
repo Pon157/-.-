@@ -1006,30 +1006,29 @@ async function handleLogin() {
 }
 
 async function handleRegister() {
-    // 1. Попытка инициализации
+    // 1. Пробуем инициализировать Supabase, если он еще не готов
     if (!supabase) {
         initSupabase();
     }
 
-    // 2. Проверка объекта (внутри функции!)
     if (!supabase) {
         showMessage('error', 'Ошибка подключения. Обновите страницу.');
-        return; // Теперь этот return легален, он внутри функции
-    }
-
-    const nameElement = document.getElementById('registerName');
-    const emailElement = document.getElementById('registerEmail');
-    const passwordElement = document.getElementById('registerPassword');
-
-    // Проверка на существование самих элементов (чтобы не было ошибки .value)
-    if (!nameElement || !emailElement || !passwordElement) {
-        console.error("Поля формы не найдены в HTML!");
         return;
     }
 
-    const name = nameElement.value.trim();
-    const email = emailElement.value.trim();
-    const password = passwordElement.value;
+    // 2. Получаем данные из полей
+    const nameField = document.getElementById('registerName');
+    const emailField = document.getElementById('registerEmail');
+    const passField = document.getElementById('registerPassword');
+
+    if (!nameField || !emailField || !passField) {
+        console.error("Поля формы не найдены! Проверьте ID в HTML.");
+        return;
+    }
+
+    const name = nameField.value.trim();
+    const email = emailField.value.trim();
+    const password = passField.value;
     
     if (!name || !email || !password) {
         showMessage('error', 'Заполните все поля');
@@ -1041,6 +1040,7 @@ async function handleRegister() {
         return;
     }
 
+    // 3. Сама логика регистрации
     try {
         const { data, error } = await supabase.auth.signUp({
             email: email,
@@ -1051,24 +1051,18 @@ async function handleRegister() {
         });
 
         if (error) throw error;
-        showMessage('success', 'Регистрация успешна!');
-    } catch (error) {
-        showMessage('error', error.message);
-    }
-} // <--- КОНЕЦ ФУНКЦИИ (только одна закрывающая скобка в самом конце)
-
-        if (error) throw error;
 
         showMessage('success', 'Регистрация успешна! Проверьте почту или войдите.');
         
-        // Опционально: закрываем модалку через пару секунд
-        setTimeout(() => closeAuthModal(), 2000);
+        setTimeout(() => {
+            if (typeof closeAuthModal === 'function') closeAuthModal();
+        }, 2000);
 
     } catch (error) {
         console.error('Ошибка регистрации:', error.message);
         showMessage('error', 'Ошибка: ' + error.message);
     }
-}
+} // <--- ВОТ ТЕПЕРЬ ЭТО ЕДИНСТВЕННЫЙ ФИНАЛ ФУНКЦИИ
     // Проверка формата email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
