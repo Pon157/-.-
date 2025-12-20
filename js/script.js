@@ -1006,21 +1006,30 @@ async function handleLogin() {
 }
 
 async function handleRegister() {
-    // 1. Сначала проверяем и пытаемся оживить Supabase
+    // 1. Попытка инициализации
     if (!supabase) {
-        initSupabase(); // Пробуем инициализировать еще раз
+        initSupabase();
     }
 
-    // 2. Если всё равно не удалось — выводим ошибку вместо того чтобы "падать"
+    // 2. Проверка объекта (внутри функции!)
     if (!supabase) {
-        showMessage('error', 'Ошибка подключения к базе. Перезагрузите страницу.');
-        console.error('Критическая ошибка: объект supabase не создан.');
+        showMessage('error', 'Ошибка подключения. Обновите страницу.');
+        return; // Теперь этот return легален, он внутри функции
+    }
+
+    const nameElement = document.getElementById('registerName');
+    const emailElement = document.getElementById('registerEmail');
+    const passwordElement = document.getElementById('registerPassword');
+
+    // Проверка на существование самих элементов (чтобы не было ошибки .value)
+    if (!nameElement || !emailElement || !passwordElement) {
+        console.error("Поля формы не найдены в HTML!");
         return;
     }
 
-    const name = document.getElementById('registerName').value.trim();
-    const email = document.getElementById('registerEmail').value.trim();
-    const password = document.getElementById('registerPassword').value;
+    const name = nameElement.value.trim();
+    const email = emailElement.value.trim();
+    const password = passwordElement.value;
     
     if (!name || !email || !password) {
         showMessage('error', 'Заполните все поля');
@@ -1033,19 +1042,20 @@ async function handleRegister() {
     }
 
     try {
-        // Показываем пользователю, что процесс пошел
-        showMessage('info', 'Регистрация...');
-
-        // 3. Выполняем регистрацию через Supabase
         const { data, error } = await supabase.auth.signUp({
             email: email,
             password: password,
             options: {
-                data: {
-                    full_name: name
-                }
+                data: { full_name: name }
             }
         });
+
+        if (error) throw error;
+        showMessage('success', 'Регистрация успешна!');
+    } catch (error) {
+        showMessage('error', error.message);
+    }
+} 
 
         if (error) throw error;
 
