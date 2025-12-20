@@ -1,25 +1,29 @@
-// ========== КОНФИГУРАЦИЯ SUPABASE ==========
-// Если переменная supabase уже объявлена (например в data.js), используем её
-// Если нет - объявляем здесь
+// ========== КОНФИГУРАЦИЯ SUPABASE (VITE VERSION) ==========
 
 // Проверяем, объявлена ли уже переменная supabase
 if (typeof supabase === 'undefined') {
-    var supabase; // Объявляем только если не существует
+    var supabase; 
 }
 
 const SUPABASE_CONFIG = {
-    // Получаем конфигурацию только из window.ENV (для браузера)
-    url: window.ENV?.SUPABASE_URL,
-    anonKey: window.ENV?.SUPABASE_ANON_KEY
+    // Vite использует import.meta.env для доступа к переменным
+    // Убедитесь, что в .env файле ключи называются VITE_SUPABASE_URL и VITE_SUPABASE_ANON_KEY
+    url: import.meta.env.VITE_SUPABASE_URL,
+    anonKey: import.meta.env.VITE_SUPABASE_ANON_KEY
 };
 
 console.log('🔧 Конфигурация Supabase:', SUPABASE_CONFIG.url ? 'Найдена' : 'Не найдена');
 
-// Инициализируем Supabase клиент если есть конфигурация
+// Инициализируем Supabase клиент
 function initSupabase() {
     try {
-        if (!supabase && window.supabase && SUPABASE_CONFIG.url && SUPABASE_CONFIG.anonKey) {
-            supabase = window.supabase.createClient(
+        // Проверяем наличие конфигурации и наличие самой библиотеки в window
+        if (!supabase && (window.supabase || typeof supabasejs !== 'undefined') && SUPABASE_CONFIG.url && SUPABASE_CONFIG.anonKey) {
+            
+            // Библиотека может быть доступна как window.supabase или window.supabasejs
+            const clientCreator = window.supabase || window.supabasejs;
+
+            supabase = clientCreator.createClient(
                 SUPABASE_CONFIG.url,
                 SUPABASE_CONFIG.anonKey,
                 {
@@ -30,16 +34,24 @@ function initSupabase() {
                     }
                 }
             );
-            console.log('✅ Supabase инициализирован');
+            console.log('✅ Supabase успешно инициализирован через Vite ENV');
             return true;
         }
+        
+        if (!SUPABASE_CONFIG.url || !SUPABASE_CONFIG.anonKey) {
+            console.warn('⚠️ Ошибка: Переменные VITE_SUPABASE_URL или VITE_SUPABASE_ANON_KEY не определены.');
+        }
+        
         console.warn('⚠️ Supabase не инициализирован. Работа в гостевом режиме.');
         return false;
     } catch (error) {
-        console.error('❌ Ошибка инициализации Supabase:', error);
+        console.error('❌ Критическая ошибка инициализации Supabase:', error);
         return false;
     }
 }
+
+// Не забудьте вызвать функцию инициализации
+initSupabase();
 
 // ========== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ==========
 let userProgress = {
