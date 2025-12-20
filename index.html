@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Курс: Эмпатия и поддержка в общении</title>
     
-    <!-- ИКОНКА САЙТА -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💙</text></svg>">
     
     <style>
@@ -33,7 +32,6 @@
     
     <link rel="stylesheet" href="css/style.css">
     
-    <!-- Supabase библиотека -->
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 </head>
 <body data-theme="dark">
@@ -108,7 +106,6 @@
                         </div>
 
                         <div class="tabs" id="moduleTabs"></div>
-
                         <div class="content-display" id="contentDisplay"></div>
 
                         <div class="test-area" id="testArea" style="display: none;">
@@ -178,34 +175,11 @@
                         <div class="checking-criteria">
                             <div class="criterion">
                                 <i class="fas fa-search"></i>
-                                <div>
-                                    <strong>Ключевые слова</strong>
-                                    <p>Ищет важные термины и понятия из теории</p>
-                                </div>
+                                <div><strong>Ключевые слова</strong><p>Ищет важные термины и понятия из теории</p></div>
                             </div>
-                            
                             <div class="criterion">
                                 <i class="fas fa-brain"></i>
-                                <div>
-                                    <strong>Смысловой анализ</strong>
-                                    <p>Определяет, соответствует ли ответ теме</p>
-                                </div>
-                            </div>
-                            
-                            <div class="criterion">
-                                <i class="fas fa-ruler"></i>
-                                <div>
-                                    <strong>Объем и качество</strong>
-                                    <p>Оценивает полноту и детализацию ответа</p>
-                                </div>
-                            </div>
-                            
-                            <div class="criterion">
-                                <i class="fas fa-check-double"></i>
-                                <div>
-                                    <strong>Проверка на ошибки</strong>
-                                    <p>Выявляет распространенные заблуждения</p>
-                                </div>
+                                <div><strong>Смысловой анализ</strong><p>Определяет, соответствует ли ответ теме</p></div>
                             </div>
                         </div>
                         
@@ -213,18 +187,9 @@
                             <h5><i class="fas fa-lightbulb"></i> Советы для успешной проверки:</h5>
                             <ul style="margin: 10px 0 0 20px;">
                                 <li>Используйте термины из теории урока</li>
-                                <li>Отвечайте развернуто, не одним предложением</li>
-                                <li>Приводите примеры из жизни</li>
-                                <li>Сравнивайте разные понятия (если требуется)</li>
-                                <li>Не копируйте ответы из интернета</li>
+                                <li>Отвечайте развернуто</li>
                             </ul>
                         </div>
-                        
-                        <p style="margin-top: 20px; font-size: 0.9em; color: #888;">
-                            <i class="fas fa-shield-alt"></i> 
-                            <strong>Примечание:</strong> Система совершенствуется. Если вы считаете оценку несправедливой, 
-                            попробуйте дополнить ответ или обратитесь к теории.
-                        </p>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -233,6 +198,13 @@
             </div>
         </div>
     </div>
+
+    <script>
+        window.ENV = {
+            SUPABASE_URL: "https://homxdvtanuqxmdayvmib.supabase.co",
+            SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhvbXhkdnRhbnVxeG1kYXl2bWliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzM3NDE3NzcsImV4cCI6MjA0OTMxNzc3N30.Jlk-w3iBdQlgTzL_fApzvxZ0R2J6Ot8lQ9GwM9rL3kk"
+        };
+    </script>
 
     <script src="js/data.js"></script>
     <script src="js/script.js"></script>
