@@ -1030,6 +1030,7 @@ async function handleRegister() {
     const email = emailField.value.trim();
     const password = passField.value;
     
+    // 3. Валидация
     if (!name || !email || !password) {
         showMessage('error', 'Заполните все поля');
         return;
@@ -1040,59 +1041,27 @@ async function handleRegister() {
         return;
     }
 
-    // 3. Сама логика регистрации
-    try {
-        const { data, error } = await supabase.auth.signUp({
-            email: email,
-            password: password,
-            options: {
-                data: { full_name: name }
-            }
-        });
-
-        if (error) throw error;
-
-        showMessage('success', 'Регистрация успешна! Проверьте почту или войдите.');
-        
-        setTimeout(() => {
-            if (typeof closeAuthModal === 'function') closeAuthModal();
-        }, 2000);
-
-    } catch (error) {
-        console.error('Ошибка регистрации:', error.message);
-        showMessage('error', 'Ошибка: ' + error.message);
-    }
-} // <--- ВОТ ТЕПЕРЬ ЭТО ЕДИНСТВЕННЫЙ ФИНАЛ ФУНКЦИИ
-    // Проверка формата email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
         showMessage('error', 'Введите корректный email');
         return;
     }
-    
-    // Проверяем наличие Supabase
-    if (!supabase) {
-        showMessage('error', '❌ Supabase не настроен. Настройте ключи в js/data.js');
-        console.error('❌ Supabase не инициализирован. Проверьте конфигурацию в js/data.js');
-        return;
-    }
-    
+
+    // 4. Логика регистрации
     try {
         showMessage('info', '⏳ Регистрация...');
         
+        // Регистрация в Auth
         const { data: authData, error: authError } = await supabase.auth.signUp({
             email,
             password,
             options: {
-                data: {
-                    full_name: name
-                },
+                data: { full_name: name },
                 emailRedirectTo: window.location.origin
             }
         });
         
         if (authError) {
-            // Проверка на уже существующий email
             if (authError.message.includes('already registered')) {
                 throw new Error('Этот email уже зарегистрирован. Попробуйте войти.');
             }
@@ -1102,7 +1071,7 @@ async function handleRegister() {
         if (authData.user) {
             console.log('✅ Пользователь создан в Auth:', authData.user.id);
             
-            // Создаем запись пользователя в таблице users
+            // Создаем запись в таблице users
             const { error: userError } = await supabase
                 .from('users')
                 .insert([
@@ -1110,7 +1079,6 @@ async function handleRegister() {
                         id: authData.user.id,
                         email: email,
                         name: name,
-                        telegram_id: null,
                         current_module: 1,
                         current_submodule: '1.1',
                         course_progress: {
@@ -1121,88 +1089,36 @@ async function handleRegister() {
                             finalExamCompleted: false,
                             finalExamScore: 0
                         },
-                        created_at: new Date().toISOString(),
-                        last_active: new Date().toISOString()
+                        created_at: new Date().toISOString()
                     }
                 ]);
             
-            if (userError && userError.code !== '23505') { // 23505 = duplicate key
-                console.error('Ошибка создания пользователя:', userError);
-                throw userError;
+            if (userError && userError.code !== '23505') {
+                console.error('Ошибка создания записи в users:', userError);
             }
             
-            console.log('✅ Запись пользователя создана');
-            
-            // Добавляем пользователя в allowed_users для доступа к боту
-            try {
-                const { error: allowedError } = await supabase
-                    .from('allowed_users')
-                    .insert([
-                        {
-                            telegram_id: null,
-                            user_id: authData.user.id,
-                            added_by: null,
-                            added_at: new Date().toISOString()
-                        }
-                    ]);
-                
-                if (allowedError && allowedError.code !== '23505') {
-                    console.warn('Ошибка добавления в allowed_users:', allowedError);
-                }
-            } catch (err) {
-                console.warn('Не удалось добавить в allowed_users:', err);
-            }
+            // Добавляем в allowed_users
+            await supabase.from('allowed_users').insert([
+                { user_id: authData.user.id, added_at: new Date().toISOString() }
+            ]).catch(err => console.warn('Ошибка allowed_users:', err));
         }
         
-        document.getElementById('modalOverlay').style.display = 'none';
-        
-        // Проверяем нужно ли подтверждение email
+        // Финал
         if (authData.user && !authData.user.confirmed_at) {
-            showMessage('success', '✅ Регистрация успешна! Проверьте почту и подтвердите email.');
+            showMessage('success', '✅ Регистрация успешна! Проверьте почту для подтверждения.');
         } else {
             showMessage('success', '✅ Регистрация успешна! Входим...');
             setTimeout(() => location.reload(), 1500);
         }
         
+        if (document.getElementById('modalOverlay')) {
+            document.getElementById('modalOverlay').style.display = 'none';
+        }
+
     } catch (error) {
         console.error('❌ Ошибка регистрации:', error);
-        showMessage('error', error.message || 'Ошибка регистрации. Попробуйте еще раз.');
+        showMessage('error', error.message || 'Ошибка регистрации.');
     }
-}
-
-function continueAsGuest() {
-    document.getElementById('modalOverlay').style.display = 'none';
-    showWelcomeScreen();
-}
-
-async function handleLogout() {
-    try {
-        const { error } = await supabase.auth.signOut();
-        if (error) throw error;
-        
-        showMessage('success', 'Вы вышли');
-        location.reload();
-        
-    } catch (error) {
-        console.error('Ошибка выхода:', error);
-        showMessage('error', 'Ошибка выхода');
-    }
-}
-
-function showAuthTab(tabName) {
-    document.querySelectorAll('.auth-tab').forEach(tab => {
-        tab.classList.remove('active');
-        tab.style.borderBottom = 'none';
-    });
-    
-    const activeTab = document.querySelector(`.auth-tab[onclick*="${tabName}"]`);
-    if (activeTab) {
-        activeTab.classList.add('active');
-        activeTab.style.borderBottom = '2px solid #3498db';
-    }
-    
-    document.getElementById('loginTab').style.display = tabName === 'login' ? 'block' : 'none';
-    document.getElementById('registerTab').style.display = tabName === 'register' ? 'block' : 'none';
 }
 
 // ========== ОСНОВНЫЕ ФУНКЦИИ КУРСА ==========
