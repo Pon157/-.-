@@ -1006,6 +1006,18 @@ async function handleLogin() {
 }
 
 async function handleRegister() {
+    // 1. Сначала проверяем и пытаемся оживить Supabase
+    if (!supabase) {
+        initSupabase(); // Пробуем инициализировать еще раз
+    }
+
+    // 2. Если всё равно не удалось — выводим ошибку вместо того чтобы "падать"
+    if (!supabase) {
+        showMessage('error', 'Ошибка подключения к базе. Перезагрузите страницу.');
+        console.error('Критическая ошибка: объект supabase не создан.');
+        return;
+    }
+
     const name = document.getElementById('registerName').value.trim();
     const email = document.getElementById('registerEmail').value.trim();
     const password = document.getElementById('registerPassword').value;
@@ -1019,7 +1031,34 @@ async function handleRegister() {
         showMessage('error', 'Пароль минимум 6 символов');
         return;
     }
-    
+
+    try {
+        // Показываем пользователю, что процесс пошел
+        showMessage('info', 'Регистрация...');
+
+        // 3. Выполняем регистрацию через Supabase
+        const { data, error } = await supabase.auth.signUp({
+            email: email,
+            password: password,
+            options: {
+                data: {
+                    full_name: name
+                }
+            }
+        });
+
+        if (error) throw error;
+
+        showMessage('success', 'Регистрация успешна! Проверьте почту или войдите.');
+        
+        // Опционально: закрываем модалку через пару секунд
+        setTimeout(() => closeAuthModal(), 2000);
+
+    } catch (error) {
+        console.error('Ошибка регистрации:', error.message);
+        showMessage('error', 'Ошибка: ' + error.message);
+    }
+}
     // Проверка формата email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
