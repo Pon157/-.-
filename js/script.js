@@ -234,10 +234,15 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 async function initApp() {
     try {
-        // Сначала инициализируем Supabase
+        console.log('🚀 Курс эмпатии загружается...');
+        
+        // 1. Сначала ПРИНУДИТЕЛЬНО пробуем инициализировать Supabase
+        // Это важно, если скрипт в начале файла не сработал
         const supabaseInitialized = initSupabase();
         
-        if (supabase && supabaseInitialized) {
+        // 2. Проверяем, существует ли объект supabase вообще
+        // Добавляем проверку window.supabase на случай задержки загрузки
+        if (supabase && (window.supabase || window.supabasejs) && supabaseInitialized) {
             console.log('🔄 Проверка сессии...');
             
             const { data: { session }, error: sessionError } = await supabase.auth.getSession();
@@ -257,9 +262,8 @@ async function initApp() {
                         return;
                     }
                     
-                    // Если обновление успешно, продолжаем с новой сессией
                     console.log("✅ Сессия обновлена");
-                    return initApp(); // Рекурсивно вызываем еще раз
+                    return initApp(); // Перезапуск после обновления
                     
                 } catch (refreshError) {
                     console.error("❌ Ошибка обновления сессии:", refreshError);
@@ -307,7 +311,8 @@ async function initApp() {
                 showWelcomeScreen();
             }
         } else {
-            console.log("🔄 Работа в гостевом режиме (Supabase не настроен)");
+            // Если supabase не определен (null/undefined)
+            console.log("🔄 Работа в гостевом режиме (Supabase не доступен)");
             await loadGuestProgress();
             renderModulesList();
             showWelcomeScreen();
@@ -315,9 +320,11 @@ async function initApp() {
         
     } catch (error) {
         console.error("❌ Критическая ошибка инициализации:", error);
-        await loadGuestProgress();
-        renderModulesList();
-        showWelcomeScreen();
+        // Даже при ошибке даем пользователю пользоваться сайтом как гость
+        if (typeof loadGuestProgress === 'function') await loadGuestProgress();
+        if (typeof renderModulesList === 'function') renderModulesList();
+        if (typeof showWelcomeScreen === 'function') showWelcomeScreen();
+        
         showMessage('error', 'Ошибка инициализации приложения');
     }
 }
@@ -1121,6 +1128,21 @@ async function handleRegister() {
     }
 }
 
+function showAuthTab(tabName) {
+    document.querySelectorAll('.auth-tab').forEach(tab => {
+        tab.classList.remove('active');
+        tab.style.borderBottom = 'none';
+    });
+    
+    const activeTab = document.querySelector(`.auth-tab[onclick*="${tabName}"]`);
+    if (activeTab) {
+        activeTab.classList.add('active');
+        activeTab.style.borderBottom = '2px solid #3498db';
+    }
+    
+    document.getElementById('loginTab').style.display = tabName === 'login' ? 'block' : 'none';
+    document.getElementById('registerTab').style.display = tabName === 'register' ? 'block' : 'none';
+}
 // ========== ОСНОВНЫЕ ФУНКЦИИ КУРСА ==========
 
 function getDefaultProgress() {
