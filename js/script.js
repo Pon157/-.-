@@ -1709,29 +1709,29 @@ async function handleRegister() {
         if (authData.user) {
             console.log('✅ Пользователь создан в Auth:', authData.user.id);
             
-            // Создаем запись пользователя в таблице users
-            const { error: userError } = await supabase
-                .from('users')
-                .insert([
-                    {
-                        id: authData.user.id,
-                        email: email,
-                        name: name,
-                        telegram_id: null,
-                        current_module: 1,
-                        current_submodule: '1.1',
-                        course_progress: {
-                            completedModules: [],
-                            completedSubmodules: [],
-                            testResults: {},
-                            assignmentResults: {},
-                            finalExamCompleted: false,
-                            finalExamScore: 0
-                        },
-                        created_at: new Date().toISOString(),
-                        last_active: new Date().toISOString()
-                    }
-                ]);
+// Создаем запись пользователя в таблице users (ЗАМЕНИТЬ НА course_users)
+const { error: userError } = await supabase
+    .from('course_users')  // ← МЕНЯЕМ users на course_users
+    .insert([
+        {
+            id: authData.user.id,
+            email: email,
+            name: name,
+            telegram_id: null,
+            current_module: 1,
+            current_submodule: '1.1',
+            course_progress: {
+                completedModules: [],
+                completedSubmodules: [],
+                testResults: {},
+                assignmentResults: {},
+                finalExamCompleted: false,
+                finalExamScore: 0
+            },
+            created_at: new Date().toISOString(),
+            last_active: new Date().toISOString()
+        }
+    ]);
             
             if (userError && userError.code !== '23505') { // 23505 = duplicate key
                 console.error('Ошибка создания пользователя:', userError);
