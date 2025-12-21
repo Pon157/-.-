@@ -1,4 +1,7 @@
 // ========== КОНФИГУРАЦИЯ SUPABASE ==========
+// Удаляем лишнее объявление переменной supabase
+// let supabase = null; // УДАЛИТЬ ЭТУ СТРОКУ - переменная уже объявлена в data.js
+
 const SUPABASE_CONFIG = {
     url: window.ENV?.SUPABASE_URL,
     anonKey: window.ENV?.SUPABASE_ANON_KEY
@@ -15,6 +18,17 @@ function initSupabase() {
                 return false;
             }
             
+            // Проверяем, не инициализирован ли уже клиент
+            if (window.supabase && typeof window.supabase === 'object') {
+                // Если supabase уже существует как объект (из data.js), используем его
+                if (window.supabase.auth) {
+                    console.log('✅ Используем существующий Supabase клиент из data.js');
+                    supabase = window.supabase;
+                    return true;
+                }
+            }
+            
+            // Создаем новый клиент
             supabase = window.supabase.createClient(
                 SUPABASE_CONFIG.url,
                 SUPABASE_CONFIG.anonKey,
@@ -38,7 +52,6 @@ function initSupabase() {
 }
 
 // ========== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ==========
-let supabase = null;
 let userProgress = {
     currentModule: 1,
     currentSubmodule: "1.1",
