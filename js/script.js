@@ -1457,28 +1457,35 @@ async function saveProgress() {
     }
 }
 
-async function saveUIState() {
-    if (!isAuthenticated || !currentUserId) return;
-    
+async function loadUIState() {
     try {
-        const { error } = await supabase
-            .from('ui_state')
-            .upsert({
-                user_id: currentUserId,
-                open_tabs: uiState.openTabs,
-                scroll_positions: uiState.scrollPositions,
-                theme: uiState.theme,
-                settings: uiState.settings,
-                updated_at: new Date().toISOString()
-            }, {
-                onConflict: 'user_id'
-            });
+        if (!supabase || !currentUserId) return;
         
-        if (error) throw error;
-        console.log("💾 UI сохранено");
+        const { data, error } = await supabase
+            .from('ui_state')
+            .select('open_tabs, scroll_positions, theme, settings')
+            .eq('user_id', currentUserId)
+            .single();
+        
+        if (error && error.code !== 'PGRST116') {
+            console.error("Ошибка загрузки состояния UI:", error);
+            return;
+        }
+        
+        if (data) {
+            uiState = {
+                openTabs: data.open_tabs || {},
+                scrollPositions: data.scroll_positions || {},
+                theme: data.theme || 'dark',
+                settings: data.settings || uiState.settings
+            };
+            
+            setTheme(uiState.theme);
+            console.log("✅ Состояние UI загружено");
+        }
         
     } catch (error) {
-        console.error("❌ Ошибка сохранения UI:", error);
+        console.error("❌ Ошибка загрузки состояния UI:", error);
     }
 }
 
