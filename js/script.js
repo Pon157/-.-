@@ -1,7 +1,7 @@
 // ========== КОНФИГУРАЦИЯ SUPABASE ==========
 const SUPABASE_CONFIG = {
-    url: window.ENV?.VITE_SUPABASE_URL || import.meta.env?.VITE_SUPABASE_URL,
-    anonKey: window.ENV?.VITE_SUPABASE_ANON_KEY || import.meta.env?.VITE_SUPABASE_ANON_KEY
+    url: window.ENV?.SUPABASE_URL,
+    anonKey: window.ENV?.SUPABASE_ANON_KEY
 };
 
 console.log('🔧 Конфигурация Supabase:', SUPABASE_CONFIG.url ? 'Найдена' : 'Не найдена');
@@ -103,6 +103,7 @@ const enhancedStyles = `
         color: var(--light-text);
         line-height: 1.6;
         min-height: 100vh;
+        transition: var(--transition);
     }
     
     /* Контейнеры */
@@ -137,6 +138,12 @@ const enhancedStyles = `
         box-shadow: 0 5px 20px rgba(52, 152, 219, 0.4);
     }
     
+    .btn-primary:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none !important;
+    }
+    
     .btn-secondary {
         background: rgba(255, 255, 255, 0.1);
         color: var(--light-text);
@@ -161,6 +168,11 @@ const enhancedStyles = `
     .module-card:hover {
         transform: translateY(-5px);
         box-shadow: var(--box-shadow);
+    }
+    
+    .module-card.active {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
     }
     
     /* Цитаты */
@@ -293,6 +305,8 @@ const enhancedStyles = `
         border: 1px solid rgba(255, 255, 255, 0.1);
         cursor: pointer;
         transition: var(--transition);
+        display: flex;
+        align-items: center;
     }
     
     .test-option:hover {
@@ -302,6 +316,16 @@ const enhancedStyles = `
     
     .test-option input[type="radio"] {
         margin-right: 10px;
+    }
+    
+    .option-correct {
+        background: rgba(46, 204, 113, 0.15) !important;
+        border-color: var(--secondary-color) !important;
+    }
+    
+    .option-incorrect {
+        background: rgba(231, 76, 60, 0.15) !important;
+        border-color: var(--danger-color) !important;
     }
     
     /* Статистика */
@@ -440,6 +464,30 @@ const enhancedStyles = `
     }
     
     /* Сертификат */
+    .certificate-modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.95);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        padding: 20px;
+    }
+    
+    .certificate-modal {
+        background: var(--darker-bg);
+        border-radius: var(--border-radius);
+        width: 100%;
+        max-width: 900px;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: var(--box-shadow);
+    }
+    
     .certificate {
         background: linear-gradient(135deg, #fff9e6 0%, #fff 100%);
         border: 20px solid #f8d7da;
@@ -488,6 +536,28 @@ const enhancedStyles = `
         to {
             opacity: 0;
             transform: translateY(20px);
+        }
+    }
+    
+    @keyframes slideInRight {
+        from {
+            opacity: 0;
+            transform: translateX(100px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    
+    @keyframes slideOutRight {
+        from {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        to {
+            opacity: 0;
+            transform: translateX(100px);
         }
     }
     
@@ -541,6 +611,12 @@ const enhancedStyles = `
         .tab {
             flex: 1 0 calc(50% - 10px);
         }
+        
+        .auto-save-indicator {
+            bottom: 10px;
+            right: 10px;
+            left: 10px;
+        }
     }
     
     @media (max-width: 480px) {
@@ -555,6 +631,10 @@ const enhancedStyles = `
         
         .tab {
             flex: 1 0 100%;
+        }
+        
+        .modal {
+            width: 95%;
         }
     }
     
@@ -623,6 +703,148 @@ const enhancedStyles = `
     .badge-warning {
         background: rgba(243, 156, 18, 0.2);
         color: var(--warning-color);
+    }
+    
+    /* Подмодули */
+    .submodule-item {
+        padding: 12px 20px;
+        margin: 5px 0;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+        cursor: pointer;
+        transition: var(--transition);
+        border-left: 3px solid transparent;
+    }
+    
+    .submodule-item:hover {
+        background: rgba(255, 255, 255, 0.08);
+    }
+    
+    .submodule-item.active {
+        background: rgba(52, 152, 219, 0.1);
+        border-left-color: var(--primary-color);
+    }
+    
+    /* Сообщения */
+    .system-message {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 15px 25px;
+        border-radius: 8px;
+        box-shadow: var(--box-shadow);
+        z-index: 10000;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.95rem;
+        animation: slideInRight 0.3s ease;
+        max-width: 400px;
+        border-left: 4px solid;
+    }
+    
+    /* Пользовательское меню */
+    .user-menu {
+        position: relative;
+        display: inline-block;
+    }
+    
+    .user-menu-content {
+        display: none;
+        position: absolute;
+        right: 0;
+        top: 100%;
+        background: var(--darker-bg);
+        min-width: 200px;
+        box-shadow: var(--box-shadow);
+        z-index: 1000;
+        border-radius: var(--border-radius);
+        overflow: hidden;
+        margin-top: 5px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .user-menu:hover .user-menu-content {
+        display: block;
+    }
+    
+    .user-menu-item {
+        display: block;
+        padding: 12px 20px;
+        color: var(--light-text);
+        text-decoration: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        transition: var(--transition);
+        background: none;
+        border: none;
+        width: 100%;
+        text-align: left;
+        cursor: pointer;
+    }
+    
+    .user-menu-item:hover {
+        background: rgba(52, 152, 219, 0.2);
+        color: var(--primary-color);
+    }
+    
+    /* Поля ввода в модалках */
+    input[type="email"],
+    input[type="password"],
+    input[type="text"] {
+        width: 100%;
+        padding: 12px;
+        border-radius: 8px;
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        background: rgba(0, 0, 0, 0.2);
+        color: var(--light-text);
+        font-size: 1rem;
+        transition: var(--transition);
+    }
+    
+    input:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+    }
+    
+    /* Дополнительные классы для контента */
+    .module-heading {
+        color: var(--primary-color);
+        margin: 20px 0 15px 0;
+        border-bottom: 2px solid rgba(52, 152, 219, 0.3);
+        padding-bottom: 10px;
+    }
+    
+    .sub-heading {
+        color: var(--light-text);
+        margin: 15px 0 10px 0;
+    }
+    
+    .text-paragraph {
+        margin: 10px 0;
+        line-height: 1.7;
+    }
+    
+    /* Приветственный экран */
+    .welcome-screen {
+        text-align: center;
+        padding: 40px 20px;
+    }
+    
+    .welcome-icon {
+        width: 100px;
+        height: 100px;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 30px;
+    }
+    
+    .welcome-icon i {
+        font-size: 3rem;
+        color: white;
     }
 </style>
 `;
@@ -922,12 +1144,12 @@ function updateUserUI(user) {
                         <i class="fas fa-user-circle"></i> ${displayName}
                     </button>
                     <div class="user-menu-content">
-                        <a href="#" class="user-menu-item" onclick="event.preventDefault(); showProfile()">
+                        <button class="user-menu-item" onclick="showProfile()">
                             <i class="fas fa-user"></i> Профиль
-                        </a>
-                        <a href="#" class="user-menu-item" onclick="event.preventDefault(); handleLogout()">
+                        </button>
+                        <button class="user-menu-item" onclick="handleLogout()">
                             <i class="fas fa-sign-out-alt"></i> Выйти
-                        </a>
+                        </button>
                     </div>
                 </div>
             `;
@@ -951,7 +1173,7 @@ function showProfile() {
     modalBody.innerHTML = `
         <div style="padding: 20px;">
             <div style="text-align: center; margin-bottom: 20px;">
-                <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #3498db, #2ecc71); 
+                <div style="width: 80px; height: 80px; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); 
                      border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px;">
                     <i class="fas fa-user" style="font-size: 2rem; color: white;"></i>
                 </div>
@@ -970,11 +1192,11 @@ function showProfile() {
                 <div class="module-card">
                     <h4><i class="fas fa-cog"></i> Настройки</h4>
                     <div style="margin-top: 10px;">
-                        <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                        <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px; cursor: pointer;">
                             <input type="checkbox" id="autoSaveToggle" ${uiState.settings.autoSave ? 'checked' : ''} onchange="toggleAutoSave(this.checked)">
                             <span>Автосохранение</span>
                         </label>
-                        <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                        <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px; cursor: pointer;">
                             <input type="checkbox" id="notificationsToggle" ${uiState.settings.notifications ? 'checked' : ''} onchange="toggleNotifications(this.checked)">
                             <span>Уведомления</span>
                         </label>
@@ -1289,22 +1511,9 @@ function showMessage(type, message) {
     }
     
     notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
         background: ${bgColor};
         color: white;
-        padding: 15px 25px;
-        border-radius: 8px;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-        z-index: 10000;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        font-size: 0.95rem;
-        animation: slideInRight 0.3s ease;
-        max-width: 400px;
-        border-left: 4px solid ${bgColor}99;
+        border-left-color: ${bgColor}99;
     `;
     
     notification.innerHTML = `<i class="fas ${icon}"></i><span>${message}</span>`;
@@ -1329,7 +1538,7 @@ function showAuthModal() {
     modalBody.innerHTML = `
         <div style="padding: 20px;">
             <div style="text-align: center; margin-bottom: 20px;">
-                <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #3498db, #2ecc71); 
+                <div style="width: 60px; height: 60px; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); 
                      border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px;">
                     <i class="fas fa-hands-helping" style="font-size: 1.5rem; color: white;"></i>
                 </div>
@@ -2933,9 +3142,8 @@ function showWelcomeScreen() {
     contentDisplay.innerHTML = `
         <div class="welcome-screen">
             <div style="text-align: center; padding: 40px 20px;">
-                <div style="width: 100px; height: 100px; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); 
-                     border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 30px;">
-                    <i class="fas fa-hands-helping" style="font-size: 3rem; color: white;"></i>
+                <div class="welcome-icon">
+                    <i class="fas fa-hands-helping"></i>
                 </div>
                 <h1 style="color: var(--primary-color); margin-bottom: 15px;">Полный курс: «Эмпатия и поддержка в общении»</h1>
                 <p style="font-size: 1.1rem; color: var(--gray-text); max-width: 700px; margin: 0 auto 40px;">
@@ -2982,7 +3190,7 @@ function showWelcomeScreen() {
                         <i class="fas fa-play-circle"></i> Начать обучение
                     </button>
                     <p style="margin-top: 20px; color: var(--gray-text);">
-                        ${isAuthenticated ? '✅ Ваш прогресс сохраняется автоматически' : '👤 Работаете как гость? <a href="#" onclick="showAuthModal()" style="color: var(--primary-color);">Войдите</a>, чтобы сохранять прогресс на всех устройствах.'}
+                        ${isAuthenticated ? '✅ Ваш прогресс сохраняется автоматически' : '👤 Работаете как гость? <a href="#" onclick="showAuthModal()" style="color: var(--primary-color); text-decoration: none; font-weight: bold;">Войдите</a>, чтобы сохранять прогресс на всех устройствах.'}
                     </p>
                 </div>
             </div>
@@ -2997,14 +3205,14 @@ function showCertificate() {
     }
     
     const certificateModal = document.createElement('div');
-    certificateModal.className = 'modal-overlay';
+    certificateModal.className = 'certificate-modal-overlay';
     certificateModal.id = 'certificateModal';
     
     const exam = courseData.finalExam;
     const gradeInfo = userProgress.finalExamGrade ? exam.scoring.gradingScale[userProgress.finalExamGrade] || "Успешно завершено" : "Успешно завершено";
     
     certificateModal.innerHTML = `
-        <div class="modal" style="max-width: 900px;">
+        <div class="certificate-modal">
             <div class="modal-header">
                 <h3 style="margin: 0;">🎓 Ваш сертификат об окончании курса</h3>
                 <button class="btn-secondary" onclick="document.getElementById('certificateModal').remove()" style="padding: 8px 12px;">
@@ -3285,28 +3493,6 @@ function setupEventListeners() {
 }
 
 // ========== ЭКСПОРТ ФУНКЦИЙ ==========
-
-window.checkAssignment = checkAssignment;
-window.checkExtraAssignment = checkExtraAssignment;
-window.openModule = openModule;
-window.resetProgress = resetProgress;
-window.showCertificate = showCertificate;
-window.showWelcomeScreen = showWelcomeScreen;
-window.printCertificate = printCertificate;
-window.saveCertificateAsImage = saveCertificateAsImage;
-window.shareCertificate = shareCertificate;
-window.openFinalExam = openFinalExam;
-window.submitFinalExam = submitFinalExam;
-window.openTest = openTest;
-window.submitTest = submitTest;
-window.showTestInfo = showTestInfo;
-
-window.showAuthModal = showAuthModal;
-window.showAuthTab = showAuthTab;
-window.handleLogin = handleLogin;
-window.handleRegister = handleRegister;
-window.continueAsGuest = continueAsGuest;
-window.handleLogout = handleLogout;
-window.showProfile = showProfile;
+// Все функции уже объявлены как глобальные, поэтому они доступны из HTML
 
 console.log("✅ Курс эмпатии загружен!");
