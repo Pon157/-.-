@@ -952,9 +952,10 @@ async function loadUserProgress() {
     try {
         if (!supabase || !currentUserId) return;
         
+        // ЧИТАЕМ ИЗ НОВОЙ ТАБЛИЦЫ course_users
         const { data: userData, error: userError } = await supabase
-            .from('users')
-            .select('current_module, current_submodule, course_progress, name')
+            .from('course_users')
+            .select('current_module, current_submodule, course_progress, name, email')
             .eq('id', currentUserId)
             .single();
         
@@ -973,9 +974,9 @@ async function loadUserProgress() {
             userProgress.assignmentResults = progressData.assignmentResults || {};
             userProgress.finalExamCompleted = progressData.finalExamCompleted || false;
             userProgress.finalExamScore = progressData.finalExamScore || 0;
-            userProgress.userName = userData.name || "Гость";
+            userProgress.userName = userData.name || userData.email?.split('@')[0] || "Гость";
             
-            console.log("✅ Прогресс загружен из Supabase");
+            console.log("✅ Прогресс загружен из course_users");
         } else {
             await createUserProgressRecord();
         }
