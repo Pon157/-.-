@@ -9,7 +9,7 @@ from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-# --- КОНФИГУРАЦИЯ ---
+# --- КОНФИГУРАЦИЯ ---. 
 load_dotenv() # Загружаем переменные из .env
 
 TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
