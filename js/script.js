@@ -1433,7 +1433,7 @@ async function saveProgress() {
     
     try {
         const { error } = await supabase
-            .from('users')
+            .from('course_users')
             .update({
                 current_module: userProgress.currentModule,
                 current_submodule: userProgress.currentSubmodule,
@@ -1450,7 +1450,7 @@ async function saveProgress() {
             .eq('id', currentUserId);
         
         if (error) throw error;
-        console.log("💾 Прогресс сохранен");
+        console.log("💾 Прогресс сохранен в course_users");
         
     } catch (error) {
         console.error("❌ Ошибка сохранения:", error);
