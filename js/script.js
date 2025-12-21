@@ -993,25 +993,30 @@ async function createUserProgressRecord() {
     try {
         if (!supabase || !currentUserId) return;
         
+        // ВСТАВЛЯЕМ В НОВУЮ ТАБЛИЦУ course_users вместо users
         const { error } = await supabase
-            .from('users')
-            .update({
-                current_module: 1,
-                current_submodule: '1.1',
-                course_progress: {
-                    completedModules: [],
-                    completedSubmodules: [],
-                    testResults: {},
-                    assignmentResults: {},
-                    finalExamCompleted: false,
-                    finalExamScore: 0
-                },
-                last_active: new Date().toISOString()
-            })
-            .eq('id', currentUserId);
+            .from('course_users')
+            .insert([
+                {
+                    id: currentUserId,
+                    email: 'user@example.com', // Будет заполнено из auth.users
+                    name: userProgress.userName || 'Пользователь',
+                    current_module: 1,
+                    current_submodule: '1.1',
+                    course_progress: {
+                        completedModules: [],
+                        completedSubmodules: [],
+                        testResults: {},
+                        assignmentResults: {},
+                        finalExamCompleted: false,
+                        finalExamScore: 0
+                    },
+                    last_active: new Date().toISOString()
+                }
+            ]);
         
         if (error) throw error;
-        console.log("✅ Запись прогресса создана");
+        console.log("✅ Запись прогресса создана в course_users");
         
     } catch (error) {
         console.error("❌ Ошибка создания записи:", error);
