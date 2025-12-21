@@ -1,680 +1,222 @@
-const { Telegraf } = require('telegraf');
-const { createClient } = require('@supabase/supabase-js');
-const express = require('express');
-const path = require('path');
-require('dotenv').config();
+import asyncio
+import logging
+import os
+from dotenv import load_dotenv
+from aiogram import Bot, Dispatcher, F, types
+from aiogram.filters import Command
+from aiogram.fsm.context import FSMContext
+from aiogram.fsm.state import State, StatesGroup
+from aiogram.fsm.storage.memory import MemoryStorage
+from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-const app = express();
-const PORT = process.env.PORT || 5000;
-const bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN);
+# --- КОНФИГУРАЦИЯ ---
+load_dotenv() # Загружаем переменные из .env
 
-// Middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(express.static(__dirname));
+TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 
-// Supabase клиент
-const supabase = createClient(
-    process.env.SUPABASE_URL,
-    process.env.SUPABASE_SERVICE_KEY
-);
+# ID чатов для пересылки (из вашего ТЗ)
+# ВАЖНО: Убедитесь, что бот добавлен в эти чаты и является админом (чтобы видеть сообщения)
+CHAT_CURATOR = -5003212025
+CHAT_STRESS_TEST = -5063879880
+CHAT_ADMIN_APPLY = -5084404528
 
-// ========== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ==========
+# --- СОСТОЯНИЯ (FSM) ---
+class BotStates(StatesGroup):
+    menu = State()              # Главное меню
+    topic_selection = State()   # Выбор темы вопроса (для куратора)
+    chat_curator = State()      # Режим общения с куратором
+    chat_stress = State()       # Режим стресс-теста
+    admin_apply = State()       # Подача заявки
 
-// Проверка доступа пользователя
-async function isUserAllowed(userId) {
-    try {
-        const { data, error } = await supabase
-            .from('allowed_users')
-            .select('*')
-            .eq('telegram_id', userId)
-            .single();
-        
-        return !error && data;
-    } catch (error) {
-        console.error('Ошибка при проверке доступа:', error);
-        return false;
+# Инициализация
+bot = Bot(token=TOKEN)
+dp = Dispatcher(storage=MemoryStorage())
+logging.basicConfig(level=logging.INFO)
+
+# --- КЛАВИАТУРЫ ---
+
+def get_main_keyboard():
+    builder = InlineKeyboardBuilder()
+    builder.button(text="🎓 Помощь куратора", callback_data="mode_curator")
+    builder.button(text="✍️ Финальная подпись (Стресс-тест)", callback_data="mode_stress")
+    builder.button(text="📋 Заявка в администрацию", callback_data="mode_admin")
+    builder.adjust(1) # Кнопки в один столбец
+    return builder.as_markup()
+
+def get_curator_topics_keyboard():
+    builder = InlineKeyboardBuilder()
+    builder.button(text="❓ Не понятен курс", callback_data="topic_course")
+    builder.button(text="📄 Не понятно задание", callback_data="topic_task")
+    builder.button(text="💬 Другой вопрос", callback_data="topic_other")
+    builder.button(text="🔙 Назад", callback_data="back_to_menu")
+    builder.adjust(1)
+    return builder.as_markup()
+
+def get_back_keyboard():
+    builder = InlineKeyboardBuilder()
+    builder.button(text="🔚 Завершить диалог / Назад", callback_data="back_to_menu")
+    return builder.as_markup()
+
+# --- ХЕНДЛЕРЫ (ОБРАБОТЧИКИ) ---
+
+# 1. Команда /start
+@dp.message(Command("start"))
+async def cmd_start(message: types.Message, state: FSMContext):
+    await state.clear() # Сбрасываем старые состояния
+    welcome_text = (
+        "Здравствуйте, вы попали в официальный бот сайта http://empathy-course.webtm.ru\n\n"
+        "В данном боте вы можете:\n"
+        "• Получить помощь в прохождении курса от куратора\n"
+        "• Получить финальную подпись в вашем сертификате\n"
+        "• Подать заявку в администрацию в наш бот"
+    )
+    await message.answer(welcome_text, reply_markup=get_main_keyboard())
+    await state.set_state(BotStates.menu)
+
+# 2. Обработка кнопки "Назад"
+@dp.callback_query(F.data == "back_to_menu")
+async def back_to_menu(callback: types.CallbackQuery, state: FSMContext):
+    await state.clear()
+    await callback.message.edit_text("Вы вернулись в главное меню. Выберите действие:", reply_markup=get_main_keyboard())
+    await state.set_state(BotStates.menu)
+
+# --- ЛОГИКА РЕЖИМА 1: КУРАТОР ---
+
+@dp.callback_query(F.data == "mode_curator")
+async def enter_curator_mode(callback: types.CallbackQuery, state: FSMContext):
+    await state.set_state(BotStates.topic_selection)
+    await callback.message.edit_text(
+        "Вы выбрали связь с куратором.\nПожалуйста, уточните тему вашего вопроса:",
+        reply_markup=get_curator_topics_keyboard()
+    )
+
+@dp.callback_query(F.data.startswith("topic_"))
+async def start_curator_chat(callback: types.CallbackQuery, state: FSMContext):
+    topic_map = {
+        "topic_course": "Не понятен курс",
+        "topic_task": "Не понятно задание",
+        "topic_other": "Общий вопрос"
     }
-}
+    topic = topic_map.get(callback.data, "Вопрос")
+    
+    # Сохраняем тему в память, чтобы знать контекст
+    await state.update_data(topic=topic)
+    await state.set_state(BotStates.chat_curator)
+    
+    await callback.message.edit_text(
+        f"Тема: <b>{topic}</b>.\n\n"
+        "Напишите ваш вопрос ниже. Кураторы (чат -5003212025) получат ваше сообщение.",
+        parse_mode="HTML",
+        reply_markup=get_back_keyboard()
+    )
 
-// Проверка администратора
-async function isAdmin(userId) {
-    try {
-        const { data, error } = await supabase
-            .from('admins')
-            .select('*')
-            .eq('telegram_id', userId)
-            .single();
-        
-        return !error && data;
-    } catch (error) {
-        console.error('Ошибка при проверке админа:', error);
-        return false;
-    }
-}
+# --- ЛОГИКА РЕЖИМА 2: СТРЕСС-ТЕСТ ---
 
-// Получение имени пользователя
-function getUserName(ctx) {
-    const from = ctx.from;
-    if (from.first_name && from.last_name) {
-        return `${from.first_name} ${from.last_name}`;
-    }
-    return from.first_name || from.username || 'Пользователь';
-}
+@dp.callback_query(F.data == "mode_stress")
+async def enter_stress_mode(callback: types.CallbackQuery, state: FSMContext):
+    await state.set_state(BotStates.chat_stress)
+    await callback.message.edit_text(
+        "📢 <b>Режим: Стресс-тест (Финальная подпись)</b>\n\n"
+        "Вы подключены к чату с экзаменатором. Он проведет стресс-тест.\n"
+        "Всё, что вы напишите ниже, будет отправлено экзаменатору.",
+        parse_mode="HTML",
+        reply_markup=get_back_keyboard()
+    )
 
-// ========== КОМАНДЫ БОТА ==========
+# --- ЛОГИКА РЕЖИМА 3: ЗАЯВКА В АДМИНИСТРАЦИЮ ---
 
-// Команда /start
-bot.start(async (ctx) => {
-    const userId = ctx.from.id;
-    const userName = getUserName(ctx);
-    
-    console.log(`🟢 /start от ${userName} (ID: ${userId})`);
-    
-    if (await isUserAllowed(userId)) {
-        const message = `👋 Добро пожаловать, ${userName}!\n\n` +
-            `Я - бот для проверки сертификатов курса "Эмпатия и поддержка в общении".\n\n` +
-            `📋 Доступные команды:\n` +
-            `/check - Проверить сертификат по ID\n` +
-            `/progress - Узнать свой прогресс обучения\n` +
-            `/my_certificates - Мои сертификаты\n` +
-            `/help - Помощь по командам\n\n` +
-            `🌐 Сайт курса: empathy-course.webtm.ru\n\n` +
-            `📝 Для проверки сертификата:\n` +
-            `1. Используйте команду /check\n` +
-            `2. Введите ID сертификата (формат: EMP-XXXXXXX)`;
-        
-        await ctx.reply(message);
-    } else {
-        const adminId = process.env.ADMIN_TELEGRAM_ID || 'не указан';
-        await ctx.reply(
-            `⛔ У вас нет доступа к этому боту, ${userName}.\n\n` +
-            `Обратитесь к администратору для получения доступа.\n` +
-            `ID администратора: ${adminId}`
-        );
-    }
-});
+@dp.callback_query(F.data == "mode_admin")
+async def enter_admin_mode(callback: types.CallbackQuery, state: FSMContext):
+    await state.set_state(BotStates.admin_apply)
+    await callback.message.edit_text(
+        "📝 <b>Подача заявки в администрацию</b>\n\n"
+        "Напишите текст вашей заявки (резюме, почему хотите вступить и т.д.).\n"
+        "Мы передадим её администраторам.",
+        parse_mode="HTML",
+        reply_markup=get_back_keyboard()
+    )
 
-// Команда /help
-bot.help(async (ctx) => {
-    const userId = ctx.from.id;
-    
-    if (!await isUserAllowed(userId)) {
-        return ctx.reply('⛔ У вас нет доступа к этой команде.');
-    }
-    
-    const helpMessage = `📚 Справка по командам бота:\n\n` +
-        `/start - Начать работу с ботом\n` +
-        `/check - Проверить сертификат по ID\n` +
-        `/help - Показать эту справку\n\n` +
-        `👨‍💼 Для администраторов:\n` +
-        `/add_user - Добавить пользователя\n` +
-        `/remove_user - Удалить пользователя\n` +
-        `/list_users - Список пользователей\n` +
-        `/stats - Статистика системы\n\n` +
-        `📝 Как проверить сертификат:\n` +
-        `1. Используйте команду /check\n` +
-        `2. Введите ID сертификата (формат: EMP-XXXXXXX)\n` +
-        `3. Получите информацию о сертификате\n\n` +
-        `📊 Как проверить прогресс:\n` +
-        `1. Используйте команду /progress\n` +
-        `2. Бот покажет ваш прогресс по модулям\n\n` +
-        `🌐 Сайт курса: empathy-course.webtm.ru`;
-    
-    await ctx.reply(helpMessage);
-});
+# --- ПЕРЕСЫЛКА СООБЩЕНИЙ ОТ ПОЛЬЗОВАТЕЛЯ В ГРУППЫ ---
 
-// Команда /check - Проверка сертификата
-bot.command('check', async (ctx) => {
-    const userId = ctx.from.id;
-    const userName = getUserName(ctx);
+@dp.message(BotStates.chat_curator)
+async def forward_to_curator(message: types.Message, state: FSMContext):
+    data = await state.get_data()
+    topic = data.get("topic", "Вопрос")
     
-    console.log(`🔍 /check от ${userName} (ID: ${userId})`);
-    
-    if (!await isUserAllowed(userId)) {
-        return ctx.reply('⛔ У вас нет доступа к этой команде.');
-    }
-    
-    await ctx.reply('🔍 Введите ID сертификата для проверки (формат: EMP-XXXXXXX):');
-    
-    // Создаем уникальный обработчик для этого пользователя
-    const certIdHandler = async (ctx) => {
-        // Проверяем что это тот же пользователь
-        if (ctx.from.id !== userId) return;
-        
-        const certId = ctx.message.text.trim().toUpperCase();
-        
-        // Удаляем этот обработчик
-        bot.off('text', certIdHandler);
-        
-        // Проверка формата
-        if (!certId.match(/^EMP-\d{7}$/)) {
-            return ctx.reply('❌ Неверный формат ID сертификата.\nФормат должен быть: EMP-XXXXXXX (7 цифр)');
-        }
-        
-        try {
-            await ctx.reply('🔎 Ищу сертификат в базе данных...');
-            
-            // Поиск в Supabase
-            const { data: certificate, error } = await supabase
-                .from('certificates')
-                .select(`
-                    *,
-                    users (
-                        name,
-                        telegram_id
-                    )
-                `)
-                .eq('certificate_id', certId)
-                .single();
-            
-            if (error || !certificate) {
-                return ctx.reply('❌ Сертификат не найден в базе данных.');
-            }
-            
-            // Форматируем дату
-            const issueDate = new Date(certificate.issue_date).toLocaleDateString('ru-RU', {
-                day: 'numeric',
-                month: 'long',
-                year: 'numeric'
-            });
-            
-            // Формируем сообщение
-            const message = `✅ СЕРТИФИКАТ НАЙДЕН!\n\n` +
-                `📄 ID сертификата: ${certificate.certificate_id}\n` +
-                `👤 Владелец: ${certificate.users?.name || 'Не указан'}\n` +
-                `🎓 Курс: ${certificate.course_name}\n` +
-                `⭐ Оценка: ${certificate.grade}\n` +
-                `📊 Баллы: ${certificate.score} / ${certificate.max_score}\n` +
-                `📅 Дата выдачи: ${issueDate}\n` +
-                `🔒 Статус: ${certificate.valid ? '✅ Действителен' : '❌ Недействителен'}\n\n` +
-                `🌐 Сайт для проверки: empathy-course.webtm.ru\n\n` +
-                `Проверено: ${new Date().toLocaleDateString('ru-RU')}`;
-            
-            await ctx.reply(message);
-            
-        } catch (error) {
-            console.error('Ошибка проверки сертификата:', error);
-            await ctx.reply('⚠️ Произошла ошибка при проверке сертификата. Попробуйте позже.');
-        }
-    };
-    
-    // Устанавливаем обработчик только для этого пользователя
-    bot.on('text', certIdHandler);
-});
+    # Добавляем подпись о теме вопроса перед пересылкой (опционально)
+    try:
+        # Пересылаем само сообщение
+        forwarded_msg = await message.forward(chat_id=CHAT_CURATOR)
+        # Отвечаем в группе на это сообщение темой, чтобы кураторы видели контекст
+        await bot.send_message(
+            chat_id=CHAT_CURATOR, 
+            text=f"👆 Вопрос от пользователя по теме: <b>{topic}</b>", 
+            reply_to_message_id=forwarded_msg.message_id,
+            parse_mode="HTML"
+        )
+        await message.answer("✅ Сообщение отправлено кураторам. Ждите ответа.", reply_markup=get_back_keyboard())
+    except Exception as e:
+        await message.answer(f"Ошибка отправки: {e}")
 
-// Команда /progress - Прогресс обучения
-bot.command('progress', async (ctx) => {
-    const userId = ctx.from.id;
-    const userName = getUserName(ctx);
-    
-    console.log(`📊 /progress от ${userName} (ID: ${userId})`);
-    
-    if (!await isUserAllowed(userId)) {
-        return ctx.reply('⛔ У вас нет доступа к этой команде.');
-    }
-    
-    try {
-        await ctx.reply('📊 Загружаю информацию о прогрессе...');
-        
-        // Находим пользователя в базе
-        const { data: user, error: userError } = await supabase
-            .from('users')
-            .select('*')
-            .eq('telegram_id', userId)
-            .single();
-        
-        if (userError || !user) {
-            return ctx.reply('❌ Пользователь не найден в системе.\nЗарегистрируйтесь на сайте: empathy-course.webtm.ru');
-        }
-        
-        // Получаем прогресс
-        const { data: progress, error: progressError } = await supabase
-            .from('progress')
-            .select('*')
-            .eq('user_id', user.id)
-            .order('module_id', { ascending: true });
-        
-        let message = `📈 ПРОГРЕСС ОБУЧЕНИЯ\n\n`;
-        message += `👤 Студент: ${user.name}\n`;
-        
-        if (progress && progress.length > 0) {
-            const completedModules = progress.filter(p => p.completed).length;
-            const totalModules = 5;
-            const overallProgress = Math.round((completedModules / totalModules) * 100);
-            
-            message += `📊 Общий прогресс: ${overallProgress}%\n`;
-            message += `✅ Пройдено модулей: ${completedModules}/${totalModules}\n\n`;
-            
-            // Детализация
-            message += `Детализация по модулям:\n`;
-            
-            for (let i = 1; i <= totalModules; i++) {
-                const moduleProgress = progress.find(p => p.module_id === i);
-                
-                if (moduleProgress) {
-                    const status = moduleProgress.completed ? '✅' : '⏳';
-                    const date = moduleProgress.completed_at 
-                        ? new Date(moduleProgress.completed_at).toLocaleDateString('ru-RU')
-                        : '';
-                    const score = moduleProgress.score ? ` (${moduleProgress.score} баллов)` : '';
-                    
-                    message += `${status} Модуль ${i}: ${moduleProgress.completed ? `Завершен ${date}${score}` : 'В процессе'}\n`;
-                } else {
-                    message += `❌ Модуль ${i}: Не начат\n`;
-                }
-            }
-            
-        } else {
-            message += '📝 Прогресс не найден.\n\nНачните обучение на сайте: empathy-course.webtm.ru';
-        }
-        
-        await ctx.reply(message);
-        
-    } catch (error) {
-        console.error('Ошибка получения прогресса:', error);
-        await ctx.reply('⚠️ Произошла ошибка при получении прогресса. Попробуйте позже.');
-    }
-});
+@dp.message(BotStates.chat_stress)
+async def forward_to_stress(message: types.Message):
+    try:
+        await message.forward(chat_id=CHAT_STRESS_TEST)
+        await message.answer("✅ Отправлено экзаменатору.", reply_markup=get_back_keyboard())
+    except Exception as e:
+        await message.answer(f"Ошибка отправки: {e}")
 
-// Команда /my_certificates - Мои сертификаты
-bot.command('my_certificates', async (ctx) => {
-    const userId = ctx.from.id;
-    const userName = getUserName(ctx);
-    
-    console.log(`📜 /my_certificates от ${userName} (ID: ${userId})`);
-    
-    if (!await isUserAllowed(userId)) {
-        return ctx.reply('⛔ У вас нет доступа к этой команде.');
-    }
-    
-    try {
-        // Находим пользователя
-        const { data: user, error: userError } = await supabase
-            .from('users')
-            .select('*')
-            .eq('telegram_id', userId)
-            .single();
-        
-        if (userError || !user) {
-            return ctx.reply('❌ Пользователь не найден в системе.');
-        }
-        
-        // Получаем сертификаты
-        const { data: certificates, error: certError } = await supabase
-            .from('certificates')
-            .select('*')
-            .eq('user_id', user.id)
-            .order('issue_date', { ascending: false });
-        
-        if (certError || !certificates || certificates.length === 0) {
-            return ctx.reply('📭 У вас пока нет сертификатов.\n\nПройти курс можно на сайте: empathy-course.webtm.ru');
-        }
-        
-        let message = `📜 ВАШИ СЕРТИФИКАТЫ\n\n`;
-        message += `👤 Владелец: ${user.name}\n`;
-        message += `🎓 Количество сертификатов: ${certificates.length}\n\n`;
-        
-        certificates.forEach((cert, index) => {
-            const issueDate = new Date(cert.issue_date).toLocaleDateString('ru-RU');
-            message += `${index + 1}. ${cert.course_name}\n`;
-            message += `   📄 ID: ${cert.certificate_id}\n`;
-            message += `   ⭐ Оценка: ${cert.grade}\n`;
-            message += `   📊 Баллы: ${cert.score}/${cert.max_score}\n`;
-            message += `   📅 Дата: ${issueDate}\n`;
-            message += `   🔒 Статус: ${cert.valid ? '✅ Действителен' : '❌ Недействителен'}\n\n`;
-        });
-        
-        await ctx.reply(message);
-        
-    } catch (error) {
-        console.error('Ошибка получения сертификатов:', error);
-        await ctx.reply('⚠️ Произошла ошибка при получении списка сертификатов.');
-    }
-});
+@dp.message(BotStates.admin_apply)
+async def forward_to_admin(message: types.Message):
+    try:
+        await message.forward(chat_id=CHAT_ADMIN_APPLY)
+        await message.answer("✅ Заявка отправлена администрации. Спасибо!", reply_markup=get_back_keyboard())
+    except Exception as e:
+        await message.answer(f"Ошибка отправки: {e}")
 
-// ========== АДМИН КОМАНДЫ ==========
+# --- ОБРАТНАЯ СВЯЗЬ (ИЗ ГРУПП ПОЛЬЗОВАТЕЛЮ) ---
+# Бот слушает сообщения в группах. Если это ОТВЕТ (Reply) на пересланное сообщение,
+# он отправляет его автору оригинала.
 
-// Обработчики для админских команд
-const adminHandlers = new Map();
+@dp.message(F.chat.id.in_({CHAT_CURATOR, CHAT_STRESS_TEST, CHAT_ADMIN_APPLY}))
+async def handle_admin_reply(message: types.Message):
+    # Проверяем, является ли это ответом на сообщение
+    if message.reply_to_message:
+        # Проверяем, было ли сообщение, на которое отвечают, переслано ботом от кого-то
+        original_msg = message.reply_to_message
+        
+        # Попытка найти ID пользователя
+        user_id = None
+        
+        if original_msg.forward_from:
+            user_id = original_msg.forward_from.id
+        
+        # Если у пользователя скрытый аккаунт (Forward Privacy), forward_from будет None.
+        # В полноценном продакшене тут нужно использовать базу данных для сопоставления ID сообщений.
+        # Но для текущей задачи делаем через стандартный механизм.
+        
+        if user_id:
+            try:
+                # Копируем сообщение администратора пользователю
+                await message.copy_to(chat_id=user_id)
+                # Опционально: ставим реакцию в группе, что отправлено
+                await message.react([types.ReactionTypeEmoji(emoji="👍")])
+            except Exception as e:
+                await message.reply(f"Не удалось доставить ответ пользователю: {e}")
+        else:
+            # Если user_id не найден (скрытый профиль), сообщаем в чат
+            await message.reply(
+                "⚠️ Не могу ответить пользователю: у него скрытый профиль (Forward Privacy).\n"
+                "Попросите пользователей открыть пересылку сообщений в настройках конфиденциальности."
+            )
 
-// Команда /add_user - Добавить пользователя
-bot.command('add_user', async (ctx) => {
-    const userId = ctx.from.id;
-    const userName = getUserName(ctx);
-    
-    console.log(`➕ /add_user от ${userName} (ID: ${userId})`);
-    
-    if (!await isAdmin(userId)) {
-        return ctx.reply('⛔ У вас нет прав администратора.');
-    }
-    
-    await ctx.reply('Введите Telegram ID пользователя для добавления:');
-    
-    // Создаем обработчик для этого пользователя
-    const userIdHandler = async (ctx) => {
-        // Проверяем что это тот же пользователь
-        if (ctx.from.id !== userId) return;
-        
-        const newUserId = parseInt(ctx.message.text.trim());
-        
-        // Удаляем обработчик из Map
-        const handler = adminHandlers.get(userId);
-        if (handler) {
-            bot.off('text', handler);
-            adminHandlers.delete(userId);
-        }
-        
-        if (isNaN(newUserId) || newUserId.toString().length < 5) {
-            return ctx.reply('❌ Введите корректный Telegram ID (только цифры).');
-        }
-        
-        try {
-            // Проверяем существование
-            const { data: existingUser } = await supabase
-                .from('allowed_users')
-                .select('*')
-                .eq('telegram_id', newUserId)
-                .single();
-            
-            if (existingUser) {
-                return ctx.reply('✅ Пользователь уже имеет доступ к боту.');
-            }
-            
-            // Добавляем
-            const { error } = await supabase
-                .from('allowed_users')
-                .insert([
-                    {
-                        telegram_id: newUserId,
-                        added_by: userId,
-                        added_at: new Date().toISOString()
-                    }
-                ]);
-            
-            if (error) {
-                console.error('Ошибка добавления:', error);
-                return ctx.reply('❌ Ошибка при добавлении пользователя.');
-            }
-            
-            await ctx.reply(`✅ Пользователь с ID ${newUserId} успешно добавлен!`);
-            
-            // Уведомляем пользователя
-            try {
-                await bot.telegram.sendMessage(
-                    newUserId,
-                    `👋 Привет! Тебе предоставлен доступ к боту проверки сертификатов курса "Эмпатия и поддержка в общении".\n\n` +
-                    `Используй команду /start для начала работы.\n` +
-                    `Сайт курса: empathy-course.webtm.ru`
-                );
-            } catch {
-                console.log('Пользователь еще не начал диалог с ботом');
-            }
-            
-        } catch (error) {
-            console.error('Ошибка:', error);
-            await ctx.reply('⚠️ Произошла ошибка при добавлении пользователя.');
-        }
-    };
-    
-    // Сохраняем обработчик в Map
-    adminHandlers.set(userId, userIdHandler);
-    bot.on('text', userIdHandler);
-});
+# --- ЗАПУСК ---
+async def main():
+    await bot.delete_webhook(drop_pending_updates=True)
+    await dp.start_polling(bot)
 
-// Команда /remove_user - Удалить пользователя
-bot.command('remove_user', async (ctx) => {
-    const userId = ctx.from.id;
-    
-    if (!await isAdmin(userId)) {
-        return ctx.reply('⛔ У вас нет прав администратора.');
-    }
-    
-    await ctx.reply('Введите Telegram ID пользователя для удаления:');
-    
-    const removeHandler = async (ctx) => {
-        if (ctx.from.id !== userId) return;
-        
-        const removeUserId = parseInt(ctx.message.text.trim());
-        
-        // Удаляем обработчик
-        const handler = adminHandlers.get(`remove_${userId}`);
-        if (handler) {
-            bot.off('text', handler);
-            adminHandlers.delete(`remove_${userId}`);
-        }
-        
-        if (isNaN(removeUserId)) {
-            return ctx.reply('❌ Введите корректный Telegram ID (только цифры).');
-        }
-        
-        try {
-            // Удаляем пользователя
-            const { error } = await supabase
-                .from('allowed_users')
-                .delete()
-                .eq('telegram_id', removeUserId);
-            
-            if (error) {
-                console.error('Ошибка удаления:', error);
-                return ctx.reply('❌ Ошибка при удалении пользователя.');
-            }
-            
-            await ctx.reply(`✅ Пользователь с ID ${removeUserId} успешно удален!`);
-            
-        } catch (error) {
-            console.error('Ошибка удаления:', error);
-            await ctx.reply('⚠️ Произошла ошибка при удалении пользователя.');
-        }
-    };
-    
-    adminHandlers.set(`remove_${userId}`, removeHandler);
-    bot.on('text', removeHandler);
-});
-
-// Команда /list_users - Список пользователей
-bot.command('list_users', async (ctx) => {
-    const userId = ctx.from.id;
-    
-    if (!await isAdmin(userId)) {
-        return ctx.reply('⛔ У вас нет прав администратора.');
-    }
-    
-    try {
-        const { data: users, error } = await supabase
-            .from('allowed_users')
-            .select('*')
-            .order('added_at', { ascending: false });
-        
-        if (error || !users || users.length === 0) {
-            return ctx.reply('📭 В базе данных нет пользователей.');
-        }
-        
-        let message = `👥 СПИСОК ПОЛЬЗОВАТЕЛЕЙ\n\n`;
-        message += `📊 Всего пользователей: ${users.length}\n\n`;
-        
-        users.forEach((user, index) => {
-            const addedDate = new Date(user.added_at).toLocaleDateString('ru-RU');
-            message += `${index + 1}. ID: ${user.telegram_id}\n`;
-            message += `   📅 Добавлен: ${addedDate}\n`;
-            message += `   👤 Добавил: ${user.added_by}\n\n`;
-        });
-        
-        await ctx.reply(message);
-        
-    } catch (error) {
-        console.error('Ошибка:', error);
-        await ctx.reply('⚠️ Произошла ошибка при получении списка пользователей.');
-    }
-});
-
-// Команда /stats - Статистика
-bot.command('stats', async (ctx) => {
-    const userId = ctx.from.id;
-    
-    if (!await isAdmin(userId)) {
-        return ctx.reply('⛔ У вас нет прав администратора.');
-    }
-    
-    try {
-        // Получаем статистику
-        const { data: users } = await supabase.from('users').select('*');
-        const { data: certificates } = await supabase.from('certificates').select('*');
-        const { data: allowedUsers } = await supabase.from('allowed_users').select('*');
-        
-        let message = `📈 СТАТИСТИКА СИСТЕМЫ\n\n`;
-        
-        if (users) {
-            message += `👤 Зарегистрированных пользователей: ${users.length}\n`;
-        }
-        
-        if (certificates) {
-            const validCerts = certificates.filter(c => c.valid).length;
-            message += `📄 Выдано сертификатов: ${certificates.length}\n`;
-            message += `✅ Действительных: ${validCerts}\n`;
-            message += `❌ Недействительных: ${certificates.length - validCerts}\n`;
-        }
-        
-        if (allowedUsers) {
-            message += `🤖 Пользователей бота: ${allowedUsers.length}\n`;
-        }
-        
-        message += `\n🌐 Сайт: empathy-course.webtm.ru\n`;
-        message += `🕒 Время сервера: ${new Date().toLocaleString('ru-RU')}`;
-        
-        await ctx.reply(message);
-        
-    } catch (error) {
-        console.error('Ошибка:', error);
-        await ctx.reply('⚠️ Произошла ошибка при получении статистики.');
-    }
-});
-
-// ========== API ЭНДПОИНТЫ ==========
-
-// API для проверки статуса
-app.get('/api/status', (req, res) => {
-    res.json({
-        status: 'online',
-        service: 'Empathy Course Bot',
-        mode: process.env.NODE_ENV || 'development',
-        timestamp: new Date().toISOString(),
-        endpoints: {
-            check: '/api/certificate/:id',
-            webhook: '/telegram-webhook'
-        }
-    });
-});
-
-// API для проверки сертификата
-app.get('/api/certificate/:id', async (req, res) => {
-    try {
-        const certificateId = req.params.id;
-        
-        const { data: certificate, error } = await supabase
-            .from('certificates')
-            .select(`
-                *,
-                users (
-                    name
-                )
-            `)
-            .eq('certificate_id', certificateId)
-            .single();
-        
-        if (error || !certificate) {
-            return res.status(404).json({
-                error: 'Certificate not found',
-                id: certificateId
-            });
-        }
-        
-        res.json({
-            success: true,
-            certificate: {
-                id: certificate.certificate_id,
-                name: certificate.users?.name || 'Не указан',
-                course: certificate.course_name,
-                grade: certificate.grade,
-                score: certificate.score,
-                maxScore: certificate.max_score,
-                issueDate: certificate.issue_date,
-                valid: certificate.valid
-            }
-        });
-        
-    } catch (error) {
-        console.error('API Error:', error);
-        res.status(500).json({ error: 'Internal server error' });
-    }
-});
-
-// Вебхук для Telegram (для production)
-app.post('/telegram-webhook', async (req, res) => {
-    try {
-        await bot.handleUpdate(req.body);
-        res.sendStatus(200);
-    } catch (error) {
-        console.error('Webhook error:', error);
-        res.sendStatus(200);
-    }
-});
-
-// ========== ЗАПУСК БОТА ==========
-
-const startBot = async () => {
-    try {
-        console.log('🚀 Запуск бота проверки сертификатов...');
-        console.log(`📁 Директория: ${__dirname}`);
-        console.log(`🌐 Домен: ${process.env.WEBHOOK_DOMAIN || 'Не указан'}`);
-        console.log(`⚙️ Режим: ${process.env.NODE_ENV || 'development'}`);
-        console.log(`🔌 Порт: ${PORT}`);
-        
-        // Проверяем Supabase
-        console.log('🔌 Проверяем соединение с Supabase...');
-        try {
-            const { data, error } = await supabase.from('users').select('count').limit(1);
-            if (error) {
-                console.log('⚠️ Не удалось подключиться к Supabase. Проверьте настройки.');
-            } else {
-                console.log('✅ Соединение с Supabase установлено!');
-            }
-        } catch (error) {
-            console.log('⚠️ Ошибка проверки Supabase:', error.message);
-        }
-        
-        // Всегда запускаем в режиме polling (без вебхука)
-        console.log('🤖 Запускаем бота в режиме polling...');
-        await bot.launch();
-        console.log('✅ Бот запущен в режиме polling!');
-        console.log('📢 Готов к работе. Используйте /start в Telegram');
-        
-        // Запускаем Express сервер
-        app.listen(PORT, () => {
-            console.log(`✅ Express сервер запущен на порту ${PORT}`);
-            console.log(`🌐 API доступен: http://localhost:${PORT}/api/status`);
-            console.log(`📄 Проверка сертификата: http://localhost:${PORT}/api/certificate/EMP-1234567`);
-            console.log(`📱 Бот работает в режиме polling`);
-        });
-        
-        // Graceful shutdown
-        process.once('SIGINT', () => {
-            console.log('\n🛑 Получен SIGINT, завершаем работу...');
-            bot.stop('SIGINT');
-            process.exit(0);
-        });
-        
-        process.once('SIGTERM', () => {
-            console.log('\n🛑 Получен SIGTERM, завершаем работу...');
-            bot.stop('SIGTERM');
-            process.exit(0);
-        });
-        
-    } catch (error) {
-        console.error('❌ Критическая ошибка при запуске бота:', error);
-        process.exit(1);
-    }
-};
-
-// Запускаем бота
-startBot();
+if __name__ == "__main__":
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        print("Бот остановлен")
