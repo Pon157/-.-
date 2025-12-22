@@ -3581,18 +3581,16 @@ function markQuestionCompleted(submoduleId, questionNumber) {
 
 // Создание оверлея для навигации
 function createModulesOverlay() {
-    const overlayHTML = `
-        <div class="modules-overlay" id="modulesOverlay">
-            <div class="overlay-header">
-                <h3>📚 Навигация по курсу</h3>
-                <button class="close-overlay" onclick="toggleModulesOverlay()">×</button>
-            </div>
-            <div class="overlay-modules-list" id="overlayModulesList">
-                <!-- Модули будут добавлены динамически -->
-            </div>
-        </div>
-        <button class="toggle-modules-btn" onclick="toggleModulesOverlay()">📖</button>
-    `;
+    const overlayHTML = '<div class="modules-overlay" id="modulesOverlay">' +
+        '<div class="overlay-header">' +
+            '<h3>📚 Навигация по курсу</h3>' +
+            '<button class="close-overlay" onclick="toggleModulesOverlay()">×</button>' +
+        '</div>' +
+        '<div class="overlay-modules-list" id="overlayModulesList">' +
+            '<!-- Модули будут добавлены динамически -->' +
+        '</div>' +
+    '</div>' +
+    '<button class="toggle-modules-btn" onclick="toggleModulesOverlay()">📖</button>';
     
     // Проверяем, не добавлен ли уже оверлей
     if (!document.getElementById('modulesOverlay')) {
