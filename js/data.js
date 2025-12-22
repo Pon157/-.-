@@ -3695,18 +3695,23 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Экспорт функций в глобальную область видимости
 window.goToAssignment = goToAssignment;
-window.checkMultipleChoice = checkMultipleChoice;  // Исправил опечатку
-window.toggleModulesOverlay = toggleModulesOverlay;  // Исправил опечатку
-window.toggleModuleSubmodules = toggleModuleSubmodules;  // Исправил опечатку
+window.checkMultipleChoice = checkMultipleChoice;
+window.toggleModulesOverlay = toggleModulesOverlay;
+window.toggleModuleSubmodules = toggleModuleSubmodules;
 window.loadSubmodule = loadSubmodule;
-
-// Добавлены стили и скрытия в документ
-// Убрал некорректную строку, которая вызывала ошибку
 
 console.log("✔ Курс полностью обновлен с оверлеем, таблицами и заданиями");
 console.log("✔ Добавлено: 1) Оверлей навигации, 2) Таблицы правильно/неправильно, 3) Интерактивные задания");
 
 // Экспортируем обновленные данные курса
-window.courseData = courseData;  // Исправил опечатку
+// ВАЖНО: courseData должна быть объявлена где-то выше в файле!
+// Если нет, добавляем:
+if (!window.courseData) {
+    window.courseData = {
+        modules: []
+    };
+    console.warn("⚠️ courseData была пустой, создана структура");
+}
+
+// Экспортируем состояние пользователя
 window.userProgress = userProgress;
-<script>
