@@ -12,7 +12,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 # --- КОНФИГУРАЦИЯ ---. 
 load_dotenv() # Загружаем переменные из .env
 
-TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+TOKEN = os.getenv("8349134247:AAGlPUb6tP1WLAE2udSKj5P_TPY9zRny9Os")
 
 # ID чатов для пересылки (из вашего ТЗ)
 # ВАЖНО: Убедитесь, что бот добавлен в эти чаты и является админом (чтобы видеть сообщения)
