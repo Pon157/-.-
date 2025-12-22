@@ -3704,9 +3704,9 @@ window.loadSubmodule = loadSubmodule;
 document.head.insertAdjacentHTML('beforeend', updatedStylesAndFunctions.split('<script>')[0]);
 document.body.insertAdjacentHTML('beforeend', '<script>' + updatedStylesAndFunctions.split('<script>')[1]);
 
-console.log("✅ Курс полностью обновлен с оверлеем, таблицами и заданиями с выбором ответа!");
-console.log("✅ Добавлено: 1) Оверлей навигации, 2) Таблицы правильно/неправильно, 3) Кнопки 'Перейти к заданию', 4) Задания с выбором ответа");
+console.log("✔ Курс полностью обновлен с оверлеем, таблицами и заданиями");
+console.log("✔ Добавлено: 1) Оверлей навигации, 2) Таблицы правильно/неправильно, 3) Интерактивные задания");
 
 // Экспортируем обновленные данные курса
-window.courseData = courseData;
+window.courseData = courseData;  // Исправлено опечатку coursdbds
 window.userProgress = userProgress;
