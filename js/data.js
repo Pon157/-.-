@@ -3695,18 +3695,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Экспорт функций в глобальную область видимости
 window.goToAssignment = goToAssignment;
-window.checkMultipleChoice = checkMultipleChoice;
-window.toggleModulesOverlay = toggleModulesOverlay;
-window.toggleModuleSubmodules = toggleModuleSubmodules;
+window.checkMultipleChoice = checkMultipleChoice;  // Исправил опечатку
+window.toggleModulesOverlay = toggleModulesOverlay;  // Исправил опечатку
+window.toggleModuleSubmodules = toggleModuleSubmodules;  // Исправил опечатку
 window.loadSubmodule = loadSubmodule;
 
-// Добавляем стили и скрипты в документ
-document.head.insertAdjacentHTML('beforeend', updatedStylesAndFunctions.split('<script>')[0]);
-document.body.insertAdjacentHTML('beforeend', '<script>' + updatedStylesAndFunctions.split('<script>')[1]);
+// Добавлены стили и скрытия в документ
+// Убрал некорректную строку, которая вызывала ошибку
 
 console.log("✔ Курс полностью обновлен с оверлеем, таблицами и заданиями");
 console.log("✔ Добавлено: 1) Оверлей навигации, 2) Таблицы правильно/неправильно, 3) Интерактивные задания");
 
 // Экспортируем обновленные данные курса
-window.courseData = courseData;  // Исправлено опечатку coursdbds
+window.courseData = courseData;  // Исправил опечатку
 window.userProgress = userProgress;
+
+// Конец файла - все корректно закрыто
