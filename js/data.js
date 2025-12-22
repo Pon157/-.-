@@ -3715,3 +3715,4 @@ if (!window.courseData) {
 window.userProgress = userProgress;
 
 // Закрываем сам код (в конце файла не должно быть не закрытых конструкций)
+}
