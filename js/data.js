@@ -46,7 +46,7 @@ function checkAssignment(submoduleId) {
 }
 
 // ДАННЫЕ КУРСА С ВСЕМИ ОБНОВЛЕНИЯМИ
-const courseData = {
+window.courseData = {
     title: "Эмпатия и поддержка в общении",
     modules: [
         {
