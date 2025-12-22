@@ -3111,318 +3111,318 @@ const courseData = {
 // ДОБАВЛЯЕМ ОБНОВЛЕННЫЕ СТИЛИ И ФУНКЦИИ
 const updatedStylesAndFunctions = `
 <style>
-    /* ОСНОВНЫЕ СТИЛИ ДЛЯ НОВЫХ ЭЛЕМЕНТОВ */
+/* ОСНОВНЫЕ СТИЛИ ДЛЯ НОВЫХ ЭЛЕМЕНТОВ */
     
-    /* ОВЕРЛЕЙ ДЛЯ ВЫБОРА МОДУЛЕЙ */
+/* ОВЕРЛЕЙ ДЛЯ ВЫБОРА МОДУЛЕЙ */
+.modules-overlay {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    width: 300px;
+    background: rgba(25, 25, 35, 0.95);
+    backdrop-filter: blur(10px);
+    z-index: 1000;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    overflow-y: auto;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 5px 0 20px rgba(0, 0, 0, 0.3);
+}
+    
+.modules-overlay.active {
+    transform: translateX(0);
+}
+    
+.overlay-header {
+    padding: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+    
+.overlay-header h3 {
+    margin: 0;
+    color: #3498db;
+    font-size: 1.2em;
+}
+    
+.close-overlay {
+    background: none;
+    border: none;
+    color: #7f8c8d;
+    font-size: 1.5em;
+    cursor: pointer;
+    padding: 5px;
+}
+    
+.overlay-modules-list {
+    padding: 20px;
+}
+    
+.overlay-module {
+    margin-bottom: 25px;
+}
+    
+.overlay-module-title {
+    color: #3498db;
+    font-weight: bold;
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid rgba(52, 152, 219, 0.3);
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+    
+.overlay-module-title:hover {
+    color: #2980b9;
+}
+    
+.overlay-submodules {
+    padding-left: 15px;
+}
+    
+.overlay-submodule {
+    padding: 8px 0;
+    border-left: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+    
+.overlay-submodule:hover {
+    border-left-color: #3498db;
+    padding-left: 10px;
+}
+    
+.overlay-submodule.active {
+    border-left-color: #2ecc71;
+    color: #2ecc71;
+    font-weight: bold;
+    padding-left: 10px;
+}
+    
+.toggle-modules-btn {
+    position: fixed;
+    left: 20px;
+    top: 20px;
+    background: #3498db;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    cursor: pointer;
+    z-index: 999;
+    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2em;
+    transition: all 0.3s;
+}
+    
+.toggle-modules-btn:hover {
+    background: #2980b9;
+    transform: scale(1.1);
+}
+    
+/* ТАБЛИЦЫ ПРАВИЛЬНО/НЕПРАВИЛЬНО */
+.do-dont-table {
+    margin: 30px 0;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    padding: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+    
+.do-dont-table h4 {
+    color: #2ecc71;
+    margin-top: 0;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+    
+.do-dont-table table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0;
+}
+    
+.do-dont-table th {
+    background: linear-gradient(135deg, rgba(46, 204, 113, 0.2), rgba(39, 174, 96, 0.2));
+    color: #2ecc71;
+    font-weight: 600;
+    text-align: center;
+    padding: 12px;
+    font-size: 0.9em;
+}
+    
+.do-dont-table th:first-child {
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+    
+.do-dont-table td {
+    padding: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    vertical-align: top;
+}
+    
+.do-dont-table td:first-child {
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    color: #2ecc71;
+}
+    
+.do-dont-table td:last-child {
+    color: #e74c3c;
+}
+    
+.do-dont-table tr:last-child td {
+    border-bottom: none;
+}
+    
+/* КНОПКА ПЕРЕЙТИ К ЗАДАНИЮ */
+.go-to-assignment-container {
+    margin: 40px 0 20px;
+    text-align: center;
+    padding: 20px;
+    background: linear-gradient(135deg, rgba(52, 152, 219, 0.1), rgba(41, 128, 185, 0.1));
+    border-radius: 10px;
+    border: 1px dashed rgba(52, 152, 219, 0.3);
+}
+    
+.go-to-assignment-btn {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 50px;
+    font-size: 1.1em;
+    font-weight: bold;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s;
+    box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+}
+    
+.go-to-assignment-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+    background: linear-gradient(135deg, #2980b9, #1f6399);
+}
+    
+/* ЗАДАНИЯ С ВЫБОРОМ ОТВЕТА */
+.multiple-choice-question {
+    margin: 25px 0;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    border-left: 4px solid #9b59b6;
+}
+    
+.multiple-choice-question h5 {
+    color: #9b59b6;
+    margin-top: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+    
+.choice-options {
+    margin: 15px 0;
+}
+    
+.choice-option {
+    display: block;
+    padding: 12px 15px;
+    margin: 8px 0;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+    
+.choice-option:hover {
+    background: rgba(155, 89, 182, 0.1);
+    border-color: #9b59b6;
+}
+    
+.choice-option input[type="radio"] {
+    margin-right: 10px;
+}
+    
+.choice-text {
+    cursor: pointer;
+}
+    
+.choice-feedback {
+    margin-top: 15px;
+    padding: 10px 15px;
+    border-radius: 8px;
+    font-size: 0.95em;
+}
+    
+.feedback.success {
+    background: rgba(46, 204, 113, 0.1);
+    border: 1px solid rgba(46, 204, 113, 0.3);
+    color: #2ecc71;
+}
+    
+.feedback.error {
+    background: rgba(231, 76, 60, 0.1);
+    border: 1px solid rgba(231, 76, 60, 0.3);
+    color: #e74c3c;
+}
+    
+/* АДАПТИВНЫЕ СТИЛИ */
+@media (max-width: 768px) {
     .modules-overlay {
-        position: fixed;
-        left: 0;
-        top: 0;
-        height: 100vh;
-        width: 300px;
-        background: rgba(25, 25, 35, 0.95);
-        backdrop-filter: blur(10px);
-        z-index: 1000;
+        width: 100%;
         transform: translateX(-100%);
-        transition: transform 0.3s ease;
-        overflow-y: auto;
-        border-right: 1px solid rgba(255, 255, 255, 0.1);
-        box-shadow: 5px 0 20px rgba(0, 0, 0, 0.3);
     }
-    
+        
     .modules-overlay.active {
         transform: translateX(0);
     }
-    
-    .overlay-header {
-        padding: 20px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    
-    .overlay-header h3 {
-        margin: 0;
-        color: #3498db;
-        font-size: 1.2em;
-    }
-    
-    .close-overlay {
-        background: none;
-        border: none;
-        color: #7f8c8d;
-        font-size: 1.5em;
-        cursor: pointer;
-        padding: 5px;
-    }
-    
-    .overlay-modules-list {
-        padding: 20px;
-    }
-    
-    .overlay-module {
-        margin-bottom: 25px;
-    }
-    
-    .overlay-module-title {
-        color: #3498db;
-        font-weight: bold;
-        margin-bottom: 10px;
-        padding-bottom: 5px;
-        border-bottom: 1px solid rgba(52, 152, 219, 0.3);
-        cursor: pointer;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    
-    .overlay-module-title:hover {
-        color: #2980b9;
-    }
-    
-    .overlay-submodules {
-        padding-left: 15px;
-    }
-    
-    .overlay-submodule {
-        padding: 8px 0;
-        border-left: 2px solid transparent;
-        cursor: pointer;
-        transition: all 0.2s;
-    }
-    
-    .overlay-submodule:hover {
-        border-left-color: #3498db;
-        padding-left: 10px;
-    }
-    
-    .overlay-submodule.active {
-        border-left-color: #2ecc71;
-        color: #2ecc71;
-        font-weight: bold;
-        padding-left: 10px;
-    }
-    
+        
     .toggle-modules-btn {
-        position: fixed;
-        left: 20px;
-        top: 20px;
-        background: #3498db;
-        color: white;
-        border: none;
-        border-radius: 50%;
-        width: 50px;
-        height: 50px;
-        cursor: pointer;
-        z-index: 999;
-        box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.2em;
-        transition: all 0.3s;
+        left: 10px;
+        top: 10px;
+        width: 40px;
+        height: 40px;
     }
-    
-    .toggle-modules-btn:hover {
-        background: #2980b9;
-        transform: scale(1.1);
-    }
-    
-    /* ТАБЛИЦЫ ПРАВИЛЬНО/НЕПРАВИЛЬНО */
+        
     .do-dont-table {
-        margin: 30px 0;
-        background: rgba(255, 255, 255, 0.05);
-        border-radius: 10px;
-        padding: 20px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        overflow-x: auto;
     }
-    
-    .do-dont-table h4 {
-        color: #2ecc71;
-        margin-top: 0;
-        margin-bottom: 15px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-    
+        
     .do-dont-table table {
-        width: 100%;
-        border-collapse: collapse;
-        margin: 0;
+        min-width: 500px;
     }
-    
-    .do-dont-table th {
-        background: linear-gradient(135deg, rgba(46, 204, 113, 0.2), rgba(39, 174, 96, 0.2));
-        color: #2ecc71;
-        font-weight: 600;
-        text-align: center;
-        padding: 12px;
-        font-size: 0.9em;
-    }
-    
-    .do-dont-table th:first-child {
-        border-right: 1px solid rgba(255, 255, 255, 0.1);
-    }
-    
-    .do-dont-table td {
-        padding: 12px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        vertical-align: top;
-    }
-    
-    .do-dont-table td:first-child {
-        border-right: 1px solid rgba(255, 255, 255, 0.1);
-        color: #2ecc71;
-    }
-    
-    .do-dont-table td:last-child {
-        color: #e74c3c;
-    }
-    
-    .do-dont-table tr:last-child td {
-        border-bottom: none;
-    }
-    
-    /* КНОПКА ПЕРЕЙТИ К ЗАДАНИЮ */
-    .go-to-assignment-container {
-        margin: 40px 0 20px;
-        text-align: center;
-        padding: 20px;
-        background: linear-gradient(135deg, rgba(52, 152, 219, 0.1), rgba(41, 128, 185, 0.1));
-        border-radius: 10px;
-        border: 1px dashed rgba(52, 152, 219, 0.3);
-    }
-    
+        
     .go-to-assignment-btn {
-        background: linear-gradient(135deg, #3498db, #2980b9);
-        color: white;
-        border: none;
-        padding: 15px 30px;
-        border-radius: 50px;
-        font-size: 1.1em;
-        font-weight: bold;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-        transition: all 0.3s;
-        box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+        width: 100%;
+        justify-content: center;
     }
-    
-    .go-to-assignment-btn:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
-        background: linear-gradient(135deg, #2980b9, #1f6399);
-    }
-    
-    /* ЗАДАНИЯ С ВЫБОРОМ ОТВЕТА */
-    .multiple-choice-question {
-        margin: 25px 0;
-        padding: 20px;
-        background: rgba(255, 255, 255, 0.05);
-        border-radius: 10px;
-        border-left: 4px solid #9b59b6;
-    }
-    
-    .multiple-choice-question h5 {
-        color: #9b59b6;
-        margin-top: 0;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-    
-    .choice-options {
-        margin: 15px 0;
-    }
-    
+        
     .choice-option {
-        display: block;
-        padding: 12px 15px;
-        margin: 8px 0;
-        background: rgba(255, 255, 255, 0.03);
-        border-radius: 8px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        cursor: pointer;
-        transition: all 0.2s;
+        padding: 15px;
     }
-    
-    .choice-option:hover {
-        background: rgba(155, 89, 182, 0.1);
-        border-color: #9b59b6;
-    }
-    
-    .choice-option input[type="radio"] {
-        margin-right: 10px;
-    }
-    
-    .choice-text {
-        cursor: pointer;
-    }
-    
-    .choice-feedback {
-        margin-top: 15px;
-        padding: 10px 15px;
-        border-radius: 8px;
-        font-size: 0.95em;
-    }
-    
-    .feedback.success {
-        background: rgba(46, 204, 113, 0.1);
-        border: 1px solid rgba(46, 204, 113, 0.3);
-        color: #2ecc71;
-    }
-    
-    .feedback.error {
-        background: rgba(231, 76, 60, 0.1);
-        border: 1px solid rgba(231, 76, 60, 0.3);
-        color: #e74c3c;
-    }
-    
-    /* АДАПТИВНЫЕ СТИЛИ */
-    @media (max-width: 768px) {
-        .modules-overlay {
-            width: 100%;
-            transform: translateX(-100%);
-        }
-        
-        .modules-overlay.active {
-            transform: translateX(0);
-        }
-        
-        .toggle-modules-btn {
-            left: 10px;
-            top: 10px;
-            width: 40px;
-            height: 40px;
-        }
-        
-        .do-dont-table {
-            overflow-x: auto;
-        }
-        
-        .do-dont-table table {
-            min-width: 500px;
-        }
-        
-        .go-to-assignment-btn {
-            width: 100%;
-            justify-content: center;
-        }
-        
-        .choice-option {
-            padding: 15px;
-        }
-    }
+}
 </style>
 
 <script>
 // ФУНКЦИИ ДЛЯ ОВЕРЛЕЯ И ИНТЕРАКТИВА
 
 // Глобальное состояние пользователя
-const userProgress = {
+var userProgress = {
     currentModule: 1,
     currentSubmodule: "1.1",
     completedSubmodules: []
@@ -3431,16 +3431,16 @@ const userProgress = {
 // Функция для перехода к заданию
 function goToAssignment(submoduleId) {
     // Находим активные вкладки и переключаем на "Задание"
-    const tabButtons = document.querySelectorAll('.tab-btn');
-    tabButtons.forEach(btn => {
+    var tabButtons = document.querySelectorAll('.tab-btn');
+    tabButtons.forEach(function(btn) {
         if (btn.textContent.includes('Задание') || btn.textContent.includes('Assignment')) {
             btn.click();
         }
     });
     
     // Прокручиваем к началу задания
-    setTimeout(() => {
-        const assignmentSection = document.querySelector('.assignment');
+    setTimeout(function() {
+        var assignmentSection = document.querySelector('.assignment');
         if (assignmentSection) {
             assignmentSection.scrollIntoView({ 
                 behavior: 'smooth',
@@ -3453,19 +3453,19 @@ function goToAssignment(submoduleId) {
 // Универсальная функция проверки заданий с выбором ответа
 function checkMultipleChoice(submoduleId, questionNumber) {
     try {
-        // 1. Формируем имя группы radio-кнопок (ИСПРАВЛЕНО)
-        const cleanSubmoduleId = submoduleId.replace(/\./g, '_');  // Заменяем ВСЕ точки на подчеркивания
-        const radioName = 'choice' + questionNumber + '_' + cleanSubmoduleId;
+        // 1. Формируем имя группы radio-кнопок
+        var cleanSubmoduleId = submoduleId.replace(/\\./g, '_');  // Заменяем ВСЕ точки на подчеркивания
+        var radioName = 'choice' + questionNumber + '_' + cleanSubmoduleId;
         
         // 2. Формируем ID блока с обратной связью
-        const feedbackId = 'choiceFeedback' + questionNumber + '_' + cleanSubmoduleId;
+        var feedbackId = 'choiceFeedback' + questionNumber + '_' + cleanSubmoduleId;
         
         // 3. Ищем выбранную радио-кнопку
-        const selector = 'input[name="' + radioName + '"]:checked';
-        const selected = document.querySelector(selector);
+        var selector = 'input[name="' + radioName + '"]:checked';
+        var selected = document.querySelector(selector);
         
         // 4. Ищем блок для вывода результата
-        const feedbackEl = document.getElementById(feedbackId);
+        var feedbackEl = document.getElementById(feedbackId);
         
         // 5. Проверяем, выбран ли ответ
         if (!selected) {
@@ -3480,9 +3480,9 @@ function checkMultipleChoice(submoduleId, questionNumber) {
         // 6. Проверяем, найден ли блок для обратной связи
         if (!feedbackEl) {
             // Альтернативный поиск: ищем ближайший .choice-feedback
-            const questionContainer = selected.closest('.multiple-choice-question');
+            var questionContainer = selected.closest('.multiple-choice-question');
             if (questionContainer) {
-                const altFeedback = questionContainer.querySelector('.choice-feedback');
+                var altFeedback = questionContainer.querySelector('.choice-feedback');
                 if (altFeedback) {
                     altFeedback.innerHTML = '<div class="feedback error">❌ Не найден блок результатов</div>';
                 }
@@ -3491,8 +3491,8 @@ function checkMultipleChoice(submoduleId, questionNumber) {
         }
         
         // 7. Определяем правильный ответ
-        const answerKey = submoduleId + '_' + questionNumber;
-        const correctAnswers = {
+        var answerKey = submoduleId + '_' + questionNumber;
+        var correctAnswers = {
             // Модуль 1.1
             "1.1_1": "b",
             "1.1_2": "b", 
@@ -3540,7 +3540,7 @@ function checkMultipleChoice(submoduleId, questionNumber) {
         };
         
         // 8. Проверяем ответ
-        const correctAnswer = correctAnswers[answerKey];
+        var correctAnswer = correctAnswers[answerKey];
         
         if (!correctAnswer) {
             console.warn('Нет данных для ключа:', answerKey);
@@ -3572,7 +3572,7 @@ function markQuestionCompleted(submoduleId, questionNumber) {
     console.log('Вопрос выполнен:', submoduleId, questionNumber);
     
     // Обновляем оверлей, если он есть
-    const submoduleEl = document.querySelector('.overlay-submodule[data-submodule="' + submoduleId + '"]');
+    var submoduleEl = document.querySelector('.overlay-submodule[data-submodule="' + submoduleId + '"]');
     if (submoduleEl && !submoduleEl.innerHTML.includes('✓')) {
         submoduleEl.innerHTML = submoduleEl.innerHTML + ' ✓';
         submoduleEl.style.color = '#2ecc71';
@@ -3581,7 +3581,7 @@ function markQuestionCompleted(submoduleId, questionNumber) {
 
 // Создание оверлея для навигации
 function createModulesOverlay() {
-    const overlayHTML = '<div class="modules-overlay" id="modulesOverlay">' +
+    var overlayHTML = '<div class="modules-overlay" id="modulesOverlay">' +
         '<div class="overlay-header">' +
             '<h3>📚 Навигация по курсу</h3>' +
             '<button class="close-overlay" onclick="toggleModulesOverlay()">×</button>' +
@@ -3601,7 +3601,7 @@ function createModulesOverlay() {
 
 // Заполнение оверлея данными
 function populateModulesOverlay() {
-    const modulesList = document.getElementById('overlayModulesList');
+    var modulesList = document.getElementById('overlayModulesList');
     if (!modulesList) return;
     
     modulesList.innerHTML = '';
@@ -3617,7 +3617,7 @@ function populateModulesOverlay() {
             
             submodulesHTML += '<div class="overlay-submodule" ' +
                 'data-submodule="' + submodule.id + '" ' +
-                'onclick="loadSubmodule(\'' + submodule.id + '\')" ' +
+                'onclick="loadSubmodule(\\'' + submodule.id + '\\')" ' +
                 style + '>' +
                 submodule.title + checkmark +
                 '</div>';
@@ -3639,7 +3639,7 @@ function populateModulesOverlay() {
 
 // Переключение видимости оверлея
 function toggleModulesOverlay() {
-    const overlay = document.getElementById('modulesOverlay');
+    var overlay = document.getElementById('modulesOverlay');
     if (overlay) {
         overlay.classList.toggle('active');
     }
@@ -3647,8 +3647,8 @@ function toggleModulesOverlay() {
 
 // Переключение подмодулей в оверлее
 function toggleModuleSubmodules(moduleId) {
-    const submodules = document.getElementById('submodules-' + moduleId);
-    const toggle = document.querySelector('[data-module="' + moduleId + '"] .module-toggle');
+    var submodules = document.getElementById('submodules-' + moduleId);
+    var toggle = document.querySelector('[data-module="' + moduleId + '"] .module-toggle');
     
     if (submodules && toggle) {
         if (submodules.style.display === 'none') {
@@ -3669,7 +3669,7 @@ function loadSubmodule(submoduleId) {
     }
     
     // Обновляем активный подмодуль
-    document.querySelectorAll('.overlay-submodule').forEach(el => {
+    document.querySelectorAll('.overlay-submodule').forEach(function(el) {
         el.classList.remove('active');
         if (el.dataset.submodule === submoduleId) {
             el.classList.add('active');
@@ -3688,7 +3688,7 @@ document.addEventListener('DOMContentLoaded', function() {
     createModulesOverlay();
     
     // Автоматически открываем первый модуль
-    setTimeout(() => {
+    setTimeout(function() {
         toggleModuleSubmodules(1);
     }, 500);
 });
@@ -3713,6 +3713,8 @@ if (!window.courseData) {
 
 // Экспортируем состояние пользователя
 window.userProgress = userProgress;
+</script>
+`;
 
-// Закрываем сам код (в конце файла не должно быть не закрытых конструкций)
-}
+// КОНЕЦ ФАЙЛА - убедитесь, что это последняя строка
+console.log("Файл data.js успешно загружен");
