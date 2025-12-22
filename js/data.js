@@ -3709,4 +3709,4 @@ console.log("✔ Добавлено: 1) Оверлей навигации, 2) Т
 // Экспортируем обновленные данные курса
 window.courseData = courseData;  // Исправил опечатку
 window.userProgress = userProgress;
-}
+
