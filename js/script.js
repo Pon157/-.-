@@ -880,7 +880,19 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 async function initApp() {
     try {
-        // Сначала инициализируем Supabase
+        // 🔥 ВАЖНО: ЭТО ГЛАВНОЕ ИСПРАВЛЕНИЕ
+        // Сначала загружаем сам курс (структуру модулей), и только потом всё остальное.
+        // Убедись, что у тебя есть функция loadCourseData(). Если нет — см. ниже.
+        console.log('📥 Загрузка данных курса...');
+        await loadCourseData(); 
+
+        // Проверка, что данные реально загрузились
+        if (typeof courseData === 'undefined' || !courseData) {
+             throw new Error("courseData не загружен после вызова loadCourseData");
+        }
+        // -----------------------------------------------------------
+
+        // Дальше идет твой код (Supabase и логика)
         const supabaseInitialized = initSupabase();
         
         if (supabase && supabaseInitialized) {
@@ -897,6 +909,8 @@ async function initApp() {
             }
             
             if (session) {
+                // ТУТ МЫ УЖЕ НЕ ПРОВЕРЯЕМ emailVerified,
+                // значит пользователь войдет сразу, как ты и хотел.
                 currentUserId = session.user.id;
                 isAuthenticated = true;
                 console.log("✅ Пользователь авторизован:", session.user.email);
@@ -919,8 +933,8 @@ async function initApp() {
                     setupAuthListener();
                     
                 } catch (loadError) {
-                    console.error("❌ Ошибка загрузки данных:", loadError);
-                    showMessage('error', 'Ошибка загрузки данных. Попробуйте обновить страницу.');
+                    console.error("❌ Ошибка загрузки данных пользователя:", loadError);
+                    showMessage('error', 'Ошибка загрузки прогресса. Попробуйте обновить страницу.');
                     await loadGuestProgress();
                     renderModulesList();
                     showWelcomeScreen();
@@ -941,13 +955,15 @@ async function initApp() {
         
     } catch (error) {
         console.error("❌ Критическая ошибка инициализации:", error);
-        await loadGuestProgress();
-        renderModulesList();
+        // Даже при ошибке пытаемся показать хотя бы меню, если courseData успел загрузиться
+        if (typeof courseData !== 'undefined') {
+            await loadGuestProgress();
+            renderModulesList();
+        }
         showWelcomeScreen();
         showMessage('error', 'Ошибка инициализации приложения');
     }
 }
-
 async function loadUserProgress() {
     try {
         if (!supabase || !currentUserId) return;
