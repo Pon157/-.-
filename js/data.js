@@ -3694,8 +3694,6 @@ window.checkMultipleChoice = checkMultipleChoice;
 window.toggleModulesOverlay = toggleModulesOverlay;
 window.toggleModuleSubmodules = toggleModuleSubmodules;
 window.loadSubmodule = loadSubmodule;
-</script>
-`;
 
 // Добавляем стили и скрипты в документ
 document.head.insertAdjacentHTML('beforeend', updatedStylesAndFunctions.split('<script>')[0]);
