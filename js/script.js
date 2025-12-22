@@ -880,50 +880,44 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 async function initApp() {
     try {
-        console.log('🚀 Курс эмпатии загружается...');
+        console.log("🚀 Курс эмпатии загружается...");
         
-        // 🔥 КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: Сначала гарантируем, что courseData доступен
-        console.log('📥 Проверка данных курса...');
+        // Добавляем стили
+        document.head.insertAdjacentHTML('beforeend', enhancedStyles);
         
-        // Сильная проверка на все случаи жизни
-        if (typeof window.courseData === 'undefined' || window.courseData === null) {
-            console.error('❌ courseData не загружен! Создаем временную структуру...');
+        // 🔥 ВАЖНОЕ ИСПРАВЛЕНИЕ: Ждем полной загрузки window.courseData
+        console.log('📥 Ожидание загрузки данных курса...');
+        
+        // Даем время на загрузку всех скриптов
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        // ПРОВЕРЯЕМ window.courseData
+        if (typeof window.courseData === 'undefined' || !window.courseData) {
+            console.error('❌ CRITICAL: window.courseData не определен!');
+            console.error('Проверь:');
+            console.error('1. data.js подключен ДО script.js в HTML');
+            console.error('2. В data.js используется window.courseData = {...}');
             
-            // Создаем минимальную, но полноценную структуру
-            window.courseData = {
-                title: "Эмпатия и поддержка в общении",
-                modules: [
-                    {
-                        id: 1,
-                        title: "Модуль 1. Основы эмпатии",
-                        description: "Что такое эмпатия и как она работает",
-                        completed: false,
-                        submodules: [
-                            {
-                                id: "1.1",
-                                title: "Что такое эмпатия: Глубина понимания",
-                                tabs: {
-                                    theory: { title: "Теория", content: "<p>Тестовая страница</p>" }
-                                }
-                            }
-                        ],
-                        test: null
-                    }
-                ],
-                finalExam: null
-            };
-            
-            console.log('⚠️ Создан временный courseData для тестирования');
-        } else {
-            console.log('✅ Данные курса загружены:', window.courseData.title || 'Без названия');
-            console.log('📊 Модулей:', window.courseData.modules?.length || 0);
+            // Попробуем найти courseData другими способами
+            if (typeof courseData !== 'undefined') {
+                console.log('⚠️ Нашел courseData (без window), копирую в window.courseData');
+                window.courseData = courseData;
+            } else {
+                // Создаем минимальную структуру для продолжения работы
+                console.log('⚠️ Создаю временную структуру courseData');
+                window.courseData = {
+                    title: "Эмпатия и поддержка в общении",
+                    modules: [],
+                    finalExam: null
+                };
+            }
         }
         
-        // 🔥 ГАРАНТИРУЕМ, что courseData доступен глобально
-        window.courseData = window.courseData || {};
+        console.log('✅ Данные курса:', window.courseData.title || 'Без названия');
+        console.log('📊 Модулей:', window.courseData.modules?.length || 0);
         
         // -----------------------------------------------------------
-        console.log('🔄 Инициализация приложения...');
+        // Дальше идет твой оригинальный код
         
         const supabaseInitialized = initSupabase();
         
@@ -941,6 +935,8 @@ async function initApp() {
             }
             
             if (session) {
+                // ТУТ МЫ УЖЕ НЕ ПРОВЕРЯЕМ emailVerified,
+                // значит пользователь войдет сразу, как ты и хотел.
                 currentUserId = session.user.id;
                 isAuthenticated = true;
                 console.log("✅ Пользователь авторизован:", session.user.email);
@@ -985,24 +981,15 @@ async function initApp() {
         
     } catch (error) {
         console.error("❌ Критическая ошибка инициализации:", error);
-        console.error("Stack trace:", error.stack);
-        
-        // Аварийный режим
-        try {
-            if (!window.courseData) {
-                window.courseData = { modules: [] };
-            }
+        // Даже при ошибке пытаемся показать хотя бы меню, если courseData успел загрузиться
+        if (typeof window.courseData !== 'undefined') {
             await loadGuestProgress();
             renderModulesList();
-            showWelcomeScreen();
-            showMessage('error', 'Ошибка инициализации приложения. Работаем в гостевом режиме.');
-        } catch (e) {
-            console.error("Аварийный режим тоже упал:", e);
-            document.body.innerHTML = '<h1 style="color: white; text-align: center; padding: 50px;">Ошибка загрузки курса. Обновите страницу.</h1>';
         }
+        showWelcomeScreen();
+        showMessage('error', 'Ошибка инициализации приложения');
     }
 }
-
 async function loadUserProgress() {
     try {
         if (!supabase || !currentUserId) return;
