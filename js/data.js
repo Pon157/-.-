@@ -3647,8 +3647,8 @@ function toggleModulesOverlay() {
 
 // Переключение подмодулей в оверлее
 function toggleModuleSubmodules(moduleId) {
-    const submodules = document.getElementById(`submodules-${moduleId}`);
-    const toggle = document.querySelector(`[data-module="${moduleId}"] .module-toggle`);
+    const submodules = document.getElementById('submodules-' + moduleId);
+    const toggle = document.querySelector('[data-module="' + moduleId + '"] .module-toggle');
     
     if (submodules && toggle) {
         if (submodules.style.display === 'none') {
