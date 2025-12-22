@@ -3452,14 +3452,19 @@ function goToAssignment(submoduleId) {
 
 // Универсальная функция проверки заданий с выбором ответа
 function checkMultipleChoice(submoduleId, questionNumber) {
-    // Формируем имя группы радио-кнопок и ID блока с ответом
+    // 1. Формируем имя группы radio-кнопок (важно использовать обратные кавычки `)
     const radioName = `choice${questionNumber}_${submoduleId.replace('.', '_')}`;
+    
+    // 2. Формируем ID блока с обратной связью
     const feedbackId = `choiceFeedback${questionNumber}_${submoduleId.replace('.', '_')}`;
     
-    // Находим выбранный вариант и блок для обратной связи
+    // 3. Ищем выбранную радио-кнопку (правильный синтаксис)
     const selected = document.querySelector(`input[name="${radioName}"]:checked`);
+    
+    // 4. Ищем блок для вывода результата
     const feedbackEl = document.getElementById(feedbackId);
     
+    // 5. Проверяем, выбран ли ответ
     if (!selected) {
         if (feedbackEl) {
             feedbackEl.innerHTML = '<div class="feedback error">❌ Пожалуйста, выберите ответ</div>';
@@ -3469,44 +3474,22 @@ function checkMultipleChoice(submoduleId, questionNumber) {
         return;
     }
     
+    // 6. Проверяем, найден ли блок для обратной связи
     if (!feedbackEl) {
-        console.error(`Элемент с ID ${feedbackId} не найден`);
+        console.error('Элемент для обратной связи не найден. ID:', feedbackId);
+        console.log('Доступные элементы на странице:', document.querySelectorAll('[id^="choiceFeedback"]').length);
         return;
     }
     
-    // Определяем правильные ответы
-    const correctAnswers = getCorrectAnswers(submoduleId, questionNumber);
-    
-    if (correctAnswers && correctAnswers.includes(selected.value)) {
-        feedbackEl.innerHTML = '<div class="feedback success">✅ Правильно! Отличный ответ.</div>';
-        
-        // Добавляем в прогресс
-        if (!userProgress.completedQuestions) {
-            userProgress.completedQuestions = [];
-        }
-        const questionKey = `${submoduleId}_q${questionNumber}`;
-        if (!userProgress.completedQuestions.includes(questionKey)) {
-            userProgress.completedQuestions.push(questionKey);
-            updateProgressInOverlay(submoduleId);
-        }
-    } else {
-        feedbackEl.innerHTML = '<div class="feedback error">❌ Неверно. Попробуйте еще раз или вернитесь к теории.</div>';
-    }
-}
-
-// Функция для определения правильных ответов
-function getCorrectAnswers(submoduleId, questionNumber) {
-    // Правильные ответы для каждого вопроса
-    const answers = {
-        // Модуль 1.1
-        "1.1_1": ["b"], // Эмпатичная реакция на смерть кота
-        "1.1_2": ["b"], // Жалость сверху, эмпатия равенство
-        "1.1_3": ["b"], // Уязвимость для эмпатии
-        
-        // Модуль 1.2
-        "1.2_1": ["b"], // Врач - когнитивная эмпатия
-        "1.2_2": ["b"], // Зеркальные нейроны
-        "1.2_3": ["b"], // Эмоциональная эмпатия ведет к выгоранию
+    // 7. Определяем правильный ответ
+    const answerKey = `${submoduleId}_${questionNumber}`;
+    const correctAnswers = {
+        "1.1_1": "b",
+        "1.1_2": "b",
+        "1.1_3": "b",
+        "1.2_1": "b",
+        "1.2_2": "b",
+        "1.2_3": "b",
         
         // Модуль 1.3
         "1.3_1": ["b"], // Наклон корпуса
@@ -3544,10 +3527,20 @@ function getCorrectAnswers(submoduleId, questionNumber) {
         "3.3_3": ["b"]  // Наклон корпуса
     };
     
-    const answerKey = `${submoduleId}_${questionNumber}`;
-    return answers[answerKey] || null;
+    // 8. Проверяем ответ
+    if (correctAnswers[answerKey] && selected.value === correctAnswers[answerKey]) {
+        feedbackEl.innerHTML = '<div class="feedback success">✅ Правильно!</div>';
+        markQuestionAsCompleted(submoduleId, questionNumber);
+    } else {
+        feedbackEl.innerHTML = '<div class="feedback error">❌ Неверно. Попробуйте еще раз.</div>';
+    }
 }
 
+// Функция для отметки выполненного вопроса
+function markQuestionAsCompleted(submoduleId, questionNumber) {
+    // Ваш код для обновления прогресса
+    console.log(`Вопрос ${questionNumber} в подмодуле ${submoduleId} выполнен`);
+}
 // Функция обновления прогресса в оверлее
 function updateProgressInOverlay(submoduleId) {
     const submoduleElement = document.querySelector(`.overlay-submodule[data-submodule="${submoduleId}"]`);
