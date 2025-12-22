@@ -3606,26 +3606,33 @@ function populateModulesOverlay() {
     
     modulesList.innerHTML = '';
     
-    courseData.modules.forEach(module => {
-        const moduleHTML = `
-            <div class="overlay-module" data-module="${module.id}">
-                <div class="overlay-module-title" onclick="toggleModuleSubmodules(${module.id})">
-                    <span>${module.title}</span>
-                    <span class="module-toggle">▼</span>
-                </div>
-                <div class="overlay-submodules" id="submodules-${module.id}" style="display: none;">
-                    ${module.submodules.map(submodule => `
-                        <div class="overlay-submodule" 
-                             data-submodule="${submodule.id}" 
-                             onclick="loadSubmodule('${submodule.id}')"
-                             ${userProgress.completedSubmodules.includes(submodule.id) ? 'style="color: #2ecc70;"' : ''}>
-                            ${submodule.title}
-                            ${userProgress.completedSubmodules.includes(submodule.id) ? ' ✓' : ''}
-                        </div>
-                    `).join('')}
-                </div>
-            </div>
-        `;
+    courseData.modules.forEach(function(module) {
+        var submodulesHTML = '';
+        
+        // Создаем HTML для каждого подмодуля
+        module.submodules.forEach(function(submodule) {
+            var isCompleted = userProgress.completedSubmodules.includes(submodule.id);
+            var style = isCompleted ? 'style="color: #2ecc70;"' : '';
+            var checkmark = isCompleted ? ' ✓' : '';
+            
+            submodulesHTML += '<div class="overlay-submodule" ' +
+                'data-submodule="' + submodule.id + '" ' +
+                'onclick="loadSubmodule(\'' + submodule.id + '\')" ' +
+                style + '>' +
+                submodule.title + checkmark +
+                '</div>';
+        });
+        
+        var moduleHTML = '<div class="overlay-module" data-module="' + module.id + '">' +
+            '<div class="overlay-module-title" onclick="toggleModuleSubmodules(' + module.id + ')">' +
+                '<span>' + module.title + '</span>' +
+                '<span class="module-toggle">▼</span>' +
+            '</div>' +
+            '<div class="overlay-submodules" id="submodules-' + module.id + '" style="display: none;">' +
+                submodulesHTML +
+            '</div>' +
+        '</div>';
+        
         modulesList.innerHTML += moduleHTML;
     });
 }
