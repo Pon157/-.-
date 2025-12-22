@@ -1202,7 +1202,7 @@ function showProfile() {
             
             <div class="module-card" style="margin-bottom: 15px;">
                 <h4><i class="fas fa-chart-line"></i> Статистика прогресса</h4>
-                <p><strong>Завершено модулей:</strong> ${userProgress.completedModules.length} из ${courseData.modules.length}</p>
+                <p><strong>Завершено модулей:</strong> ${userProgress.completedModules.length} из ${window.courseData ? window.courseData.modules.length : '0'}</p>
                 <p><strong>Завершено подмодулей:</strong> ${userProgress.completedSubmodules.length}</p>
                 <p><strong>Итоговый экзамен:</strong> ${userProgress.finalExamCompleted ? `✅ ${userProgress.finalExamScore} баллов` : '❌ Не пройден'}</p>
             </div>
@@ -1457,35 +1457,28 @@ async function saveProgress() {
     }
 }
 
-async function loadUIState() {
+async function saveUIState() {
     try {
         if (!supabase || !currentUserId) return;
         
-        const { data, error } = await supabase
+        const { error } = await supabase
             .from('ui_state')
-            .select('open_tabs, scroll_positions, theme, settings')
-            .eq('user_id', currentUserId)
-            .single();
+            .upsert({
+                user_id: currentUserId,
+                open_tabs: uiState.openTabs,
+                scroll_positions: uiState.scrollPositions,
+                theme: uiState.theme,
+                settings: uiState.settings,
+                updated_at: new Date().toISOString()
+            }, {
+                onConflict: 'user_id'
+            });
         
-        if (error && error.code !== 'PGRST116') {
-            console.error("Ошибка загрузки состояния UI:", error);
-            return;
-        }
-        
-        if (data) {
-            uiState = {
-                openTabs: data.open_tabs || {},
-                scrollPositions: data.scroll_positions || {},
-                theme: data.theme || 'dark',
-                settings: data.settings || uiState.settings
-            };
-            
-            setTheme(uiState.theme);
-            console.log("✅ Состояние UI загружено");
-        }
+        if (error) throw error;
+        console.log("💾 Состояние UI сохранено");
         
     } catch (error) {
-        console.error("❌ Ошибка загрузки состояния UI:", error);
+        console.error("❌ Ошибка сохранения состояния UI:", error);
     }
 }
 
@@ -1845,10 +1838,20 @@ async function openModule(moduleId, submoduleId) {
     uiState.openTabs[moduleId] = submoduleId;
     await saveUIState();
     
-    const module = courseData.modules.find(m => m.id === moduleId);
-    const submodule = module.submodules.find(s => s.id === submoduleId);
+    // Проверяем, существует ли courseData
+    if (!window.courseData) {
+        console.error('courseData не определен!');
+        showMessage('error', 'Ошибка загрузки данных курса');
+        return;
+    }
     
-    if (!module || !submodule) return;
+    const module = window.courseData.modules.find(m => m.id === moduleId);
+    const submodule = module ? module.submodules.find(s => s.id === submoduleId) : null;
+    
+    if (!module || !submodule) {
+        console.error('Модуль или подмодуль не найден:', moduleId, submoduleId);
+        return;
+    }
     
     document.getElementById('testArea').style.display = 'none';
     document.getElementById('finalExamArea').style.display = 'none';
@@ -1872,7 +1875,13 @@ function setTheme(theme) {
 }
 
 function updateProgressUI() {
-    const totalSubmodules = courseData.modules.reduce((sum, module) => {
+    // Проверяем, существует ли courseData
+    if (!window.courseData || !window.courseData.modules) {
+        console.warn('courseData не загружен, пропускаем updateProgressUI');
+        return;
+    }
+    
+    const totalSubmodules = window.courseData.modules.reduce((sum, module) => {
         return sum + (module.submodules ? module.submodules.length : 0);
     }, 0);
     
@@ -1896,7 +1905,7 @@ function updateProgressUI() {
     
     const finalExamBtn = document.getElementById('finalExamBtn');
     if (finalExamBtn) {
-        const allModulesCompleted = userProgress.completedModules.length === courseData.modules.length;
+        const allModulesCompleted = userProgress.completedModules.length === window.courseData.modules.length;
         if (allModulesCompleted && !userProgress.finalExamCompleted) {
             finalExamBtn.classList.remove('disabled');
             finalExamBtn.onclick = openFinalExam;
@@ -1905,7 +1914,7 @@ function updateProgressUI() {
             finalExamBtn.onclick = function(e) {
                 e.preventDefault();
                 if (!allModulesCompleted) {
-                    alert(`Завершите все модули! Вы прошли ${userProgress.completedModules.length} из ${courseData.modules.length}.`);
+                    alert(`Завершите все модули! Вы прошли ${userProgress.completedModules.length} из ${window.courseData.modules.length}.`);
                 } else {
                     alert('Итоговый экзамен уже пройден!');
                 }
@@ -1931,8 +1940,13 @@ function updateProgressUI() {
 }
 
 function updateModuleProgress() {
+    // Проверяем, существует ли courseData
+    if (!window.courseData || !window.courseData.modules) {
+        return;
+    }
+    
     const moduleId = userProgress.currentModule;
-    const module = courseData.modules.find(m => m.id === moduleId);
+    const module = window.courseData.modules.find(m => m.id === moduleId);
     
     if (!module || !module.submodules) return;
     
@@ -1959,6 +1973,12 @@ function updateModuleProgress() {
 }
 
 function renderModulesList() {
+    // Проверяем, существует ли courseData
+    if (!window.courseData || !window.courseData.modules) {
+        console.warn('courseData не загружен, пропускаем renderModulesList');
+        return;
+    }
+    
     const modulesList = document.getElementById('modulesList');
     if (!modulesList) return;
     
@@ -1977,7 +1997,7 @@ function renderModulesList() {
     
     container.innerHTML = '';
     
-    courseData.modules.forEach(module => {
+    window.courseData.modules.forEach(module => {
         const moduleItem = document.createElement('div');
         moduleItem.className = `module-card ${userProgress.currentModule === module.id ? 'active' : ''}`;
         
@@ -2062,7 +2082,12 @@ function renderTabs(submodule) {
         moduleTabs.appendChild(tab);
     });
     
-    const module = courseData.modules.find(m => 
+    // Проверяем, существует ли courseData
+    if (!window.courseData || !window.courseData.modules) {
+        return;
+    }
+    
+    const module = window.courseData.modules.find(m => 
         m.submodules && m.submodules.some(s => s.id === submodule.id)
     );
     
@@ -2170,7 +2195,14 @@ async function checkAssignment(submoduleId) {
     const moduleId = userProgress.currentModule;
     console.log("Текущий модуль:", moduleId);
     
-    const module = courseData.modules.find(m => m.id === moduleId);
+    // Проверяем, существует ли courseData
+    if (!window.courseData || !window.courseData.modules) {
+        console.error('courseData не загружен!');
+        showMessage('error', 'Ошибка: данные курса не загружены');
+        return;
+    }
+    
+    const module = window.courseData.modules.find(m => m.id === moduleId);
     if (!module) {
         console.error("Модуль не найден:", moduleId);
         return;
@@ -2230,6 +2262,13 @@ async function checkAssignment(submoduleId) {
     console.log("Количество слов:", wordCount);
     
     try {
+        // Проверяем, существует ли функция проверки
+        if (typeof submodule.tabs.assignment.check !== 'function') {
+            console.error("Функция проверки не найдена");
+            showFeedback(feedbackElement, "❌ Ошибка проверки. Функция проверки не найдена.", false);
+            return;
+        }
+        
         const result = submodule.tabs.assignment.check(answer);
         
         console.log("Результат проверки:", result);
@@ -2299,8 +2338,15 @@ function checkExtraAssignment(submoduleId) {
     console.log("=== НАЧАЛО ПРОВЕРКИ ДОПОЛНИТЕЛЬНОГО ЗАДАНИЯ ===");
     
     const moduleId = userProgress.currentModule;
-    const module = courseData.modules.find(m => m.id === moduleId);
-    const submodule = module.submodules.find(s => s.id === submoduleId);
+    
+    // Проверяем, существует ли courseData
+    if (!window.courseData || !window.courseData.modules) {
+        console.error('courseData не загружен!');
+        return;
+    }
+    
+    const module = window.courseData.modules.find(m => m.id === moduleId);
+    const submodule = module ? module.submodules.find(s => s.id === submoduleId) : null;
     
     if (!module || !submodule) {
         console.error("Не найден модуль или подмодуль");
@@ -2363,7 +2409,12 @@ function checkExtraAssignment(submoduleId) {
 }
 
 function checkIfModuleCompleted(moduleId) {
-    const module = courseData.modules.find(m => m.id === moduleId);
+    // Проверяем, существует ли courseData
+    if (!window.courseData || !window.courseData.modules) {
+        return;
+    }
+    
+    const module = window.courseData.modules.find(m => m.id === moduleId);
     if (!module || !module.submodules) return;
     
     const allSubmodulesCompleted = module.submodules.every(sub => 
@@ -2403,7 +2454,13 @@ function checkIfModuleCompleted(moduleId) {
 }
 
 function showTestInfo(moduleId) {
-    const module = courseData.modules.find(m => m.id === moduleId);
+    // Проверяем, существует ли courseData
+    if (!window.courseData || !window.courseData.modules) {
+        console.error('courseData не загружен!');
+        return;
+    }
+    
+    const module = window.courseData.modules.find(m => m.id === moduleId);
     if (!module || !module.test) return;
     
     const modalTitle = document.getElementById('modalTitle');
@@ -2460,7 +2517,13 @@ function showTestInfo(moduleId) {
 }
 
 function showTestResultModal(moduleId) {
-    const module = courseData.modules.find(m => m.id === moduleId);
+    // Проверяем, существует ли courseData
+    if (!window.courseData || !window.courseData.modules) {
+        console.error('courseData не загружен!');
+        return;
+    }
+    
+    const module = window.courseData.modules.find(m => m.id === moduleId);
     const result = userProgress.testResults[moduleId];
     
     if (!module || !result) return;
@@ -2530,7 +2593,13 @@ function showTestResultModal(moduleId) {
 }
 
 function openTest(moduleId) {
-    const module = courseData.modules.find(m => m.id === moduleId);
+    // Проверяем, существует ли courseData
+    if (!window.courseData || !window.courseData.modules) {
+        console.error('courseData не загружен!');
+        return;
+    }
+    
+    const module = window.courseData.modules.find(m => m.id === moduleId);
     if (!module || !module.test) return;
     
     document.getElementById('contentDisplay').style.display = 'none';
@@ -2667,7 +2736,14 @@ function openTest(moduleId) {
 
 function submitTest() {
     const moduleId = userProgress.currentModule;
-    const module = courseData.modules.find(m => m.id === moduleId);
+    
+    // Проверяем, существует ли courseData
+    if (!window.courseData || !window.courseData.modules) {
+        console.error('courseData не загружен!');
+        return;
+    }
+    
+    const module = window.courseData.modules.find(m => m.id === moduleId);
     
     if (!module || !module.test) return;
     
@@ -2766,7 +2842,13 @@ function submitTest() {
 }
 
 function showTestResult(moduleId, result) {
-    const module = courseData.modules.find(m => m.id === moduleId);
+    // Проверяем, существует ли courseData
+    if (!window.courseData || !window.courseData.modules) {
+        console.error('courseData не загружен!');
+        return;
+    }
+    
+    const module = window.courseData.modules.find(m => m.id === moduleId);
     
     const modalTitle = document.getElementById('modalTitle');
     const modalBody = document.getElementById('modalBody');
@@ -2833,16 +2915,18 @@ function showTestResult(moduleId, result) {
 }
 
 function openFinalExam() {
-    const exam = courseData.finalExam;
-    
-    if (!exam) {
+    // Проверяем, существует ли courseData
+    if (!window.courseData || !window.courseData.finalExam) {
+        console.error('courseData не загружен!');
         alert("Итоговый экзамен не найден!");
         return;
     }
     
-    const allModulesCompleted = userProgress.completedModules.length === courseData.modules.length;
+    const exam = window.courseData.finalExam;
+    
+    const allModulesCompleted = userProgress.completedModules.length === window.courseData.modules.length;
     if (!allModulesCompleted) {
-        alert(`Сначала завершите все модули! Вы прошли ${userProgress.completedModules.length} из ${courseData.modules.length}.`);
+        alert(`Сначала завершите все модули! Вы прошли ${userProgress.completedModules.length} из ${window.courseData.modules.length}.`);
         return;
     }
     
@@ -3018,8 +3102,13 @@ function openFinalExam() {
 }
 
 function submitFinalExam() {
-    const exam = courseData.finalExam;
-    if (!exam) return;
+    // Проверяем, существует ли courseData
+    if (!window.courseData || !window.courseData.finalExam) {
+        console.error('courseData не загружен!');
+        return;
+    }
+    
+    const exam = window.courseData.finalExam;
     
     let theoryScore = 0;
     let practicalScore = 0;
@@ -3230,11 +3319,17 @@ function showCertificate() {
         return;
     }
     
+    // Проверяем, существует ли courseData
+    if (!window.courseData || !window.courseData.finalExam) {
+        console.error('courseData не загружен!');
+        return;
+    }
+    
     const certificateModal = document.createElement('div');
     certificateModal.className = 'certificate-modal-overlay';
     certificateModal.id = 'certificateModal';
     
-    const exam = courseData.finalExam;
+    const exam = window.courseData.finalExam;
     const gradeInfo = userProgress.finalExamGrade ? exam.scoring.gradingScale[userProgress.finalExamGrade] || "Успешно завершено" : "Успешно завершено";
     
     certificateModal.innerHTML = `
@@ -3300,7 +3395,7 @@ function showCertificate() {
                                 <div style="margin: 30px 0; padding: 20px; background: #f8f9fa; border-radius: 10px;">
                                     <h4 style="color: #2c3e50; margin-bottom: 15px;">Пройденные модули:</h4>
                                     <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;">
-                                        ${courseData.modules.map(module => `
+                                        ${window.courseData.modules.map(module => `
                                             <span style="background: #e8f4fc; color: #2c3e50; padding: 8px 15px; border-radius: 20px; font-size: 0.9rem;">
                                                 ${module.title.split('.')[1]}
                                             </span>
@@ -3459,9 +3554,12 @@ function resetProgress() {
     if (confirm("Вы уверены, что хотите сбросить весь прогресс?\n\nЭто действие удалит:\n• Все завершенные модули\n• Результаты тестов\n• Результат итогового экзамена\n• Все черновики ответов\n\nЭто действие нельзя отменить.")) {
         userProgress = getDefaultProgress();
         
-        courseData.modules.forEach(module => {
-            module.completed = false;
-        });
+        // Проверяем, существует ли courseData
+        if (window.courseData && window.courseData.modules) {
+            window.courseData.modules.forEach(module => {
+                module.completed = false;
+            });
+        }
         
         localStorage.removeItem('empathyCourseProgress');
         localStorage.removeItem('guestAnswerDrafts');
@@ -3470,7 +3568,7 @@ function resetProgress() {
             // Очищаем черновики в базе данных
             supabase.from('answer_drafts').delete().eq('user_id', currentUserId);
             // Сбрасываем прогресс в базе данных
-            supabase.from('users').update({
+            supabase.from('course_users').update({
                 current_module: 1,
                 current_submodule: '1.1',
                 course_progress: {
