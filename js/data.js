@@ -3452,73 +3452,108 @@ function goToAssignment(submoduleId) {
 
 // Универсальная функция проверки заданий с выбором ответа
 function checkMultipleChoice(submoduleId, questionNumber) {
-    const selected = document.querySelector(`input[name="choice${questionNumber}_${submoduleId.replace('.', '_')}"]:checked`);
-    const feedbackEl = document.getElementById(`choiceFeedback${questionNumber}_${submoduleId.replace('.', '_')}`);
+    // Формируем имя группы радио-кнопок и ID блока с ответом
+    const radioName = `choice${questionNumber}_${submoduleId.replace('.', '_')}`;
+    const feedbackId = `choiceFeedback${questionNumber}_${submoduleId.replace('.', '_')}`;
+    
+    // Находим выбранный вариант и блок для обратной связи
+    const selected = document.querySelector(`input[name="${radioName}"]:checked`);
+    const feedbackEl = document.getElementById(feedbackId);
     
     if (!selected) {
-        feedbackEl.innerHTML = '<div class="feedback error">❌ Пожалуйста, выберите ответ</div>';
+        if (feedbackEl) {
+            feedbackEl.innerHTML = '<div class="feedback error">❌ Пожалуйста, выберите ответ</div>';
+        } else {
+            alert('Пожалуйста, выберите ответ');
+        }
         return;
     }
     
-    // Определяем правильные ответы для каждого вопроса
-    const correctAnswers = {
-        // Модуль 1.1
-        "1.1_1": "b", // Эмпатичная реакция на смерть кота
-        "1.1_2": "b", // Жалость сверху, эмпатия равенство
-        "1.1_3": "b", // Уязвимость для эмпатии
-        
-        // Модуль 1.2
-        "1.2_1": "b", // Врач - когнитивная эмпатия
-        "1.2_2": "b", // Зеркальные нейроны
-        "1.2_3": "b", // Эмоциональная эмпатия ведет к выгоранию
-        
-        // Модуль 1.3
-        "1.3_1": "b", // Наклон корпуса
-        "1.3_2": "a", // Конгруэнтность
-        "1.3_3": "a", // Тональность важна
-        
-        // Модуль 2.1
-        "2.1_1": "b", // Триггер
-        "2.1_2": "b", // Ко-регуляция
-        "2.1_3": "b", // Молча быть рядом
-        
-        // Модуль 2.2
-        "2.2_1": "b", // Токсичная позитивность
-        "2.2_2": "c", // Пример токсичной позитивности
-        "2.2_3": "a", // "Другим еще хуже" обесценивает
-        
-        // Модуль 2.3
-        "2.3_1": "c", // Контроль и выбор
-        "2.3_2": "b", // Холдинг
-        "2.3_3": "b", // Оценочные суждения разрушают
-        
-        // Модуль 3.1
-        "3.1_1": "b", // Техника отражения
-        "3.1_2": "b", // Валидация
-        "3.1_3": "a", // Попугайничанье
-        
-        // Модуль 3.2
-        "3.2_1": "b", // Открытый вопрос
-        "3.2_2": "b", // "Почему" звучит как обвинение
-        "3.2_3": "c", // Вопросы о значении
-        
-        // Модуль 3.3
-        "3.3_1": "b", // Активное молчание
-        "3.3_2": "b", // Паузы дают время подумать
-        "3.3_3": "b"  // Наклон корпуса
-    };
+    if (!feedbackEl) {
+        console.error(`Элемент с ID ${feedbackId} не найден`);
+        return;
+    }
     
-    const answerKey = `${submoduleId}_${questionNumber}`;
+    // Определяем правильные ответы
+    const correctAnswers = getCorrectAnswers(submoduleId, questionNumber);
     
-    if (correctAnswers[answerKey] && selected.value === correctAnswers[answerKey]) {
+    if (correctAnswers && correctAnswers.includes(selected.value)) {
         feedbackEl.innerHTML = '<div class="feedback success">✅ Правильно! Отличный ответ.</div>';
         
         // Добавляем в прогресс
-        if (!userProgress.completedSubmodules.includes(submoduleId)) {
-            userProgress.completedSubmodules.push(submoduleId);
+        if (!userProgress.completedQuestions) {
+            userProgress.completedQuestions = [];
+        }
+        const questionKey = `${submoduleId}_q${questionNumber}`;
+        if (!userProgress.completedQuestions.includes(questionKey)) {
+            userProgress.completedQuestions.push(questionKey);
+            updateProgressInOverlay(submoduleId);
         }
     } else {
         feedbackEl.innerHTML = '<div class="feedback error">❌ Неверно. Попробуйте еще раз или вернитесь к теории.</div>';
+    }
+}
+
+// Функция для определения правильных ответов
+function getCorrectAnswers(submoduleId, questionNumber) {
+    // Правильные ответы для каждого вопроса
+    const answers = {
+        // Модуль 1.1
+        "1.1_1": ["b"], // Эмпатичная реакция на смерть кота
+        "1.1_2": ["b"], // Жалость сверху, эмпатия равенство
+        "1.1_3": ["b"], // Уязвимость для эмпатии
+        
+        // Модуль 1.2
+        "1.2_1": ["b"], // Врач - когнитивная эмпатия
+        "1.2_2": ["b"], // Зеркальные нейроны
+        "1.2_3": ["b"], // Эмоциональная эмпатия ведет к выгоранию
+        
+        // Модуль 1.3
+        "1.3_1": ["b"], // Наклон корпуса
+        "1.3_2": ["a"], // Конгруэнтность
+        "1.3_3": ["a"], // Тональность важна
+        
+        // Модуль 2.1
+        "2.1_1": ["b"], // Триггер
+        "2.1_2": ["b"], // Ко-регуляция
+        "2.1_3": ["b"], // Молча быть рядом
+        
+        // Модуль 2.2
+        "2.2_1": ["b"], // Токсичная позитивность
+        "2.2_2": ["c"], // Пример токсичной позитивности
+        "2.2_3": ["a"], // "Другим еще хуже" обесценивает
+        
+        // Модуль 2.3
+        "2.3_1": ["c"], // Контроль и выбор
+        "2.3_2": ["b"], // Холдинг
+        "2.3_3": ["b"], // Оценочные суждения разрушают
+        
+        // Модуль 3.1
+        "3.1_1": ["b"], // Техника отражения
+        "3.1_2": ["b"], // Валидация
+        "3.1_3": ["a"], // Попугайничанье
+        
+        // Модуль 3.2
+        "3.2_1": ["b"], // Открытый вопрос
+        "3.2_2": ["b"], // "Почему" звучит как обвинение
+        "3.2_3": ["c"], // Вопросы о значении
+        
+        // Модуль 3.3
+        "3.3_1": ["b"], // Активное молчание
+        "3.3_2": ["b"], // Паузы дают время подумать
+        "3.3_3": ["b"]  // Наклон корпуса
+    };
+    
+    const answerKey = `${submoduleId}_${questionNumber}`;
+    return answers[answerKey] || null;
+}
+
+// Функция обновления прогресса в оверлее
+function updateProgressInOverlay(submoduleId) {
+    const submoduleElement = document.querySelector(`.overlay-submodule[data-submodule="${submoduleId}"]`);
+    if (submoduleElement && !submoduleElement.innerHTML.includes('✓')) {
+        submoduleElement.innerHTML += ' ✓';
+        submoduleElement.style.color = '#2ecc71';
     }
 }
 
