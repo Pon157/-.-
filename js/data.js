@@ -3676,8 +3676,8 @@ function loadSubmodule(submoduleId) {
         }
     });
     
-    // Здесь должна быть логика загрузки контента подмодуля
-    console.log(`Загружаем подмодуль: ${submoduleId}`);
+// Здесь должна быть логика загрузки контента подмодуля
+console.log('Загружаем подмодуль: ' + submoduleId);
     
     // В реальном приложении здесь будет вызов функции загрузки контента
     // loadSubmoduleContent(submoduleId);
