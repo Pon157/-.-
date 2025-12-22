@@ -3452,127 +3452,130 @@ function goToAssignment(submoduleId) {
 
 // Универсальная функция проверки заданий с выбором ответа
 function checkMultipleChoice(submoduleId, questionNumber) {
-    // 1. Формируем имя группы radio-кнопок
-    const radioName = `choice${questionNumber}_${submoduleId.replace('.', '_')}`;
-    
-    // 2. Формируем ID блока с обратной связью
-    const feedbackId = `choiceFeedback${questionNumber}_${submoduleId.replace('.', '_')}`;
-    
-    // 3. Ищем выбранную радио-кнопку
-    const selected = document.querySelector(`input[name="${radioName}"]:checked`);
-    
-    // 4. Ищем блок для вывода результата
-    const feedbackEl = document.getElementById(feedbackId);
-    
-    // 5. Проверяем, выбран ли ответ
-    if (!selected) {
-        if (feedbackEl) {
-            feedbackEl.innerHTML = '<div class="feedback error">❌ Пожалуйста, выберите ответ</div>';
-        } else {
-            alert('Пожалуйста, выберите ответ');
-        }
-        return;
-    }
-    
-    // 6. Проверяем, найден ли блок для обратной связи
-    if (!feedbackEl) {
-        console.error('Элемент для обратной связи не найден. ID:', feedbackId);
-        console.log('Попытка найти другие элементы...');
+    try {
+        // 1. Формируем имя группы radio-кнопок (ИСПРАВЛЕНО)
+        const cleanSubmoduleId = submoduleId.replace(/\./g, '_');  // Заменяем ВСЕ точки на подчеркивания
+        const radioName = 'choice' + questionNumber + '_' + cleanSubmoduleId;
         
-        // Ищем любой элемент обратной связи рядом
-        const parentQuestion = selected.closest('.multiple-choice-question');
-        if (parentQuestion) {
-            const anyFeedback = parentQuestion.querySelector('.choice-feedback');
-            if (anyFeedback) {
-                console.log('Нашел альтернативный элемент обратной связи');
-                anyFeedback.innerHTML = '<div class="feedback error">❌ Ошибка поиска ID</div>';
+        // 2. Формируем ID блока с обратной связью
+        const feedbackId = 'choiceFeedback' + questionNumber + '_' + cleanSubmoduleId;
+        
+        // 3. Ищем выбранную радио-кнопку
+        const selector = 'input[name="' + radioName + '"]:checked';
+        const selected = document.querySelector(selector);
+        
+        // 4. Ищем блок для вывода результата
+        const feedbackEl = document.getElementById(feedbackId);
+        
+        // 5. Проверяем, выбран ли ответ
+        if (!selected) {
+            if (feedbackEl) {
+                feedbackEl.innerHTML = '<div class="feedback error">❌ Выберите ответ</div>';
+            } else {
+                alert('Выберите ответ');
             }
+            return false;
         }
-        return;
-    }
-    
-    // 7. Определяем правильный ответ (ВСЕ ЗНАЧЕНИЯ - СТРОКИ)
-    const answerKey = `${submoduleId}_${questionNumber}`;
-    const correctAnswers = {
-        // Модуль 1.1 - ВСЕ СТРОКИ
-        "1.1_1": "b",
-        "1.1_2": "b", 
-        "1.1_3": "b",
         
-        // Модуль 1.2
-        "1.2_1": "b",
-        "1.2_2": "b",
-        "1.2_3": "b",
-        
-        // Модуль 1.3
-        "1.3_1": "b", // Наклон корпуса
-        "1.3_2": "a", // Конгруэнтность
-        "1.3_3": "a", // Тональность важна
-        
-        // Модуль 2.1
-        "2.1_1": "b", // Триггер
-        "2.1_2": "b", // Ко-регуляция
-        "2.1_3": "b", // Молча быть рядом
-        
-        // Модуль 2.2
-        "2.2_1": "b", // Токсичная позитивность
-        "2.2_2": "c", // Пример токсичной позитивности
-        "2.2_3": "a", // "Другим еще хуже" обесценивает
-        
-        // Модуль 2.3
-        "2.3_1": "c", // Контроль и выбор
-        "2.3_2": "b", // Холдинг
-        "2.3_3": "b", // Оценочные суждения разрушают
-        
-        // Модуль 3.1
-        "3.1_1": "b", // Техника отражения
-        "3.1_2": "b", // Валидация
-        "3.1_3": "a", // Попугайничанье
-        
-        // Модуль 3.2
-        "3.2_1": "b", // Открытый вопрос
-        "3.2_2": "b", // "Почему" звучит как обвинение
-        "3.2_3": "c", // Вопросы о значении
-        
-        // Модуль 3.3
-        "3.3_1": "b", // Активное молчание
-        "3.3_2": "b", // Паузы дают время подумать
-        "3.3_3": "b"  // Наклон корпуса
-    };
-    
-    // 8. Проверяем ответ
-    const correctAnswer = correctAnswers[answerKey];
-    
-    if (!correctAnswer) {
-        console.error('Не найден правильный ответ для ключа:', answerKey);
-        feedbackEl.innerHTML = '<div class="feedback error">❌ Ошибка проверки: нет данных</div>';
-        return;
-    }
-    
-    // Сравниваем выбранное значение с правильным
-    if (selected.value === correctAnswer) {
-        feedbackEl.innerHTML = '<div class="feedback success">✅ Правильно!</div>';
-        
-        // Отмечаем вопрос как выполненный
-        if (typeof markQuestionAsCompleted === 'function') {
-            markQuestionAsCompleted(submoduleId, questionNumber);
+        // 6. Проверяем, найден ли блок для обратной связи
+        if (!feedbackEl) {
+            // Альтернативный поиск: ищем ближайший .choice-feedback
+            const questionContainer = selected.closest('.multiple-choice-question');
+            if (questionContainer) {
+                const altFeedback = questionContainer.querySelector('.choice-feedback');
+                if (altFeedback) {
+                    altFeedback.innerHTML = '<div class="feedback error">❌ Не найден блок результатов</div>';
+                }
+            }
+            return false;
         }
-    } else {
-        feedbackEl.innerHTML = `<div class="feedback error">❌ Неверно. Правильный ответ: ${correctAnswer.toUpperCase()}</div>`;
+        
+        // 7. Определяем правильный ответ
+        const answerKey = submoduleId + '_' + questionNumber;
+        const correctAnswers = {
+            // Модуль 1.1
+            "1.1_1": "b",
+            "1.1_2": "b", 
+            "1.1_3": "b",
+            
+            // Модуль 1.2
+            "1.2_1": "b",
+            "1.2_2": "b",
+            "1.2_3": "b",
+            
+            // Модуль 1.3
+            "1.3_1": "b",
+            "1.3_2": "a", 
+            "1.3_3": "a",
+            
+            // Модуль 2.1
+            "2.1_1": "b",
+            "2.1_2": "b",
+            "2.1_3": "b",
+            
+            // Модуль 2.2
+            "2.2_1": "b",
+            "2.2_2": "c",
+            "2.2_3": "a",
+            
+            // Модуль 2.3
+            "2.3_1": "c",
+            "2.3_2": "b",
+            "2.3_3": "b",
+            
+            // Модуль 3.1
+            "3.1_1": "b",
+            "3.1_2": "b",
+            "3.1_3": "a",
+            
+            // Модуль 3.2
+            "3.2_1": "b",
+            "3.2_2": "b",
+            "3.2_3": "c",
+            
+            // Модуль 3.3
+            "3.3_1": "b",
+            "3.3_2": "b",
+            "3.3_3": "b"
+        };
+        
+        // 8. Проверяем ответ
+        const correctAnswer = correctAnswers[answerKey];
+        
+        if (!correctAnswer) {
+            console.warn('Нет данных для ключа:', answerKey);
+            feedbackEl.innerHTML = '<div class="feedback warning">⚠️ Ответ принят (тест)</div>';
+            return true;
+        }
+        
+        // 9. Сравниваем
+        if (selected.value === correctAnswer) {
+            feedbackEl.innerHTML = '<div class="feedback success">✅ Правильно!</div>';
+            
+            // Отмечаем прогресс
+            markQuestionCompleted(submoduleId, questionNumber);
+            return true;
+        } else {
+            feedbackEl.innerHTML = '<div class="feedback error">❌ Неверно</div>';
+            return false;
+        }
+        
+    } catch (error) {
+        console.error('Ошибка в checkMultipleChoice:', error);
+        alert('Ошибка при проверке ответа');
+        return false;
     }
 }
 
-// Функция для отметки выполненного вопроса (если её нет)
-if (typeof markQuestionAsCompleted === 'undefined') {
-    function markQuestionAsCompleted(submoduleId, questionNumber) {
-        console.log(`Отмечаю вопрос ${questionNumber} в подмодуле ${submoduleId} как выполненный`);
-        
-        // Обновляем оверлей
-        const submoduleEl = document.querySelector(`.overlay-submodule[data-submodule="${submoduleId}"]`);
-        if (submoduleEl && !submoduleEl.innerHTML.includes('✓')) {
-            submoduleEl.innerHTML += ' ✓';
-            submoduleEl.style.color = '#2ecc71';
-        }
+// Функция для отметки выполненного вопроса
+function markQuestionCompleted(submoduleId, questionNumber) {
+    console.log('Вопрос выполнен:', submoduleId, questionNumber);
+    
+    // Обновляем оверлей, если он есть
+    const submoduleEl = document.querySelector('.overlay-submodule[data-submodule="' + submoduleId + '"]');
+    if (submoduleEl && !submoduleEl.innerHTML.includes('✓')) {
+        submoduleEl.innerHTML = submoduleEl.innerHTML + ' ✓';
+        submoduleEl.style.color = '#2ecc71';
     }
 }
 
