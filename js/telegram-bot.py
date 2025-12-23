@@ -12,10 +12,10 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.utils.keyboard import InlineKeyboardBuilder
-from aiogram.exceptions import TelegramAPIError, TelegramForbiddenError, TelegramBadRequest
+from aiogram.exceptions import TelegramForbiddenError, TelegramBadRequest, TelegramAPIError
 
 # --- ЛОГИ ---
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(message)s")
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 # --- КОНФИГУРАЦИЯ ---
@@ -34,7 +34,8 @@ db_path = script_dir / "academy_pro.db"
 def init_db():
     conn = sqlite3.connect(db_path)
     cur = conn.cursor()
-    cur.execute("CREATE TABLE IF NOT EXISTS users (user_id INTEGER PRIMARY KEY, curator_id INTEGER, is_banned INTEGER DEFAULT 0, full_name TEXT)")
+    cur.execute("""CREATE TABLE IF NOT EXISTS users 
+                   (user_id INTEGER PRIMARY KEY, curator_id INTEGER, is_banned INTEGER DEFAULT 0, full_name TEXT)""")
     try: cur.execute("ALTER TABLE users ADD COLUMN full_name TEXT")
     except: pass
     conn.commit()
@@ -71,17 +72,43 @@ class BotStates(StatesGroup):
     admin_apply = State()
 
 # --- ВСПОМОГАТЕЛЬНЫЕ ---
-async def delete_after_5s(msg: types.Message):
+async def delete_msg_fast(msg: types.Message):
     await asyncio.sleep(5)
     try: await msg.delete()
     except: pass
 
-async def send_report(m: types.Message, text: str):
-    rep = await m.answer(f"✅ {text}")
-    asyncio.create_task(delete_after_5s(rep))
+async def send_temp_status(m: types.Message, text: str):
+    try:
+        rep = await m.answer(text)
+        asyncio.create_task(delete_msg_fast(rep))
+    except: pass
 
-# --- КЛАВИАТУРЫ ---
-def get_main_kb():
+# --- КОМАНДЫ АДМИНА (БАН) ---
+
+@dp.message(Command("ban"))
+async def cmd_ban(message: types.Message):
+    if message.chat.id not in ADMIN_CHATS: return
+    
+    target_id = None
+    # 1. Если указан ID: /ban 12345
+    parts = message.text.split()
+    if len(parts) > 1 and parts[1].isdigit():
+        target_id = int(parts[1])
+    # 2. Если ответ на сообщение
+    elif message.reply_to_message:
+        src = message.reply_to_message.text or message.reply_to_message.caption or ""
+        match = re.search(r"ID: (\d+)", src)
+        if match: target_id = int(match.group(1))
+
+    if target_id:
+        update_user_db(target_id, is_banned=1)
+        await message.reply(f"🚫 Пользователь <code>{target_id}</code> <b>ЗАБАНЕН</b>.", parse_mode="HTML")
+    else:
+        await message.reply("Не удалось найти ID. Либо /ban [ID], либо ответ на инфо-карточку.")
+
+# --- ПОЛЬЗОВАТЕЛЬСКОЕ МЕНЮ ---
+
+def main_kb():
     builder = InlineKeyboardBuilder()
     builder.button(text="🎓 Помощь куратора", callback_data="m_curator")
     builder.button(text="✍️ Стресс-тест", callback_data="m_stress")
@@ -89,99 +116,115 @@ def get_main_kb():
     builder.adjust(1)
     return builder.as_markup()
 
-# --- ХЕНДЛЕРЫ ---
-
 @dp.message(Command("start"))
 async def cmd_start(message: types.Message, state: FSMContext):
     await state.clear()
-    await message.answer(f"Привет! Выберите раздел:", reply_markup=get_main_kb())
+    _, banned, _ = get_user_data(message.from_user.id)
+    if banned: return await message.answer("🚫 Вы заблокированы в системе.")
+    await message.answer("Привет! Выберите раздел для бесконечного общения:", reply_markup=main_kb())
 
 @dp.callback_query(F.data == "back_to_menu")
 async def back(callback: types.CallbackQuery, state: FSMContext):
     await state.clear()
-    await callback.message.edit_text("Главное меню:", reply_markup=get_main_kb())
+    await callback.message.edit_text("Главное меню:", reply_markup=main_kb())
 
 @dp.callback_query(F.data.startswith("m_"))
-async def mode_select(callback: types.CallbackQuery, state: FSMContext):
-    _, _, name = get_user_data(callback.from_user.id)
+async def mode_handler(callback: types.CallbackQuery, state: FSMContext):
+    uid = callback.from_user.id
+    _, banned, name = get_user_data(uid)
+    if banned: return await callback.answer("Вы забанены.", show_alert=True)
+    
     if not name:
         await state.update_data(target=callback.data)
         await state.set_state(BotStates.registration)
         return await callback.message.edit_text("📝 Введите ваше <b>Имя и Фамилию</b>:", parse_mode="HTML")
     
-    await enter_chat(callback.message, state, callback.data, True)
+    await open_infinite_chat(callback.message, state, callback.data, edit=True)
 
 @dp.message(BotStates.registration)
-async def reg_done(message: types.Message, state: FSMContext):
+async def process_reg(message: types.Message, state: FSMContext):
+    if not message.text or len(message.text) < 3:
+        return await message.answer("Введите имя полностью.")
     update_user_db(message.from_user.id, full_name=message.text)
     data = await state.get_data()
     await message.answer(f"Приятно познакомиться, {message.text}!")
-    await enter_chat(message, state, data.get("target", "m_curator"), False)
+    await open_infinite_chat(message, state, data.get("target", "m_curator"), edit=False)
 
-async def enter_chat(message: types.Message, state: FSMContext, mode: str, edit: bool):
-    kb = InlineKeyboardBuilder().button(text="🔙 Меню", callback_data="back_to_menu").as_markup()
+async def open_infinite_chat(message: types.Message, state: FSMContext, mode: str, edit: bool):
+    kb = InlineKeyboardBuilder().button(text="🔙 Выйти в меню", callback_data="back_to_menu").as_markup()
+    txt = ""
     if "curator" in mode:
         await state.set_state(BotStates.chat_curator)
-        txt = "💬 Чат с куратором открыт."
+        txt = "💬 <b>Чат с КУРАТОРОМ открыт.</b>\nПишите всё, что хотите, он увидит."
     elif "stress" in mode:
         await state.set_state(BotStates.chat_stress)
-        txt = "🔥 ЭКЗАМЕН. Напишите «Готов»."
+        txt = "🔥 <b>РЕЖИМ ЭКЗАМЕНА.</b>\nЕсли готовы, напишите «Готов»."
     else:
         await state.set_state(BotStates.admin_apply)
-        txt = "📋 Чат 'Стать админом' открыт."
+        txt = "📋 <b>Чат 'СТАТЬ АДМИНОМ' открыт.</b>\nПишите вашу заявку."
 
-    if edit: await message.edit_text(txt, reply_markup=kb)
-    else: await message.answer(txt, reply_markup=kb)
+    if edit: await message.edit_text(txt, parse_mode="HTML", reply_markup=kb)
+    else: await message.answer(txt, parse_mode="HTML", reply_markup=kb)
 
-# --- ПЕРЕСЫЛКА (ОТ ПОЛЬЗОВАТЕЛЯ К АДМИНУ) ---
+# --- БЕСКОНЕЧНЫЙ ЧАТ (ОТ ПОЛЬЗОВАТЕЛЯ) ---
 
 @dp.message(StateFilter(BotStates.chat_curator, BotStates.chat_stress, BotStates.admin_apply))
-async def forward_to_admin(m: types.Message, state: FSMContext):
+async def forward_msg(m: types.Message, state: FSMContext):
     cur_id, banned, name = get_user_data(m.from_user.id)
     if banned: return
     
     st = await state.get_state()
-    chat = CHAT_CURATOR
-    label = "🆕 КУРАТОР"
-    if st == BotStates.chat_curator.state and cur_id: label = "🔒 УЧЕНИК"
-    elif st == BotStates.chat_stress.state: chat, label = CHAT_STRESS_TEST, "⚠️ СТРЕСС"
-    elif st == BotStates.admin_apply.state: chat, label = CHAT_ADMIN_APPLY, "📧 ЗАЯВКА"
+    chat_id = CHAT_CURATOR
+    tag = "🆕 НОВЫЙ"
+    if st == BotStates.chat_curator.state and cur_id: tag = "🔒 УЧЕНИК"
+    elif st == BotStates.chat_stress.state: chat_id, tag = CHAT_STRESS_TEST, "⚠️ СТРЕСС"
+    elif st == BotStates.admin_apply.state: chat_id, tag = CHAT_ADMIN_APPLY, "📧 ЗАЯВКА"
 
-    header = f"👤 <b>{name}</b>\n{label} | ID: <code>{m.from_user.id}</code>"
+    header = f"👤 <b>{name}</b>\n{tag} | ID: <code>{m.from_user.id}</code>"
     
     try:
+        # Шлем инфо-карточку + само сообщение
         if m.text:
-            await bot.send_message(chat, f"{header}\n\nСообщение: {m.text}", parse_mode="HTML")
+            await bot.send_message(chat_id, f"{header}\n\n📝: {m.text}", parse_mode="HTML")
         else:
-            await bot.send_message(chat, header, parse_mode="HTML")
-            await m.copy_to(chat)
-        await send_report(m, "Отправлено")
+            await bot.send_message(chat_id, header, parse_mode="HTML")
+            await m.copy_to(chat_id)
+        await send_temp_status(m, "✅ Доставлено")
     except Exception as e:
-        logger.error(e)
+        logger.error(f"Forward error: {e}")
 
-# --- ОТВЕТЫ (ОТ АДМИНА К ПОЛЬЗОВАТЕЛЮ) ---
+# --- ОТВЕТЫ АДМИНА (С ОБРАБОТКОЙ ОШИБОК) ---
 
 @dp.message(F.reply_to_message)
-async def admin_reply(message: types.Message):
+async def admin_answer(message: types.Message):
     if message.chat.id not in ADMIN_CHATS: return
     
-    # Ищем ID в тексте сообщения, на которое отвечаем
     src = message.reply_to_message.text or message.reply_to_message.caption or ""
     match = re.search(r"ID: (\d+)", src)
     if not match: return
     
     user_id = int(match.group(1))
-    
-    if message.chat.id == CHAT_CURATOR:
-        c_id, _, _ = get_user_data(user_id)
-        if not c_id: update_user_db(user_id, curator_id=message.from_user.id)
 
     try:
         await message.copy_to(user_id)
-        try: await message.react([types.ReactionTypeEmoji(emoji="✅")])
+        # Ставим реакцию, если получилось (только для новых версий ТГ)
+        try: await message.react([types.ReactionTypeEmoji(emoji="✍️")])
         except: pass
-    except:
-        await message.reply("❌ Не доставлено.")
+        
+        # Если куратор ответил первым - привязываем его
+        if message.chat.id == CHAT_CURATOR:
+            c_id, _, _ = get_user_data(user_id)
+            if not c_id: update_user_db(user_id, curator_id=message.from_user.id)
+
+    except TelegramForbiddenError:
+        await message.reply("❌ <b>ОШИБКА:</b> Пользователь заблокировал бота. Сообщение не доставлено.")
+    except TelegramBadRequest as e:
+        await message.reply(f"❌ <b>ОШИБКА:</b> Некорректный запрос или пользователь удалил чат. ({e.message})")
+    except TelegramAPIError as e:
+        await message.reply(f"❌ <b>КРИТИЧЕСКАЯ ОШИБКА:</b> Сообщение не ушло. Текст: {e.message}")
+    except Exception as e:
+        logger.error(f"Global reply error: {e}")
+        await message.reply("❌ Неизвестная техническая ошибка при отправке.")
 
 async def main():
     await bot.delete_webhook(drop_pending_updates=True)
