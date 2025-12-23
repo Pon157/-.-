@@ -6,12 +6,11 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 from aiogram import Bot, Dispatcher, F, types
-from aiogram.filters import Command
+from aiogram.filters import Command, StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.utils.keyboard import InlineKeyboardBuilder
-from aiogram.exceptions import TelegramBadRequest
 
 # --- КОНФИГУРАЦИЯ ---
 script_dir = Path(__file__).parent
@@ -19,7 +18,6 @@ env_path = script_dir / '.env' if (script_dir / '.env').exists() else script_dir
 load_dotenv(dotenv_path=env_path)
 TOKEN = os.getenv("BOT_TOKEN")
 
-# Твои ID чатов
 CHAT_CURATOR = -1003550048093
 CHAT_STRESS_TEST = -1003584211374
 CHAT_ADMIN_APPLY = -1003686254634
@@ -62,7 +60,6 @@ class BotStates(StatesGroup):
     admin_apply = State()
 
 # --- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ---
-
 async def delete_after_delay(message: types.Message, delay: int = 5):
     await asyncio.sleep(delay)
     try:
@@ -85,94 +82,76 @@ def get_main_kb():
     return builder.as_markup()
 
 def get_back_kb():
-    builder = InlineKeyboardBuilder()
-    builder.button(text="🔙 Выйти из чата / Меню", callback_data="back_to_menu")
-    return builder.as_markup()
+    return InlineKeyboardBuilder().button(text="🔙 Выйти в меню", callback_data="back_to_menu").as_markup()
 
 # --- ХЕНДЛЕРЫ ---
 
 @dp.message(Command("start"))
 async def cmd_start(message: types.Message, state: FSMContext):
     await state.clear()
-    await message.answer(f"Привет, {message.from_user.first_name}! Выберите раздел для общения:", reply_markup=get_main_kb())
+    await message.answer(f"Привет, {message.from_user.first_name}! Выберите раздел:", reply_markup=get_main_kb())
 
 @dp.callback_query(F.data == "back_to_menu")
 async def back_to_menu(callback: types.CallbackQuery, state: FSMContext):
     await state.clear()
-    await callback.message.edit_text("Вы вышли из чата. Главное меню:", reply_markup=get_main_kb())
+    await callback.message.edit_text("Главное меню:", reply_markup=get_main_kb())
 
 @dp.callback_query(F.data.startswith("mode_"))
 async def modes_handler(callback: types.CallbackQuery, state: FSMContext):
     if callback.data == "mode_curator":
         await state.set_state(BotStates.chat_curator)
-        await callback.message.edit_text("💬 Чат с куратором открыт. Пишите ваши сообщения. Для выхода нажмите кнопку ниже:", reply_markup=get_back_kb())
+        await callback.message.edit_text("💬 ЧАТ С КУРАТОРОМ\nПишите ваши сообщения:", reply_markup=get_back_kb())
     elif callback.data == "mode_stress":
         await state.set_state(BotStates.chat_stress)
-        await callback.message.edit_text("🔥 Режим Стресс-теста активен. Экзаменатор на связи:", reply_markup=get_back_kb())
+        await callback.message.edit_text("🔥 РЕЖИМ СТРЕСС-ТЕСТА\nЭкзаменатор на связи:", reply_markup=get_back_kb())
     elif callback.data == "mode_admin":
         await state.set_state(BotStates.admin_apply)
-        await callback.message.edit_text("📋 Чат по заявкам. Пишите подробности:", reply_markup=get_back_kb())
+        await callback.message.edit_text("📋 ЧАТ ПО ЗАЯВКАМ\nПишите подробности:", reply_markup=get_back_kb())
 
-# --- БЕСКОНЕЧНАЯ ПЕРЕСЫЛКА ---
+# --- БЕСКОНЕЧНЫЙ ЧАТ (ИСПРАВЛЕННЫЙ ФИЛЬТР) ---
 
-@dp.message(state=[BotStates.chat_curator, BotStates.chat_stress, BotStates.admin_apply])
+@dp.message(StateFilter(BotStates.chat_curator, BotStates.chat_stress, BotStates.admin_apply))
 async def process_infinite_chat(m: types.Message, state: FSMContext):
     current_state = await state.get_state()
-    
     target_chat = None
     prefix = ""
-    
-    if current_state == BotStates.chat_curator:
+
+    if current_state == BotStates.chat_curator.state:
         target_chat = CHAT_CURATOR
         cur_id, _ = get_user_data(m.from_user.id)
         prefix = "🔒 ВАШ УЧЕНИК" if cur_id else "🆕 КУРАТОР (НОВЫЙ)"
-    elif current_state == BotStates.chat_stress:
+    elif current_state == BotStates.chat_stress.state:
         target_chat = CHAT_STRESS_TEST
         prefix = "⚠️ СТРЕСС-ТЕСТ"
-    elif current_state == BotStates.admin_apply:
+    elif current_state == BotStates.admin_apply.state:
         target_chat = CHAT_ADMIN_APPLY
         prefix = "📧 ЗАЯВКА"
 
     try:
-        # Отправляем инфо-карточку только если это не текстовый ответ (чтобы не спамить карточками)
-        # Но для простоты оставим карточку перед каждым сообщением, чтобы админ мог нажать Reply
         await bot.send_message(target_chat, f"👤 {prefix}\nID: <code>{m.from_user.id}</code>", parse_mode="HTML")
         await m.copy_to(target_chat)
         await safe_send_report(m, "Доставлено", True)
-    except Exception as e:
-        await safe_send_report(m, "Ошибка доставки", False)
+    except Exception:
+        await safe_send_report(m, "Ошибка отправки", False)
 
-# --- ОТВЕТЫ АДМИНОВ ПОЛЬЗОВАТЕЛЮ ---
-
+# --- ОТВЕТЫ ---
 @dp.message(F.reply_to_message)
 async def handle_admin_reply(message: types.Message):
-    # Проверяем, что админ пишет в одном из рабочих чатов
-    if message.chat.id not in [CHAT_CURATOR, CHAT_STRESS_TEST, CHAT_ADMIN_APPLY]:
-        return
-
-    # Ищем ID пользователя в сообщении, на которое отвечает админ
+    if message.chat.id not in [CHAT_CURATOR, CHAT_STRESS_TEST, CHAT_ADMIN_APPLY]: return
     match = re.search(r"ID: (\d+)", message.reply_to_message.text or message.reply_to_message.caption or "")
-    if not match:
-        return
-
+    if not match: return
+    
     user_id = int(match.group(1))
-
-    # Если это чат кураторов, закрепляем его
     if message.chat.id == CHAT_CURATOR:
         cur_id, _ = get_user_data(user_id)
-        if not cur_id:
-            set_curator(user_id, message.from_user.id)
+        if not cur_id: set_curator(user_id, message.from_user.id)
 
     try:
-        # Пересылаем ответ админа пользователю
         await message.copy_to(user_id)
-        # Ставим реакцию админу, что ушло
-        try:
-            await message.react([types.ReactionTypeEmoji(emoji="✅")])
-        except:
-            pass
-    except Exception:
-        await message.reply("❌ Не удалось отправить ответ. Возможно, пользователь заблокировал бота.")
+        try: await message.react([types.ReactionTypeEmoji(emoji="✅")])
+        except: pass
+    except:
+        await message.reply("❌ Не доставлено.")
 
 async def main():
     await bot.delete_webhook(drop_pending_updates=True)
