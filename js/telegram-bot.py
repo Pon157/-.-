@@ -121,7 +121,7 @@ async def cmd_start(message: types.Message, state: FSMContext):
     await state.clear()
     _, banned, _ = get_user_data(message.from_user.id)
     if banned: return await message.answer("🚫 Вы заблокированы в системе.")
-    await message.answer("Привет! Выберите раздел для бесконечного общения:", reply_markup=main_kb())
+    await message.answer("Привет! Выберите раздел", reply_markup=main_kb())
 
 @dp.callback_query(F.data == "back_to_menu")
 async def back(callback: types.CallbackQuery, state: FSMContext):
