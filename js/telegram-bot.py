@@ -10,7 +10,8 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 # --- КОНФИГУРАЦИЯ ---
-TOKEN = "8349134247:AAGlPUb6tP1WLAE2udSKj5P_TPY9zRny9Os"
+load_dotenv()  # Загружаем переменные из .env
+TOKEN = os.getenv("BOT_TOKEN")
 
 # Твои актуальные ID
 CHAT_CURATOR = -1003550048093
