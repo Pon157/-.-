@@ -2,6 +2,7 @@ import asyncio
 import logging
 import re
 import sqlite3
+from dotenv import load_dotenv
 from aiogram import Bot, Dispatcher, F, types
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
