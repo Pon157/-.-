@@ -2099,30 +2099,27 @@ function renderTabs(submodule) {
     moduleTabs.innerHTML = '';
     contentDisplay.innerHTML = '';
     
-    if (!submodule.tabs) {
+    // Проверяем, есть ли контент у подмодуля
+    if (!submodule || !submodule.content) {
         contentDisplay.innerHTML = '<p>Нет контента для этого подмодуля</p>';
         return;
     }
     
-    const tabNames = Object.keys(submodule.tabs);
+    // Создаем одну вкладку "Теория и практика"
+    const tab = document.createElement('div');
+    tab.className = 'tab active';
+    tab.textContent = 'Теория и практика';
+    tab.dataset.tab = 'content';
     
-    tabNames.forEach((tabName, index) => {
-        const tab = document.createElement('div');
-        tab.className = `tab ${index === 0 ? 'active' : ''}`;
-        tab.textContent = submodule.tabs[tabName].title;
-        tab.dataset.tab = tabName;
-        
-        tab.addEventListener('click', () => {
-            document.querySelectorAll('.tab').forEach(t => {
-                t.classList.remove('active');
-            });
-            tab.classList.add('active');
-            
-            showTabContent(tabName, submodule);
+    tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => {
+            t.classList.remove('active');
         });
-        
-        moduleTabs.appendChild(tab);
+        tab.classList.add('active');
+        showTabContent(submodule);
     });
+    
+    moduleTabs.appendChild(tab);
     
     // Проверяем, существует ли courseData
     if (!window.courseData || !window.courseData.modules) {
@@ -2156,20 +2153,18 @@ function renderTabs(submodule) {
         }
     }
     
-    if (tabNames.length > 0) {
-        showTabContent(tabNames[0], submodule);
-    }
+    showTabContent(submodule);
 }
 
-function showTabContent(tabName, submodule) {
+function showTabContent(submodule) {
     const contentDisplay = document.getElementById('contentDisplay');
     
-    if (!submodule.tabs[tabName]) {
+    if (!submodule || !submodule.content) {
         contentDisplay.innerHTML = '<p>Контент не найден</p>';
         return;
     }
     
-    let content = submodule.tabs[tabName].content;
+    let content = submodule.content;
     
     // Улучшаем форматирование контента
     content = content
@@ -2177,12 +2172,7 @@ function showTabContent(tabName, submodule) {
         .replace(/<h4>/g, '<h4 class="sub-heading">')
         .replace(/<p>/g, '<p class="text-paragraph">')
         .replace(/<ul>/g, '<ul class="enhanced-list">')
-        .replace(/<ol>/g, '<ol class="enhanced-list">')
-        .replace(/class="quote"/g, 'class="quote-box"')
-        .replace(/class="author"/g, 'class="quote-author"')
-        .replace(/class="source"/g, 'class="source-box"')
-        .replace(/class="definition"/g, 'class="definition-box"')
-        .replace(/class="practical-tip"/g, 'class="practical-tip"');
+        .replace(/<ol>/g, '<ol class="enhanced-list">');
     
     contentDisplay.innerHTML = `
         <div class="tab-content active">
