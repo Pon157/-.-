@@ -1,3 +1,49 @@
+function checkAssignment(submoduleId) {
+    console.log("=== НАЧАЛО ПРОВЕРКИ ===");
+    
+    // Находим текущий модуль и подмодуль
+    const moduleId = userProgress.currentModule;
+    const module = courseData.modules.find(m => m.id === moduleId);
+    const submodule = module.submodules.find(s => s.id === submoduleId);
+    
+    if (!module || !submodule) {
+        console.error("Модуль или подмодуль не найдены");
+        return;
+    }
+    
+    // ID элементов
+    const answerId = 'answer' + submoduleId.replace('.', '_');
+    const feedbackId = 'feedback' + submoduleId.replace('.', '_');
+    
+    const answerElement = document.getElementById(answerId);
+    const feedbackElement = document.getElementById(feedbackId);
+    
+    if (!answerElement || !feedbackElement) return;
+    
+    const answer = answerElement.value.trim();
+    
+    if (!answer) {
+        showFeedback(feedbackElement, "❌ Пожалуйста, напишите ответ перед проверкой.", false);
+        return;
+    }
+    
+    // После успешной проверки можно очистить черновик
+    if (isAuthenticated && currentUserId) {
+        // Очищаем черновик после успешной проверки
+        const key = `${submoduleId}_main`;
+        answerDraftsCache.delete(key);
+        
+        // Удаляем из базы данных
+        supabase
+            .from('answer_drafts')
+            .delete()
+            .eq('user_id', currentUserId)
+            .eq('submodule_id', submoduleId)
+            .eq('answer_type', 'main');
+    }
+}
+
+
 // УЛУЧШЕННАЯ БАЗА ЗНАНИЙ С СИСТЕМОЙ ПРОВЕРКИ
 const knowledgeBase = {
     // Модуль 1.1
