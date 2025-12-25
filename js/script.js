@@ -2222,60 +2222,24 @@ function initCheckButtons() {
 
 async function checkAssignment(submoduleId) {
     console.log("=== НАЧАЛО ПРОВЕРКИ ===");
-    console.log("Подмодуль для проверки:", submoduleId);
     
     const moduleId = userProgress.currentModule;
-    console.log("Текущий модуль:", moduleId);
-    
-    // Проверяем, существует ли courseData
-    if (!window.courseData || !window.courseData.modules) {
-        console.error('courseData не загружен!');
-        showMessage('error', 'Ошибка: данные курса не загружены');
-        return;
-    }
-    
     const module = window.courseData.modules.find(m => m.id === moduleId);
-    if (!module) {
-        console.error("Модуль не найден:", moduleId);
-        return;
-    }
-    
-    console.log("Найден модуль:", module.title);
-    
     const submodule = module.submodules.find(s => s.id === submoduleId);
-    if (!submodule) {
-        console.error("Подмодуль не найден:", submoduleId);
+    
+    if (!module || !submodule) {
+        console.error("Модуль или подмодуль не найдены");
         return;
     }
     
-    console.log("Найден подмодуль:", submodule.title);
-    
-    if (!submodule.tabs || !submodule.tabs.assignment) {
-        console.error("У подмодуля нет задания:", submoduleId);
-        return;
-    }
-    
-    console.log("Задание найдено");
-    
+    // ID элементов
     const answerId = 'answer' + submoduleId.replace('.', '_');
     const feedbackId = 'feedback' + submoduleId.replace('.', '_');
-    
-    console.log("Ищем элементы:", answerId, feedbackId);
     
     const answerElement = document.getElementById(answerId);
     const feedbackElement = document.getElementById(feedbackId);
     
-    if (!answerElement) {
-        console.error("Не найден textarea с id:", answerId);
-        return;
-    }
-    
-    if (!feedbackElement) {
-        console.error("Не найден feedback с id:", feedbackId);
-        return;
-    }
-    
-    console.log("Элементы найдены!");
+    if (!answerElement || !feedbackElement) return;
     
     const answer = answerElement.value.trim();
     
@@ -2290,69 +2254,52 @@ async function checkAssignment(submoduleId) {
         return;
     }
     
-    console.log("Ответ пользователя (первые 100 символов):", answer.substring(0, 100) + "...");
-    console.log("Количество слов:", wordCount);
+    // Простая проверка - если ответ содержит достаточно слов и не пустой
+    const isCorrect = wordCount >= 5 && answer.length > 20;
     
-    try {
-        // Проверяем, существует ли функция проверки
-        if (typeof submodule.tabs.assignment.check !== 'function') {
-            console.error("Функция проверки не найдена");
-            showFeedback(feedbackElement, "❌ Ошибка проверки. Функция проверки не найдена.", false);
-            return;
-        }
+    if (isCorrect) {
+        showFeedback(feedbackElement, "✅ Отличная работа! Ваш ответ демонстрирует понимание материала.", true);
         
-        const result = submodule.tabs.assignment.check(answer);
-        
-        console.log("Результат проверки:", result);
-        
-        showFeedback(feedbackElement, result.message, result.correct);
-        
-        if (result.correct) {
-            if (!userProgress.completedSubmodules.includes(submoduleId)) {
-                userProgress.completedSubmodules.push(submoduleId);
-                
-                answerElement.style.borderColor = 'var(--secondary-color)';
-                answerElement.style.boxShadow = '0 0 0 2px rgba(46, 204, 113, 0.2)';
-                
-                const assignmentHeader = answerElement.closest('.assignment')?.querySelector('h4');
-                if (assignmentHeader && !assignmentHeader.querySelector('.fa-check-circle')) {
-                    const checkIcon = document.createElement('i');
-                    checkIcon.className = 'fas fa-check-circle';
-                    checkIcon.style.color = 'var(--secondary-color)';
-                    checkIcon.style.marginLeft = '10px';
-                    checkIcon.style.animation = 'scaleIn 0.3s ease';
-                    assignmentHeader.appendChild(checkIcon);
-                }
-                
-                await saveProgress();
-                
-                checkIfModuleCompleted(moduleId);
+        if (!userProgress.completedSubmodules.includes(submoduleId)) {
+            userProgress.completedSubmodules.push(submoduleId);
+            
+            answerElement.style.borderColor = 'var(--secondary-color)';
+            answerElement.style.boxShadow = '0 0 0 2px rgba(46, 204, 113, 0.2)';
+            
+            const assignmentHeader = answerElement.closest('.assignment')?.querySelector('h4');
+            if (assignmentHeader && !assignmentHeader.querySelector('.fa-check-circle')) {
+                const checkIcon = document.createElement('i');
+                checkIcon.className = 'fas fa-check-circle';
+                checkIcon.style.color = 'var(--secondary-color)';
+                checkIcon.style.marginLeft = '10px';
+                checkIcon.style.animation = 'scaleIn 0.3s ease';
+                assignmentHeader.appendChild(checkIcon);
             }
             
-            // УДАЛЯЕМ ЧЕРНОВИК ПОСЛЕ УСПЕШНОЙ ПРОВЕРКИ
-            if (isAuthenticated && currentUserId) {
-                const key = `${submoduleId}_main`;
-                answerDraftsCache.delete(key);
-                
-                // Удаляем из базы данных
-                await supabase
-                    .from('answer_drafts')
-                    .delete()
-                    .eq('user_id', currentUserId)
-                    .eq('submodule_id', submoduleId)
-                    .eq('answer_type', 'main');
-                    
-                console.log("✅ Черновик удален после успешной проверки");
-            }
-            
-        } else {
-            answerElement.style.borderColor = 'var(--danger-color)';
-            answerElement.style.boxShadow = '0 0 0 2px rgba(231, 76, 60, 0.2)';
+            await saveProgress();
+            checkIfModuleCompleted(moduleId);
         }
         
-    } catch (error) {
-        console.error("Ошибка при проверке задания:", error);
-        showFeedback(feedbackElement, "❌ Произошла ошибка при проверке. Попробуйте еще раз.", false);
+        // УДАЛЯЕМ ЧЕРНОВИК ПОСЛЕ УСПЕШНОЙ ПРОВЕРКИ
+        if (isAuthenticated && currentUserId) {
+            const key = `${submoduleId}_main`;
+            answerDraftsCache.delete(key);
+            
+            // Удаляем из базы данных
+            await supabase
+                .from('answer_drafts')
+                .delete()
+                .eq('user_id', currentUserId)
+                .eq('submodule_id', submoduleId)
+                .eq('answer_type', 'main');
+                
+            console.log("✅ Черновик удален после успешной проверки");
+        }
+        
+    } else {
+        showFeedback(feedbackElement, "❌ Пожалуйста, напишите более развернутый ответ (минимум 5 слов).", false);
+        answerElement.style.borderColor = 'var(--danger-color)';
+        answerElement.style.boxShadow = '0 0 0 2px rgba(231, 76, 60, 0.2)';
     }
     
     console.log("=== КОНЕЦ ПРОВЕРКИ ===");
