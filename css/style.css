@@ -1521,3 +1521,27 @@ input::placeholder, textarea::placeholder {
         max-width: 60px;
     }
 }
+
+/* Стили для светло-фиолетового меню модулей */
+.module-item {
+    background: rgba(232, 230, 255, 0.9) !important;
+    border: 1px solid rgba(200, 198, 255, 0.7) !important;
+}
+
+.module-item:hover {
+    background: rgba(212, 210, 255, 0.95) !important;
+    border-color: #a8a5ff !important;
+}
+
+.module-item.active {
+    background: rgba(200, 198, 255, 0.95) !important;
+    border-left: 4px solid #6c63ff !important;
+}
+
+.module-item h3 {
+    color: #4a4588 !important;
+}
+
+.module-item p {
+    color: #6a6599 !important;
+}
