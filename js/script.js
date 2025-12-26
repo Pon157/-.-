@@ -79,8 +79,9 @@ let uiState = {
     }
 };
 
+
 /* Основные стили */
-root {
+:root {
     --primary-color: #6c63ff; /* Фиолетовый */
     --secondary-color: #4a90e2; /* Синий */
     --danger-color: #ff6b6b; /* Красный */
