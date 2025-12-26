@@ -80,19 +80,20 @@ let uiState = {
 };
 
 
-/* Основные стили */
-:root {
-    --primary-color: #6c63ff; /* Фиолетовый */
-    --secondary-color: #4a90e2; /* Синий */
-    --danger-color: #ff6b6b; /* Красный */
-    --warning-color: #ffa726; /* Оранжевый */
-    --dark-bg: #f8f9ff; /* Светло-фиолетовый фон */
-    --darker-bg: #ffffff; /* Белый для карточек */
-    --light-text: #2d2b55; /* Темно-фиолетовый текст */
-    --gray-text: #777799; /* Серо-фиолетовый текст */
-    --border-radius: 12px;
-    --box-shadow: 0 8px 32px rgba(108, 99, 255, 0.1); /* Фиолетовые тени */
-    --transition: all 0.3s ease;
+const enhancedStyles = `
+<style>
+    /* Основные стили */
+    :root {
+        --primary-color: #6c63ff; /* Фиолетовый */
+        --secondary-color: #4a90e2; /* Синий */
+        --danger-color: #ff6b6b; /* Красный */
+        --warning-color: #ffa726; /* Оранжевый */
+        --dark-bg: #f8f9ff; /* Светло-фиолетовый фон */
+        --darker-bg: #ffffff; /* Белый для карточек */
+        --light-text: #2d2b55; /* Темно-фиолетовый текст */
+        --gray-text: #777799; /* Серо-фиолетовый текст */
+        --border-radius: 12px;
+        --box-shadow: 0 8px 32px rgba(108, 99, 255,
 }
 
 [data-theme="light"] {
