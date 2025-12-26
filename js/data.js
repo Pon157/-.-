@@ -1,5 +1,6 @@
 function checkAssignment(submoduleId) {
     console.log("=== НАЧАЛО ПРОВЕРКИ ===");
+    console.log("Подмодуль для проверки:", submoduleId);
     
     // Находим текущий модуль и подмодуль
     const moduleId = userProgress.currentModule;
@@ -11,6 +12,9 @@ function checkAssignment(submoduleId) {
         return;
     }
     
+    console.log("Найден модуль:", module.title);
+    console.log("Найден подмодуль:", submodule.title);
+    
     // ID элементов
     const answerId = 'answer' + submoduleId.replace('.', '_');
     const feedbackId = 'feedback' + submoduleId.replace('.', '_');
@@ -18,7 +22,10 @@ function checkAssignment(submoduleId) {
     const answerElement = document.getElementById(answerId);
     const feedbackElement = document.getElementById(feedbackId);
     
-    if (!answerElement || !feedbackElement) return;
+    if (!answerElement || !feedbackElement) {
+        console.error("Элементы ответа или фидбека не найдены");
+        return;
+    }
     
     const answer = answerElement.value.trim();
     
@@ -29,39 +36,55 @@ function checkAssignment(submoduleId) {
     
     // Проверка задания
     if (submodule.tabs.practice && submodule.tabs.practice.check) {
+        console.log("Проверка задания для подмодуля:", submoduleId);
         const result = submodule.tabs.practice.check(answer);
         showFeedback(feedbackElement, result.message, result.correct);
         
-        // После успешной проверки можно очистить черновик
-        if (result.correct && isAuthenticated && currentUserId) {
-            // Очищаем черновик после успешной проверки
-            const key = `${submoduleId}_main`;
-            answerDraftsCache.delete(key);
+        // Обновляем прогресс
+        if (result.correct) {
+            updateProgress(submoduleId, 'assignment');
             
-            // Удаляем из базы данных
-            supabase
-                .from('answer_drafts')
-                .delete()
-                .eq('user_id', currentUserId)
-                .eq('submodule_id', submoduleId)
-                .eq('answer_type', 'main');
+            // После успешной проверки можно очистить черновик
+            if (isAuthenticated && currentUserId) {
+                // Очищаем черновик после успешной проверки
+                const key = `${submoduleId}_main`;
+                answerDraftsCache.delete(key);
+                
+                // Удаляем из базы данных
+                supabase
+                    .from('answer_drafts')
+                    .delete()
+                    .eq('user_id', currentUserId)
+                    .eq('submodule_id', submoduleId)
+                    .eq('answer_type', 'main');
+            }
         }
+    } else {
+        console.error("У подмодуля нет функции проверки:", submoduleId);
+        showFeedback(feedbackElement, "❌ Ошибка проверки задания. Обратитесь к администратору.", false);
     }
 }
 
 function checkQuiz(submoduleId, questionId, selectedAnswers) {
     console.log("=== ПРОВЕРКА ТЕСТА ===");
+    console.log("Подмодуль:", submoduleId, "Вопрос:", questionId, "Ответы:", selectedAnswers);
     
     const moduleId = userProgress.currentModule;
     const module = courseData.modules.find(m => m.id === moduleId);
     const submodule = module.submodules.find(s => s.id === submoduleId);
     
-    if (!module || !submodule) return;
+    if (!module || !submodule) {
+        console.error("Модуль или подмодуль не найдены");
+        return;
+    }
     
     const feedbackId = 'quiz_feedback_' + submoduleId.replace('.', '_') + '_' + questionId;
     const feedbackElement = document.getElementById(feedbackId);
     
-    if (!feedbackElement) return;
+    if (!feedbackElement) {
+        console.error("Элемент фидбека не найден:", feedbackId);
+        return;
+    }
     
     // Находим вопрос в практике
     if (submodule.tabs.practice && submodule.tabs.practice.quizQuestions) {
@@ -101,15 +124,309 @@ function checkQuiz(submoduleId, questionId, selectedAnswers) {
         
         showFeedback(feedbackElement, message, correct);
         
-        // После успешной проверки можно отметить как выполненное
-        if (correct && isAuthenticated && currentUserId) {
-            // Помечаем вопрос как пройденный
-            const quizKey = `${submoduleId}_quiz_${questionId}`;
-            localStorage.setItem(quizKey, 'completed');
+        // После успешной проверки обновляем прогресс
+        if (correct) {
+            // Отмечаем конкретный вопрос как пройденный
+            markQuestionAsCompleted(submoduleId, questionId);
+            
+            // Проверяем, все ли вопросы в подмодуле пройдены
+            checkAllQuizQuestionsCompleted(submoduleId);
+        }
+    } else {
+        showFeedback(feedbackElement, "❌ Вопросы теста не найдены", false);
+    }
+}
+
+// Функция для обновления прогресса
+function updateProgress(submoduleId, type) {
+    console.log("Обновление прогресса для:", submoduleId, "Тип:", type);
+    
+    // Находим модуль и подмодуль
+    const module = courseData.modules.find(m => m.id === userProgress.currentModule);
+    const submodule = module.submodules.find(s => s.id === submoduleId);
+    
+    if (!submodule) return;
+    
+    // Инициализируем прогресс подмодуля, если его нет
+    if (!userProgress.progress[submoduleId]) {
+        userProgress.progress[submoduleId] = {
+            assignments: [],
+            quizzes: [],
+            completed: false
+        };
+    }
+    
+    // Добавляем выполненное задание
+    if (type === 'assignment') {
+        if (!userProgress.progress[submoduleId].assignments.includes('main')) {
+            userProgress.progress[submoduleId].assignments.push('main');
+            console.log("Задание добавлено в прогресс");
+        }
+    }
+    
+    // Проверяем, все ли задания подмодуля выполнены
+    checkSubmoduleCompletion(submoduleId);
+    
+    // Сохраняем прогресс
+    saveProgress();
+}
+
+// Функция для проверки завершения всех заданий в подмодуле
+function checkSubmoduleCompletion(submoduleId) {
+    const module = courseData.modules.find(m => m.id === userProgress.currentModule);
+    const submodule = module.submodules.find(s => s.id === submoduleId);
+    
+    if (!submodule || !userProgress.progress[submoduleId]) return;
+    
+    const progress = userProgress.progress[submoduleId];
+    let allCompleted = false;
+    
+    // Проверяем письменное задание
+    const assignmentCompleted = progress.assignments && progress.assignments.includes('main');
+    
+    // Проверяем вопросы теста (если они есть)
+    let quizCompleted = true;
+    if (submodule.tabs.practice && submodule.tabs.practice.quizQuestions) {
+        const totalQuestions = submodule.tabs.practice.quizQuestions.length;
+        const completedQuestions = progress.quizzes ? progress.quizzes.length : 0;
+        quizCompleted = completedQuestions >= totalQuestions;
+    }
+    
+    // Если все задания выполнены
+    allCompleted = assignmentCompleted && quizCompleted;
+    
+    if (allCompleted && !progress.completed) {
+        progress.completed = true;
+        console.log("🎉 Подмодуль", submoduleId, "завершен!");
+        
+        // Проверяем, все ли подмодули в модуле завершены
+        checkModuleCompletion(module.id);
+    }
+    
+    return allCompleted;
+}
+
+// Функция для проверки завершения модуля
+function checkModuleCompletion(moduleId) {
+    const module = courseData.modules.find(m => m.id === moduleId);
+    if (!module) return;
+    
+    let allSubmodulesCompleted = true;
+    
+    // Проверяем каждый подмодуль
+    module.submodules.forEach(submodule => {
+        const submoduleProgress = userProgress.progress[submodule.id];
+        if (!submoduleProgress || !submoduleProgress.completed) {
+            allSubmodulesCompleted = false;
+        }
+    });
+    
+    if (allSubmodulesCompleted && !module.completed) {
+        module.completed = true;
+        console.log("🎊 Модуль", moduleId, "завершен!");
+    }
+}
+
+// Функция для отметки вопроса как пройденного
+function markQuestionAsCompleted(submoduleId, questionId) {
+    if (!userProgress.progress[submoduleId]) {
+        userProgress.progress[submoduleId] = {
+            assignments: [],
+            quizzes: [],
+            completed: false
+        };
+    }
+    
+    // Добавляем вопрос в список пройденных, если его там нет
+    if (!userProgress.progress[submoduleId].quizzes.includes(questionId)) {
+        userProgress.progress[submoduleId].quizzes.push(questionId);
+        console.log("Вопрос", questionId, "добавлен в прогресс");
+    }
+    
+    // Сохраняем прогресс
+    saveProgress();
+}
+
+// Функция для проверки, все ли вопросы теста пройдены
+function checkAllQuizQuestionsCompleted(submoduleId) {
+    const module = courseData.modules.find(m => m.id === userProgress.currentModule);
+    const submodule = module.submodules.find(s => s.id === submoduleId);
+    
+    if (!submodule || !submodule.tabs.practice || !submodule.tabs.practice.quizQuestions) return;
+    
+    const progress = userProgress.progress[submoduleId];
+    if (!progress || !progress.quizzes) return;
+    
+    const totalQuestions = submodule.tabs.practice.quizQuestions.length;
+    const completedQuestions = progress.quizzes.length;
+    
+    console.log("Вопросов в тесте:", totalQuestions, "Пройдено:", completedQuestions);
+    
+    // Если все вопросы пройдены, проверяем завершение подмодуля
+    if (completedQuestions >= totalQuestions) {
+        checkSubmoduleCompletion(submoduleId);
+    }
+}
+
+// Функция для сохранения прогресса
+function saveProgress() {
+    // Сохраняем в localStorage
+    localStorage.setItem('userProgress', JSON.stringify(userProgress));
+    
+    // Если пользователь авторизован, сохраняем в базу данных
+    if (isAuthenticated && currentUserId) {
+        saveProgressToDatabase();
+    }
+}
+
+// Функция для сохранения прогресса в базу данных
+async function saveProgressToDatabase() {
+    try {
+        const { error } = await supabase
+            .from('user_progress')
+            .upsert({
+                user_id: currentUserId,
+                progress_data: userProgress,
+                updated_at: new Date().toISOString()
+            });
+        
+        if (error) throw error;
+        console.log("✅ Прогресс сохранен в базу данных");
+    } catch (error) {
+        console.error("❌ Ошибка сохранения прогресса:", error);
+    }
+}
+
+// Инициализация прогресса пользователя
+let userProgress = {
+    currentModule: 1,
+    progress: {}
+};
+
+// Загрузка прогресса из localStorage
+function loadProgress() {
+    const savedProgress = localStorage.getItem('userProgress');
+    if (savedProgress) {
+        userProgress = JSON.parse(savedProgress);
+        console.log("📊 Прогресс загружен из localStorage");
+    }
+    
+    // Если пользователь авторизован, загружаем прогресс из базы данных
+    if (isAuthenticated && currentUserId) {
+        loadProgressFromDatabase();
+    }
+}
+
+// Загрузка прогресса из базы данных
+async function loadProgressFromDatabase() {
+    try {
+        const { data, error } = await supabase
+            .from('user_progress')
+            .select('progress_data')
+            .eq('user_id', currentUserId)
+            .single();
+        
+        if (error && error.code !== 'PGRST116') throw error; // PGRST116 - no rows returned
+        
+        if (data && data.progress_data) {
+            userProgress = data.progress_data;
+            console.log("✅ Прогресс загружен из базы данных");
+            
+            // Сохраняем в localStorage для резервной копии
+            localStorage.setItem('userProgress', JSON.stringify(userProgress));
+        }
+    } catch (error) {
+        console.error("❌ Ошибка загрузки прогресса из базы данных:", error);
+    }
+}
+
+// Объект для хранения черновиков ответов
+let answerDraftsCache = new Map();
+
+// Функция для загрузки черновиков
+async function loadAnswerDrafts() {
+    if (isAuthenticated && currentUserId) {
+        try {
+            const { data, error } = await supabase
+                .from('answer_drafts')
+                .select('*')
+                .eq('user_id', currentUserId);
+            
+            if (error) throw error;
+            
+            if (data) {
+                data.forEach(draft => {
+                    const key = `${draft.submodule_id}_${draft.answer_type}`;
+                    answerDraftsCache.set(key, draft.content);
+                });
+                console.log("📝 Черновики загружены:", data.length);
+            }
+        } catch (error) {
+            console.error("❌ Ошибка загрузки черновиков:", error);
         }
     }
 }
 
+// Автосохранение черновиков
+function setupAutoSave(submoduleId) {
+    const answerId = 'answer' + submoduleId.replace('.', '_');
+    const textarea = document.getElementById(answerId);
+    
+    if (!textarea) return;
+    
+    // Загружаем сохраненный черновик
+    const key = `${submoduleId}_main`;
+    if (answerDraftsCache.has(key)) {
+        textarea.value = answerDraftsCache.get(key);
+    }
+    
+    // Настраиваем автосохранение
+    let saveTimeout;
+    textarea.addEventListener('input', () => {
+        clearTimeout(saveTimeout);
+        saveTimeout = setTimeout(() => {
+            saveDraft(submoduleId, 'main', textarea.value);
+        }, 1000);
+    });
+}
+
+// Функция сохранения черновика
+async function saveDraft(submoduleId, answerType, content) {
+    const key = `${submoduleId}_${answerType}`;
+    answerDraftsCache.set(key, content);
+    
+    if (isAuthenticated && currentUserId) {
+        try {
+            const { error } = await supabase
+                .from('answer_drafts')
+                .upsert({
+                    user_id: currentUserId,
+                    submodule_id: submoduleId,
+                    answer_type: answerType,
+                    content: content,
+                    updated_at: new Date().toISOString()
+                });
+            
+            if (error) throw error;
+            console.log("💾 Черновик сохранен:", submoduleId);
+        } catch (error) {
+            console.error("❌ Ошибка сохранения черновика:", error);
+        }
+    }
+}
+
+// Обновляем инициализацию при загрузке страницы
+document.addEventListener('DOMContentLoaded', () => {
+    loadProgress();
+    loadAnswerDrafts();
+    
+    // Инициализируем автосохранение для текущего подмодуля
+    if (userProgress.currentModule && userProgress.currentModule.submodule) {
+        setupAutoSave(userProgress.currentModule.submodule);
+    }
+});
+
+// Функция для отображения фидбека
 function showFeedback(element, message, isCorrect) {
     element.innerHTML = `
         <div class="feedback ${isCorrect ? 'correct' : 'incorrect'}">
@@ -117,7 +434,14 @@ function showFeedback(element, message, isCorrect) {
         </div>
     `;
     element.style.display = 'block';
+    
+    // Добавляем анимацию
+    element.style.animation = 'none';
+    setTimeout(() => {
+        element.style.animation = 'fadeIn 0.5s ease-out';
+    }, 10);
 }
+
 
 // Данные курса: модули, подмодули, задания  
 const courseData = {
@@ -3540,7 +3864,6 @@ function checkQuizMultiple(submoduleId, questionId, checkbox) {
 }
 
 // Добавляем проверочные функции для каждого подмодуля
-// Добавляем проверочные функции в объект курса
 courseData.modules.forEach(module => {
     module.submodules.forEach(submodule => {
         if (!submodule.tabs.practice) {
@@ -3551,10 +3874,11 @@ courseData.modules.forEach(module => {
         submodule.tabs.practice.quizQuestions = [];
         
         // Добавляем проверочные функции для письменных заданий
+        // МОДУЛЬ 1
         if (submodule.id === "1.1") {
             submodule.tabs.practice.check = function(answer) {
-                const keywordsEmpathy = ["понимаю", "представляю", "должно быть", "чувствую", "разделяю", "поддержку"];
-                const keywordsPity = ["жалко", "жалеешь", "бедный", "несчастный", "сожалею", "повезло бы"];
+                const keywordsEmpathy = ["понимаю", "представляю", "должно быть", "чувствую", "разделяю", "поддержку", "сопереживаю"];
+                const keywordsPity = ["жалко", "жалеешь", "бедный", "несчастный", "сожалею", "повезло бы", "жалоб"];
                 
                 let hasEmpathy = false;
                 let hasPity = false;
@@ -3571,12 +3895,13 @@ courseData.modules.forEach(module => {
                     return {correct: true, message: "✅ Отлично! Вы четко разделили эмпатию («понимаю тебя») и жалость («жалко»)."};
                 } else if (hasEmpathy) {
                     return {correct: true, message: "✅ Хорошо! Вы привели пример эмпатии. Попробуйте также добавить пример жалости для контраста."};
+                } else if (hasPity) {
+                    return {correct: false, message: "❌ Похоже, вы привели только пример жалости. Добавьте пример эмпатии — реакции на равных."};
                 } else {
                     return {correct: false, message: "❌ Попробуйте еще. Ищите разницу: жалость — это чувство сверху, эмпатия — разделение чувств на равных."};
                 }
             };
             
-            // Вопросы для теста
             submodule.tabs.practice.quizQuestions = [
                 {
                     id: "q1",
@@ -3617,6 +3942,8 @@ courseData.modules.forEach(module => {
                 
                 if (foundTypes >= 2) {
                     return {correct: true, message: "✅ Хорошая работа! Вы правильно определили виды эмпатии."};
+                } else if (foundTypes >= 1) {
+                    return {correct: false, message: "❌ Вы указали только один вид. Опишите все три: когнитивную (понимание), эмоциональную (чувствование) и сострадательную (желание помочь)."};
                 } else {
                     return {correct: false, message: "❌ Попробуйте включить в ответ упоминания когнитивной, эмоциональной и сострадательной эмпатии."};
                 }
@@ -3652,7 +3979,7 @@ courseData.modules.forEach(module => {
         
         if (submodule.id === "1.3") {
             submodule.tabs.practice.check = function(answer) {
-                const reflectionWords = ["устал", "прессинг", "не понимает", "не способен", "тяжело", "сложно"];
+                const reflectionWords = ["устал", "прессинг", "не понимает", "не способен", "тяжело", "сложно", "трудно", "усталость"];
                 let reflectionCount = 0;
                 
                 reflectionWords.forEach(word => {
@@ -3697,9 +4024,10 @@ courseData.modules.forEach(module => {
             ];
         }
         
+        // МОДУЛЬ 2
         if (submodule.id === "2.1") {
             submodule.tabs.practice.check = function(answer) {
-                const keywords = ["субъектив", "восприятие", "след", "последствия", "внутри", "переживание"];
+                const keywords = ["субъектив", "восприятие", "след", "последствия", "внутри", "переживание", "реакция", "травма это не событие"];
                 let keywordCount = 0;
                 
                 keywords.forEach(word => {
@@ -3708,6 +4036,8 @@ courseData.modules.forEach(module => {
                 
                 if (keywordCount >= 2) {
                     return {correct: true, message: "✅ Отлично! Вы правильно поняли, что травма — это внутренний след события, а не само событие."};
+                } else if (keywordCount >= 1) {
+                    return {correct: false, message: "❌ Попробуйте подчеркнуть разницу: одно и то же событие может быть травмой для одного и не быть для другого, потому что травма — в восприятии."};
                 } else {
                     return {correct: false, message: "❌ Попробуйте подчеркнуть, что травма — это то, как человек пережил событие внутри себя, а не само событие."};
                 }
@@ -3719,7 +4049,7 @@ courseData.modules.forEach(module => {
                     type: "single-choice",
                     question: "Что означает термин «ко-регуляция»?",
                     options: [
-                        "Когда два человека ссорятся",
+                        "Когда два человек ссорятся",
                         "Когда спокойствие одного помогает успокоиться другому",
                         "Когда оба человека испытывают одинаковые эмоции"
                     ],
@@ -3743,7 +4073,7 @@ courseData.modules.forEach(module => {
         
         if (submodule.id === "2.2") {
             submodule.tabs.practice.check = function(answer) {
-                const helpIndicators = ["слезы нормальны", "право чувствовать", "твой темп", "здесь с тобой", "принимаю твои чувства"];
+                const helpIndicators = ["слезы нормальны", "право чувствовать", "твой темп", "здесь с тобой", "принимаю твои чувства", "мне жаль", "могу поддержать"];
                 let helpCount = 0;
                 
                 helpIndicators.forEach(phrase => {
@@ -3790,8 +4120,8 @@ courseData.modules.forEach(module => {
         
         if (submodule.id === "2.3") {
             submodule.tabs.practice.check = function(answer) {
-                const openPhrases = ["хочешь поговорить", "как ты себя чувствуешь", "что тебе нужно", "чем я могу помочь", "хочешь ли ты", "если захочешь"];
-                const pressurePhrases = ["ты должен", "тебе нужно", "я сделаю за тебя", "просто сядь в машину", "преодолей страх"];
+                const openPhrases = ["хочешь поговорить", "как ты себя чувствуешь", "что тебе нужно", "чем я могу помочь", "хочешь ли ты", "если захочешь", "когда будешь готов", "в твоем темпе"];
+                const pressurePhrases = ["ты должен", "тебе нужно", "я сделаю за тебя", "просто сядь в машину", "преодолей страх", "возьми себя в руки"];
                 
                 let openCount = 0;
                 let pressureCount = 0;
@@ -3842,12 +4172,10 @@ courseData.modules.forEach(module => {
             ];
         }
         
-        // Добавляем проверочные функции для остальных подмодулей...
-        // Продолжение для модулей 3, 4, 5...
-        
+        // МОДУЛЬ 3
         if (submodule.id === "3.1") {
             submodule.tabs.practice.check = function(answer) {
-                const reflectionWords = ["критикует", "придраться", "стрессе", "начальник", "правильно"];
+                const reflectionWords = ["критикует", "придраться", "стрессе", "начальник", "правильно", "ощущаешь", "чувствуешь", "переживаешь"];
                 let reflectionCount = 0;
                 
                 reflectionWords.forEach(word => {
@@ -3862,11 +4190,39 @@ courseData.modules.forEach(module => {
                     return {correct: false, message: "❌ Ответ не отражает жалобу. Попробуйте повторить ключевые слова: 'критикует', 'придраться', 'стресс'."};
                 }
             };
+            
+            submodule.tabs.practice.quizQuestions = [
+                {
+                    id: "q1",
+                    type: "single-choice",
+                    question: "Что такое техника отражения?",
+                    options: [
+                        "Критика слов собеседника",
+                        "Повторение ключевых слов собеседника",
+                        "Рассказ о своем похожем опыте"
+                    ],
+                    correct: 1,
+                    explanation: "Техника отражения — это повторение ключевых слов и смыслов говорящего, чтобы показать, что вы его слышите и понимаете."
+                },
+                {
+                    id: "q2",
+                    type: "multiple-choice",
+                    question: "Какие из этих реакций являются примером отражения?",
+                    options: [
+                        "«Ты не должен так чувствовать»",
+                        "«Похоже, ты очень расстроен этой ситуацией»",
+                        "«Если я правильно понял, ты злишься из-за несправедливости»",
+                        "«Просто забудь об этом и иди дальше»"
+                    ],
+                    correct: [1, 2],
+                    explanation: "Второй и третий варианты — это отражение чувств и перефразирование. Первый и четвертый — критика и обесценивание."
+                }
+            ];
         }
         
         if (submodule.id === "3.2") {
             submodule.tabs.practice.check = function(answer) {
-                const questionIndicators = ["что", "как", "расскажи", "опиши", "какой", "какая"];
+                const questionIndicators = ["что", "как", "расскажи", "опиши", "какой", "какая", "почему", "каковы"];
                 let questionCount = 0;
                 
                 questionIndicators.forEach(word => {
@@ -3881,11 +4237,38 @@ courseData.modules.forEach(module => {
                     return {correct: false, message: "❌ Вопросы все еще закрытые. Попробуйте начать с 'Что', 'Как', 'Расскажи'."};
                 }
             };
+            
+            submodule.tabs.practice.quizQuestions = [
+                {
+                    id: "q1",
+                    type: "single-choice",
+                    question: "Какой вопрос является открытым?",
+                    options: [
+                        "«Тебе плохо?»",
+                        "«Что ты чувствуешь сейчас?»",
+                        "«Это было вчера?»"
+                    ],
+                    correct: 1,
+                    explanation: "Открытый вопрос — это вопрос, на который нельзя ответить «да» или «нет». Он начинается со слов «что», «как», «почему» и т.д."
+                },
+                {
+                    id: "q2",
+                    type: "single-choice",
+                    question: "Почему вопрос «почему» может быть проблемным?",
+                    options: [
+                        "Он слишком длинный",
+                        "Он звучит как обвинение",
+                        "На него нельзя ответить"
+                    ],
+                    correct: 1,
+                    explanation: "Вопрос «почему» часто звучит как обвинение и вызывает защитную реакцию. Лучше использовать «что привело к этому?» или «как это получилось?»."
+                }
+            ];
         }
         
         if (submodule.id === "3.3") {
             submodule.tabs.practice.check = function(answer) {
-                const nonverbalSignals = ["кив", "взгляд", "поза", "наклон", "выражение лица", "пауза", "молчание", "открытая поза"];
+                const nonverbalSignals = ["кив", "взгляд", "поза", "наклон", "выражение лица", "пауза", "молчание", "открытая поза", "зрительный контакт", "язык тела"];
                 let signalCount = 0;
                 
                 nonverbalSignals.forEach(signal => {
@@ -3900,12 +4283,40 @@ courseData.modules.forEach(module => {
                     return {correct: false, message: "❌ Попробуйте описать конкретные невербальные действия: кивки головой, наклон тела к собеседнику, соответствующий взгляд."};
                 }
             };
+            
+            submodule.tabs.practice.quizQuestions = [
+                {
+                    id: "q1",
+                    type: "single-choice",
+                    question: "Паузы в разговоре мешают эмпатическому общению.",
+                    options: [
+                        "Верно",
+                        "Неверно"
+                    ],
+                    correct: 1,
+                    explanation: "Неверно. Паузы дают время подумать и выразить чувства. Они создают пространство для глубины и показывают уважение к собеседнику."
+                },
+                {
+                    id: "q2",
+                    type: "multiple-choice",
+                    question: "Какие невербальные сигналы показывают активное слушание?",
+                    options: [
+                        "Кивки головой",
+                        "Скрещенные руки",
+                        "Наклон тела к собеседнику",
+                        "Постоянная проверка телефона"
+                    ],
+                    correct: [0, 2],
+                    explanation: "Кивки головой и наклон тела к собеседнику показывают внимание и вовлеченность. Скрещенные руки и проверка телефона показывают закрытость и отсутствие интереса."
+                }
+            ];
         }
         
+        // МОДУЛЬ 4
         if (submodule.id === "4.1") {
             submodule.tabs.practice.check = function(answer) {
-                const helpKeywords = ["помощь", "выбор", "самостоятельность", "вместе", "поддержка"];
-                const rescueKeywords = ["спасение", "замен", "контроль", "сам сделаю", "должен слушать"];
+                const helpKeywords = ["помощь", "выбор", "самостоятельность", "вместе", "поддержка", "сотрудничество", "уважение границ"];
+                const rescueKeywords = ["спасение", "замен", "контроль", "сам сделаю", "должен слушать", "обязан", "за тебя"];
                 
                 let helpCount = 0;
                 let rescueCount = 0;
@@ -3924,12 +4335,40 @@ courseData.modules.forEach(module => {
                     return {correct: false, message: "❌ Попробуйте четче разделить: помощь = поддержка самостоятельности, спасение = лишение выбора."};
                 }
             };
+            
+            submodule.tabs.practice.quizQuestions = [
+                {
+                    id: "q1",
+                    type: "single-choice",
+                    question: "Какая фраза предлагает помощь, а не спасение?",
+                    options: [
+                        "«Я все сделаю за тебя»",
+                        "«Хочешь, помогу составить план?»",
+                        "«Ты должен сделать это немедленно»"
+                    ],
+                    correct: 1,
+                    explanation: "Помощь предполагает выбор и уважение к автономии. «Хочешь, помогу составить план?» дает человеку контроль. Остальные варианты — это спасение или давление."
+                },
+                {
+                    id: "q2",
+                    type: "multiple-choice",
+                    question: "Кто такие участники треугольника Карпмана?",
+                    options: [
+                        "Помощник",
+                        "Спасатель",
+                        "Жертва",
+                        "Преследователь"
+                    ],
+                    correct: [1, 2, 3],
+                    explanation: "Треугольник Карпмана состоит из трех ролей: спасатель (делает за других), жертва (беспомощный) и преследователь (обвинитель). Помощник — это здоровая роль вне треугольника."
+                }
+            ];
         }
         
         if (submodule.id === "4.2") {
             submodule.tabs.practice.check = function(answer) {
-                const helpIndicators = ["хочешь", "может быть", "предлагаю", "давай подумаем", "если хочешь", "как ты считаешь"];
-                const rescueIndicators = ["я сделаю", "ты должен", "надо", "обязательно", "лучше знаю"];
+                const helpIndicators = ["хочешь", "может быть", "предлагаю", "давай подумаем", "если хочешь", "как ты считаешь", "может помочь", "возможно"];
+                const rescueIndicators = ["я сделаю", "ты должен", "надо", "обязательно", "лучше знаю", "только так", "всегда"];
                 
                 let helpCount = 0;
                 let rescueCount = 0;
@@ -3950,11 +4389,39 @@ courseData.modules.forEach(module => {
                     return {correct: false, message: "❌ Ответ все еще содержит элементы спасения. Попробуйте начать с 'Хочешь...' или 'Может быть...'."};
                 }
             };
+            
+            submodule.tabs.practice.quizQuestions = [
+                {
+                    id: "q1",
+                    type: "single-choice",
+                    question: "Почему важно спрашивать, какой вид поддержки нужен?",
+                    options: [
+                        "Чтобы быстрее закончить разговор",
+                        "Чтобы оказать именно ту помощь, которая нужна",
+                        "Чтобы показать свое превосходство"
+                    ],
+                    correct: 1,
+                    explanation: "Спрашивая, какой вид поддержки нужен, вы оказываете именно ту помощь, которая действительно нужна человеку, а не ту, которую вы считаете правильной."
+                },
+                {
+                    id: "q2",
+                    type: "multiple-choice",
+                    question: "Какие формулировки являются экологичными?",
+                    options: [
+                        "«Я сделаю это за тебя»",
+                        "«Хочешь, я помогу?»",
+                        "«Чем я могу быть полезен?»",
+                        "«Ты должен принять мою помощь»"
+                    ],
+                    correct: [1, 2],
+                    explanation: "Экологичные формулировки дают выбор и уважают автономию. «Хочешь, я помогу?» и «Чем я могу быть полезен?» — такие примеры."
+                }
+            ];
         }
         
         if (submodule.id === "4.3") {
             submodule.tabs.practice.check = function(answer) {
-                const boundaryWords = ["не могу", "границ", "откажусь", "нет", "извини", "но", "ресурс", "выгора"];
+                const boundaryWords = ["не могу", "границ", "откажусь", "нет", "извини", "но", "ресурс", "выгора", "предел", "отдых", "забота о себе"];
                 let boundaryCount = 0;
                 
                 boundaryWords.forEach(word => {
@@ -3969,11 +4436,39 @@ courseData.modules.forEach(module => {
                     return {correct: false, message: "❌ Попробуйте четче обозначить свою позицию: 'Я не могу брать эту работу', 'Мои ресурсы ограничены'."};
                 }
             };
+            
+            submodule.tabs.practice.quizQuestions = [
+                {
+                    id: "q1",
+                    type: "single-choice",
+                    question: "Что такое зона ближайшего развития?",
+                    options: [
+                        "Место, где человек отдыхает",
+                        "Задачи, которые человек может решить с помощью",
+                        "Территория, где запрещено помогать"
+                    ],
+                    correct: 1,
+                    explanation: "Зона ближайшего развития — это задачи, которые человек может решить с помощью, но не может решить самостоятельно. Это оптимальная область для помощи."
+                },
+                {
+                    id: "q2",
+                    type: "single-choice",
+                    question: "Почему важно уважать отказ от помощи?",
+                    options: [
+                        "Чтобы быстрее закончить разговор",
+                        "Чтобы сохранить контроль и выбор за человеком",
+                        "Чтобы не тратить свое время"
+                    ],
+                    correct: 1,
+                    explanation: "Уважение отказа от помощи сохраняет автономию человека. Когда человек сам решает принимать помощь или нет, он чувствует контроль над ситуацией."
+                }
+            ];
         }
         
+        // МОДУЛЬ 5
         if (submodule.id === "5.1") {
             submodule.tabs.practice.check = function(answer) {
-                const burnoutSigns = ["усталость", "раздражительность", "сон", "болезнь", "цинизм", "эффективность", "истощение"];
+                const burnoutSigns = ["усталость", "раздражительность", "сон", "болезнь", "цинизм", "эффективность", "истощение", "апатия", "негативизм", "тревожность"];
                 let signCount = 0;
                 
                 burnoutSigns.forEach(sign => {
@@ -3988,11 +4483,38 @@ courseData.modules.forEach(module => {
                     return {correct: false, message: "❌ Попробуйте описать конкретные признаки: постоянная усталость, раздражительность, снижение эффективности работы."};
                 }
             };
+            
+            submodule.tabs.practice.quizQuestions = [
+                {
+                    id: "q1",
+                    type: "single-choice",
+                    question: "Какой из перечисленных признаков НЕ относится к эмоциональному выгоранию?",
+                    options: [
+                        "Энтузиазм и повышенная работоспособность",
+                        "Хроническая усталость",
+                        "Циничное отношение к тем, кому помогаешь"
+                    ],
+                    correct: 0,
+                    explanation: "Энтузиазм и повышенная работоспособность — это признаки начальной стадии («медовый месяц»), а не самого выгорания. Выгорание характеризуется истощением и цинизмом."
+                },
+                {
+                    id: "q2",
+                    type: "single-choice",
+                    question: "Что такое вторичная травма?",
+                    options: [
+                        "Когда человек сам переживает травматическое событие",
+                        "Последствия от выслушивания травматического опыта других",
+                        "Травма, полученная на работе"
+                    ],
+                    correct: 1,
+                    explanation: "Вторичная травма — это психологические последствия от работы с травмированными людьми. Помогающий специалист может начать испытывать симптомы, похожие на ПТСР."
+                }
+            ];
         }
         
         if (submodule.id === "5.2") {
             submodule.tabs.practice.check = function(answer) {
-                const recoveryMethods = ["сон", "прогулка", "спорт", "медитация", "дневник", "хобби", "отдых", "общение", "терапия", "массаж"];
+                const recoveryMethods = ["сон", "прогулка", "спорт", "медитация", "дневник", "хобби", "отдых", "общение", "терапия", "массаж", "дыхание", "творчество", "природа"];
                 let methodCount = 0;
                 
                 recoveryMethods.forEach(method => {
@@ -4007,11 +4529,39 @@ courseData.modules.forEach(module => {
                     return {correct: false, message: "❌ План слишком общий. Попробуйте указать конкретные действия: 'ежедневная 20-минутная прогулка', '8 часов сна'."};
                 }
             };
+            
+            submodule.tabs.practice.quizQuestions = [
+                {
+                    id: "q1",
+                    type: "single-choice",
+                    question: "Что такое сеть пассивного режима работы мозга?",
+                    options: [
+                        "Состояние глубокого сна",
+                        "Состояние мозга в покое, важное для восстановления",
+                        "Режим работы при стрессе"
+                    ],
+                    correct: 1,
+                    explanation: "Сеть пассивного режима работы мозга активируется, когда мы не сосредоточены на внешних задачах. Это состояние важно для обработки информации и восстановления."
+                },
+                {
+                    id: "q2",
+                    type: "multiple-choice",
+                    question: "Какие методы помогают завершить цикл стресса?",
+                    options: [
+                        "Физическая активность",
+                        "Глубокое дыхание",
+                        "Скроллинг соцсетей",
+                        "Творчество"
+                    ],
+                    correct: [0, 1, 3],
+                    explanation: "Физическая активность, глубокое дыхание и творчество помогают вывести гормоны стресса из тела. Скроллинг соцсетей перегружает мозг информацией и не способствует восстановлению."
+                }
+            ];
         }
         
         if (submodule.id === "5.3") {
             submodule.tabs.practice.check = function(answer) {
-                const boundaryWords = ["не могу", "границ", "откажусь", "нет", "извини", "но", "ресурс", "выгора"];
+                const boundaryWords = ["не могу", "границ", "откажусь", "нет", "извини", "но", "ресурс", "выгора", "предел", "отдых", "забота о себе", "личное время", "приоритеты"];
                 let boundaryCount = 0;
                 
                 boundaryWords.forEach(word => {
@@ -4026,12 +4576,47 @@ courseData.modules.forEach(module => {
                     return {correct: false, message: "❌ Попробуйте четче обозначить свою позицию: 'Я не могу взять эту работу, потому что...'."};
                 }
             };
+            
+            submodule.tabs.practice.quizQuestions = [
+                {
+                    id: "q1",
+                    type: "single-choice",
+                    question: "Почему важно уметь говорить «нет»?",
+                    options: [
+                        "Чтобы показать свою власть",
+                        "Чтобы защитить свои ресурсы и избежать выгорания",
+                        "Чтобы обидеть других людей"
+                    ],
+                    correct: 1,
+                    explanation: "Умение говорить «нет» защищает ваши ресурсы (время, энергию, эмоции) и предотвращает выгорание. Это необходимое условие для устойчивой помощи другим."
+                },
+                {
+                    id: "q2",
+                    type: "multiple-choice",
+                    question: "Какие утверждения о границах верны?",
+                    options: [
+                        "Границы — это эгоизм",
+                        "Границы делают эмпатию возможной",
+                        "Устанавливать границы — это нормально",
+                        "Настоящие помогающие не имеют границ"
+                    ],
+                    correct: [1, 2],
+                    explanation: "Границы не эгоизм, а необходимость. Они делают эмпатию возможной, потому что защищают от выгорания. Устанавливать границы нормально и необходимо."
+                }
+            ];
         }
     });
 });
 
 console.log("✅ Данные курса загружены. Всего модулей: " + courseData.modules.length);
-console.log("✅ Итоговый экзамен включает: " + courseData.finalExam.sections[0].questions.length + " теоретических вопросов, " + courseData.finalExam.sections[1].tasks.length + " практических заданий, " + courseData.finalExam.sections[2].tasks.length + " ситуационный анализ");
+console.log("✅ Проверочные функции добавлены ко всем подмодулям");
+console.log("✅ Система прогресса настроена");
+
+// Инициализация при загрузке
+window.addEventListener('load', () => {
+    loadProgress();
+    console.log("📊 Прогресс пользователя:", userProgress);
+});
 
 // Стили для нового дизайна
 const newStyles = `
