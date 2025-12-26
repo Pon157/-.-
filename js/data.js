@@ -42,820 +42,6 @@ function checkAssignment(submoduleId) {
             .eq('answer_type', 'main');
     }
 }
-
-
-// УЛУЧШЕННАЯ БАЗА ЗНАНИЙ С СИСТЕМОЙ ПРОВЕРКИ
-const knowledgeBase = {
-    // Модуль 1.1
-    "1.1": {
-        assignment: {
-            question: "Опишите разницу между «жалко» и «понимаю тебя»",
-            validation: {
-                type: "text",
-                minWords: 30,
-                requiredKeywords: [
-                    { keyword: "жалость", points: 3, synonyms: ["жалеть", "жалко", "бедняжка"] },
-                    { keyword: "эмпатия", points: 3, synonyms: ["сопереживание", "понимание", "чувствовать вместе"] },
-                    { keyword: "позиция сверху", points: 2, synonyms: ["сверху", "неравенство", "дистанция"] },
-                    { keyword: "позиция равных", points: 2, synonyms: ["равные", "наравне", "вместе"] },
-                    { keyword: "пример", points: 2, synonyms: ["ситуация", "фраза", "ответ"] }
-                ],
-                minScore: 8
-            },
-            modelAnswer: "Жалость — это позиция сверху вниз («Бедняжка, как тебе не повезло»), которая создает дистанцию и неравенство. Эмпатия — это позиция равных («Понимаю твое разочарование, я бы тоже расстроился»), когда мы разделяем чувства другого человека, оставаясь рядом с ним."
-        },
-        quiz: {
-            "1": {
-                type: "single",
-                question: "Что является ключевым отличием эмпатии от жалости?",
-                options: [
-                    { id: "a", text: "Эмпатия — это позиция сверху, жалость — позиция равных" },
-                    { id: "b", text: "Эмпатия — это позиция равных, жалость — позиция сверху" },
-                    { id: "c", text: "Между ними нет существенной разницы" }
-                ],
-                correct: "b"
-            },
-            "2": {
-                type: "multiple",
-                question: "Какие утверждения верны об эмпатии? (выберите все подходящие)",
-                options: [
-                    { id: "a", text: "Требует уязвимости и открытости" },
-                    { id: "b", text: "Это способ «чувствовать вместе»" },
-                    { id: "c", text: "Всегда включает в себя решение проблемы за другого" },
-                    { id: "d", text: "Укрепляет отношения" }
-                ],
-                correct: ["a", "b", "d"]
-            }
-        }
-    },
-    
-    // Модуль 1.2
-    "1.2": {
-        assignment: {
-            question: "Приведите пример каждого вида эмпатии",
-            validation: {
-                type: "text",
-                minWords: 40,
-                requiredKeywords: [
-                    { keyword: "когнитивная", points: 2, synonyms: ["интеллектуальная", "понимание", "умом"] },
-                    { keyword: "эмоциональная", points: 2, synonyms: ["чувствовать", "эмоции", "зеркальные нейроны"] },
-                    { keyword: "сострадательная", points: 2, synonyms: ["помощь", "действие", "поддержка"] },
-                    { keyword: "пример когнитивной", points: 2, synonyms: ["понимаю ситуацию", "осознаю"] },
-                    { keyword: "пример эмоциональной", points: 2, synonyms: ["чувствую твою боль", "сопереживаю"] },
-                    { keyword: "пример сострадательной", points: 2, synonyms: ["помочь", "поддержать", "предложить помощь"] }
-                ],
-                minScore: 8
-            },
-            modelAnswer: "Когнитивная эмпатия: «Понимаю, как сложно потерять работу в нынешней экономической ситуации» (интеллектуальное понимание). Эмоциональная эмпатия: «Я чувствую твою тревогу и растерянность» (разделение эмоций). Сострадательная эмпатия: «Давай подумаем, как я могу поддержать тебя в поиске новой работы» (понимание + желание помочь конструктивно)."
-        },
-        quiz: {
-            "1": {
-                type: "single",
-                question: "Какой вид эмпатии наиболее подвержен риску выгорания?",
-                options: [
-                    { id: "a", text: "Когнитивная эмпатия" },
-                    { id: "b", text: "Эмоциональная эмпатия" },
-                    { id: "c", text: "Сострадательная эмпатия" }
-                ],
-                correct: "b"
-            },
-            "2": {
-                type: "multiple",
-                question: "Какие утверждения верны о зеркальных нейронах? (выберите все подходящие)",
-                options: [
-                    { id: "a", text: "Активируются при выполнении действия" },
-                    { id: "b", text: "Активируются при наблюдении за действием другого" },
-                    { id: "c", text: "Отвечают только за логическое мышление" },
-                    { id: "d", text: "Являются основой эмоциональной эмпатии" }
-                ],
-                correct: ["a", "b", "d"]
-            },
-            "3": {
-                type: "single",
-                question: "Какой вид эмпатии уместен при анализе договора с клиентом?",
-                options: [
-                    { id: "a", text: "Эмоциональная эмпатия" },
-                    { id: "b", text: "Когнитивная эмпатия" },
-                    { id: "c", text: "Сострадательная эмпатия" }
-                ],
-                correct: "b"
-            }
-        }
-    },
-    
-    // Модуль 1.3
-    "1.3": {
-        assignment: {
-            question: "Ответьте эмпатично",
-            validation: {
-                type: "text",
-                minWords: 25,
-                requiredKeywords: [
-                    { keyword: "похоже", points: 1, synonyms: ["вижу", "кажется", "чувствуется"] },
-                    { keyword: "чувствуешь", points: 2, synonyms: ["испытываешь", "переживаешь"] },
-                    { keyword: "усталость", points: 2, synonyms: ["устал", "истощение", "выгорание"] },
-                    { keyword: "давление", points: 2, synonyms: ["прессинг", "нагрузка", "стресс"] },
-                    { keyword: "непонимание", points: 2, synonyms: ["одиночество", "непонятый", "изоляция"] },
-                    { keyword: "тяжело", points: 1, synonyms: ["сложно", "трудно", "нелегко"] }
-                ],
-                minScore: 6,
-                prohibitedKeywords: [
-                    "не переживай",
-                    "ерунда",
-                    "взбодрись",
-                    "сам виноват",
-                    "забей"
-                ]
-            },
-            modelAnswer: "Похоже, ты чувствуешь себя совершенно истощенным от постоянного давления на работе и ощущаешь, что тебя никто не понимает. Должно быть, очень тяжело, когда кажется, что все навалилось сразу и нет поддержки."
-        },
-        quiz: {
-            "1": {
-                type: "single",
-                question: "Что такое конгруэнтность в общении?",
-                options: [
-                    { id: "a", text: "Умение быстро отвечать" },
-                    { id: "b", text: "Совпадение слов и невербальных сигналов" },
-                    { id: "c", text: "Способность говорить красиво" }
-                ],
-                correct: "b"
-            },
-            "2": {
-                type: "multiple",
-                question: "Какие из этих невербальных сигналов показывают эмпатию? (выберите все подходящие)",
-                options: [
-                    { id: "a", text: "Наклон тела к собеседнику" },
-                    { id: "b", text: "Скрещенные руки на груди" },
-                    { id: "c", text: "Умеренный зрительный контакт" },
-                    { id: "d", text: "Проверка телефона во время разговора" }
-                ],
-                correct: ["a", "c"]
-            },
-            "3": {
-                type: "single",
-                question: "Какой процент информации об эмоциях передается через слова по данным исследований?",
-                options: [
-                    { id: "a", text: "Около 7%" },
-                    { id: "b", text: "Около 50%" },
-                    { id: "c", text: "Около 90%" }
-                ],
-                correct: "a"
-            }
-        }
-    }
-};
-
-// СИСТЕМА ПРОВЕРКИ РАЗВЕРНУТЫХ ОТВЕТОВ
-function checkAssignment(submoduleId) {
-    console.log("=== ПРОВЕРКА РАЗВЕРНУТОГО ОТВЕТА ===");
-    
-    const answerId = 'answer' + submoduleId.replace('.', '_');
-    const feedbackId = 'feedback' + submoduleId.replace('.', '_');
-    
-    const answerElement = document.getElementById(answerId);
-    const feedbackElement = document.getElementById(feedbackId);
-    
-    if (!answerElement || !feedbackElement) {
-        console.error("Элементы не найдены");
-        return;
-    }
-    
-    const userAnswer = answerElement.value.trim();
-    
-    if (!userAnswer) {
-        showFeedback(feedbackElement, "❌ Пожалуйста, напишите ответ перед проверкой.", false);
-        return;
-    }
-    
-    // Проверка на минимальную длину
-    if (userAnswer.length < 50) {
-        showFeedback(feedbackElement, "❌ Ответ слишком короткий. Напишите развернутый ответ минимум из 50 символов.", false);
-        return;
-    }
-    
-    // Проверка на осмысленность (защита от "хуй" и т.д.)
-    if (isMeaninglessAnswer(userAnswer)) {
-        showFeedback(feedbackElement, "❌ Ответ не соответствует теме задания. Пожалуйста, напишите осмысленный ответ, используя термины из урока.", false);
-        return;
-    }
-    
-    // Получаем данные для проверки
-    const assignmentData = knowledgeBase[submoduleId]?.assignment;
-    if (!assignmentData) {
-        showFeedback(feedbackElement, "⚠️ Данные для проверки не найдены.", false);
-        return;
-    }
-    
-    const validation = assignmentData.validation;
-    
-    // Проверяем запрещенные слова
-    if (validation.prohibitedKeywords) {
-        for (const prohibited of validation.prohibitedKeywords) {
-            if (userAnswer.toLowerCase().includes(prohibited.toLowerCase())) {
-                showFeedback(feedbackElement, `❌ В ответе найдено запрещенное выражение: "${prohibited}". Эмпатичный ответ не должен содержать обесценивающих фраз.`, false);
-                return;
-            }
-        }
-    }
-    
-    // Проверяем по ключевым словам
-    let totalScore = 0;
-    let maxScore = 0;
-    let foundKeywords = [];
-    let missingKeywords = [];
-    
-    const lowerAnswer = userAnswer.toLowerCase();
-    
-    validation.requiredKeywords.forEach(keywordData => {
-        maxScore += keywordData.points;
-        
-        // Проверяем основное ключевое слово и его синонимы
-        const allKeywords = [keywordData.keyword.toLowerCase(), ...keywordData.synonyms.map(s => s.toLowerCase())];
-        let found = false;
-        
-        for (const kw of allKeywords) {
-            if (lowerAnswer.includes(kw)) {
-                totalScore += keywordData.points;
-                foundKeywords.push(keywordData.keyword);
-                found = true;
-                break;
-            }
-        }
-        
-        if (!found) {
-            missingKeywords.push(keywordData.keyword);
-        }
-    });
-    
-    // Проверяем минимальное количество слов
-    const wordCount = userAnswer.split(/\s+/).length;
-    if (validation.minWords && wordCount < validation.minWords) {
-        totalScore -= 2;
-    }
-    
-    // Вычисляем процент
-    const percentage = maxScore > 0 ? Math.round((totalScore / maxScore) * 100) : 0;
-    
-    // Формируем обратную связь
-    let feedback = `<h4>Результаты проверки задания</h4>`;
-    feedback += `<p><strong>Набрано баллов:</strong> ${totalScore} из ${maxScore} (${percentage}%)</p>`;
-    
-    if (foundKeywords.length > 0) {
-        feedback += `<p>✅ Найдены ключевые понятия: ${foundKeywords.join(', ')}</p>`;
-    }
-    
-    if (missingKeywords.length > 0) {
-        feedback += `<p>❌ Отсутствуют: ${missingKeywords.join(', ')}</p>`;
-    }
-    
-    // Проверяем результат
-    if (percentage >= 70 && totalScore >= validation.minScore) {
-        feedback += `<p style="color: #2ecc71; font-weight: bold;">✅ Отлично! Задание выполнено успешно.</p>`;
-        feedback += `<p><strong>Пример хорошего ответа:</strong><br><em>${assignmentData.modelAnswer}</em></p>`;
-        
-        // Сохраняем результат
-        saveProgress(submoduleId, 'assignment', percentage);
-        
-        showFeedback(feedbackElement, feedback, true);
-    } else {
-        feedback += `<p style="color: #e74c3c; font-weight: bold;">❌ Нужно доработать ответ.</p>`;
-        feedback += `<p><strong>Рекомендации:</strong></p>`;
-        feedback += `<ul>`;
-        feedback += `<li>Используйте термины из урока</li>`;
-        feedback += `<li>Приведите конкретные примеры</li>`;
-        feedback += `<li>Пишите развернуто (минимум ${validation.minWords || 30} слов)</li>`;
-        feedback += `</ul>`;
-        feedback += `<p><strong>Пример правильного ответа:</strong><br><em>${assignmentData.modelAnswer}</em></p>`;
-        
-        showFeedback(feedbackElement, feedback, false);
-    }
-}
-
-// СИСТЕМА ПРОВЕРКИ ТЕСТОВ С ВЫБОРОМ ОТВЕТА
-function checkQuiz(submoduleId) {
-    console.log("=== ПРОВЕРКА ТЕСТА ===");
-    
-    const feedbackId = 'quiz-feedback' + submoduleId.replace('.', '_');
-    const feedbackElement = document.getElementById(feedbackId);
-    
-    if (!feedbackElement) {
-        console.error("Элемент обратной связи не найден");
-        return;
-    }
-    
-    const quizData = knowledgeBase[submoduleId]?.quiz;
-    if (!quizData) {
-        showFeedback(feedbackElement, "⚠️ Данные теста не найдены.", false);
-        return;
-    }
-    
-    let score = 0;
-    let totalQuestions = Object.keys(quizData).length;
-    let feedbackHTML = `<h4>Результаты теста</h4>`;
-    let allCorrect = true;
-    
-    // Проверяем каждый вопрос
-    Object.keys(quizData).forEach(questionKey => {
-        const question = quizData[questionKey];
-        const questionNumber = questionKey;
-        
-        feedbackHTML += `<p><strong>Вопрос ${questionNumber}:</strong> ${question.question}</p>`;
-        
-        let userAnswers = [];
-        let isCorrect = false;
-        
-        if (question.type === 'single') {
-            // Одиночный выбор
-            const radioName = `q${questionNumber}_${submoduleId.replace('.', '_')}`;
-            const selectedRadio = document.querySelector(`input[name="${radioName}"]:checked`);
-            
-            if (selectedRadio) {
-                userAnswers = [selectedRadio.value];
-                isCorrect = selectedRadio.value === question.correct;
-            }
-            
-            feedbackHTML += `<div style="margin-left: 20px; margin-bottom: 10px;">`;
-            question.options.forEach(option => {
-                const isSelected = selectedRadio && selectedRadio.value === option.id;
-                const isRightAnswer = option.id === question.correct;
-                
-                let marker = '○';
-                let color = '#95a5a6';
-                
-                if (isSelected && isRightAnswer) {
-                    marker = '✅';
-                    color = '#2ecc71';
-                } else if (isSelected && !isRightAnswer) {
-                    marker = '❌';
-                    color = '#e74c3c';
-                } else if (!isSelected && isRightAnswer) {
-                    marker = '✓';
-                    color = '#2ecc71';
-                }
-                
-                feedbackHTML += `<div style="color: ${color}; margin: 2px 0;">${marker} ${option.text}</div>`;
-            });
-            feedbackHTML += `</div>`;
-            
-        } else if (question.type === 'multiple') {
-            // Множественный выбор
-            const checkboxName = `q${questionNumber}_${submoduleId.replace('.', '_')}`;
-            const selectedCheckboxes = document.querySelectorAll(`input[name="${checkboxName}"]:checked`);
-            
-            selectedCheckboxes.forEach(cb => userAnswers.push(cb.value));
-            
-            // Сортируем для сравнения
-            const userAnswersSorted = [...userAnswers].sort();
-            const correctAnswersSorted = [...question.correct].sort();
-            
-            isCorrect = arraysEqual(userAnswersSorted, correctAnswersSorted);
-            
-            feedbackHTML += `<div style="margin-left: 20px; margin-bottom: 10px;">`;
-            question.options.forEach(option => {
-                const isSelected = userAnswers.includes(option.id);
-                const isRightAnswer = question.correct.includes(option.id);
-                
-                let marker = '☐';
-                let color = '#95a5a6';
-                
-                if (isSelected && isRightAnswer) {
-                    marker = '✅';
-                    color = '#2ecc71';
-                } else if (isSelected && !isRightAnswer) {
-                    marker = '❌';
-                    color = '#e74c3c';
-                } else if (!isSelected && isRightAnswer) {
-                    marker = '☑';
-                    color = '#2ecc71';
-                }
-                
-                feedbackHTML += `<div style="color: ${color}; margin: 2px 0;">${marker} ${option.text}</div>`;
-            });
-            feedbackHTML += `</div>`;
-        }
-        
-        if (isCorrect) {
-            score++;
-            feedbackHTML += `<p style="color: #2ecc71;">✅ Ответ правильный</p>`;
-        } else {
-            allCorrect = false;
-            feedbackHTML += `<p style="color: #e74c3c;">❌ Ответ неправильный</p>`;
-        }
-        
-        feedbackHTML += `<hr style="border: none; border-top: 1px dashed #ccc; margin: 10px 0;">`;
-    });
-    
-    const percentage = Math.round((score / totalQuestions) * 100);
-    
-    feedbackHTML += `<h4 style="margin-top: 20px;">Итоговый результат: ${score} из ${totalQuestions} (${percentage}%)</h4>`;
-    
-    if (percentage === 100) {
-        feedbackHTML += `<p style="color: #2ecc71; font-weight: bold; font-size: 1.1em;">🎉 Отлично! Все ответы правильные!</p>`;
-        
-        // Сохраняем результат
-        saveProgress(submoduleId, 'quiz', percentage);
-        
-        showFeedback(feedbackElement, feedbackHTML, true);
-    } else if (percentage >= 70) {
-        feedbackHTML += `<p style="color: #f39c12; font-weight: bold;">📚 Хорошо, но есть ошибки. Повторите материал.</p>`;
-        showFeedback(feedbackElement, feedbackHTML, false);
-    } else {
-        feedbackHTML += `<p style="color: #e74c3c; font-weight: bold;">📖 Нужно повторить теорию. Обратите внимание на вопросы с ошибками.</p>`;
-        showFeedback(feedbackElement, feedbackHTML, false);
-    }
-}
-
-// ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
-function arraysEqual(arr1, arr2) {
-    if (!arr1 || !arr2) return false;
-    if (arr1.length !== arr2.length) return false;
-    for (let i = 0; i < arr1.length; i++) {
-        if (arr1[i] !== arr2[i]) return false;
-    }
-    return true;
-}
-
-function showFeedback(element, message, isSuccess) {
-    element.innerHTML = message;
-    element.className = isSuccess ? 'feedback success' : 'feedback error';
-    element.style.display = 'block';
-    
-    // Анимация появления
-    element.style.opacity = '0';
-    element.style.transform = 'translateY(10px)';
-    element.style.transition = 'all 0.3s ease';
-    
-    setTimeout(() => {
-        element.style.opacity = '1';
-        element.style.transform = 'translateY(0)';
-    }, 10);
-    
-    // Прокрутка к элементу
-    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-}
-
-function isMeaninglessAnswer(text) {
-    const lowerText = text.toLowerCase();
-    
-    // Список бессмысленных или оскорбительных слов
-    const meaninglessPatterns = [
-        /ху[йея]/i,
-        /пизд/i,
-        /бля/i,
-        /еб/i,
-        /\bа\b\s*\bа\b\s*\bа\b/i, // повторяющиеся буквы
-        /\bтест\b/i,
-        /\bпроверка\b/i,
-        /\.{5,}/, // много точек подряд
-        /\,{5,}/, // много запятых подряд
-        /\s{10,}/ // много пробелов подряд
-    ];
-    
-    // Проверяем на бессмысленные комбинации
-    if (text.length > 0) {
-        // Если текст состоит в основном из одного повторяющегося символа
-        const uniqueChars = new Set(text.replace(/\s/g, ''));
-        if (uniqueChars.size < 3 && text.length > 10) return true;
-        
-        // Если текст слишком короткий для осмысленного ответа
-        if (text.split(/\s+/).length < 5) return true;
-    }
-    
-    // Проверяем по паттернам
-    for (const pattern of meaninglessPatterns) {
-        if (pattern.test(lowerText)) {
-            return true;
-        }
-    }
-    
-    return false;
-}
-
-function saveProgress(submoduleId, type, score) {
-    // Сохраняем прогресс в localStorage
-    const progressKey = `progress_${submoduleId}_${type}`;
-    localStorage.setItem(progressKey, JSON.stringify({
-        score: score,
-        date: new Date().toISOString(),
-        type: type
-    }));
-    
-    console.log(`Прогресс сохранен: ${submoduleId} - ${type} - ${score}%`);
-}
-
-// ФУНКЦИЯ ДЛЯ СОЗДАНИЯ ФОРМЫ ТЕСТА
-function createQuizForm(submoduleId, quizData) {
-    let formHTML = '';
-    
-    Object.keys(quizData).forEach(questionKey => {
-        const question = quizData[questionKey];
-        const questionNumber = questionKey;
-        
-        formHTML += `<div class="quiz-question">`;
-        formHTML += `<p><strong>Вопрос ${questionNumber}:</strong> ${question.question}</p>`;
-        
-        if (question.type === 'single') {
-            // Радиокнопки для одиночного выбора
-            question.options.forEach(option => {
-                const inputId = `q${questionNumber}_${submoduleId.replace('.', '_')}_${option.id}`;
-                formHTML += `
-                <div class="option">
-                    <input type="radio" 
-                           id="${inputId}" 
-                           name="q${questionNumber}_${submoduleId.replace('.', '_')}" 
-                           value="${option.id}">
-                    <label for="${inputId}">${option.text}</label>
-                </div>`;
-            });
-            
-        } else if (question.type === 'multiple') {
-            // Чекбоксы для множественного выбора
-            question.options.forEach(option => {
-                const inputId = `q${questionNumber}_${submoduleId.replace('.', '_')}_${option.id}`;
-                formHTML += `
-                <div class="option">
-                    <input type="checkbox" 
-                           id="${inputId}" 
-                           name="q${questionNumber}_${submoduleId.replace('.', '_')}" 
-                           value="${option.id}">
-                    <label for="${inputId}">${option.text}</label>
-                </div>`;
-            });
-        }
-        
-        formHTML += `</div><hr>`;
-    });
-    
-    // Кнопка проверки
-    formHTML += `<button class="btn-primary" onclick="checkQuiz('${submoduleId}')">Проверить тест</button>`;
-    formHTML += `<div id="quiz-feedback${submoduleId.replace('.', '_')}" class="feedback"></div>`;
-    
-    return formHTML;
-}
-
-// ФУНКЦИЯ ДЛЯ СОЗДАНИЯ ФОРМЫ РАЗВЕРНУТОГО ОТВЕТА
-function createAssignmentForm(submoduleId, assignmentData) {
-    let formHTML = '';
-    
-    formHTML += `<div class="assignment-question">`;
-    formHTML += `<p><strong>Задание:</strong> ${assignmentData.question}</p>`;
-    formHTML += `<textarea id="answer${submoduleId.replace('.', '_')}" 
-                         placeholder="Напишите развернутый ответ здесь... (минимум 50 символов)"
-                         rows="6"></textarea>`;
-    formHTML += `<div class="hint-box">`;
-    formHTML += `<p><small>💡 Подсказка: используйте термины из урока, приводите конкретные примеры, пишите развернуто.</small></p>`;
-    formHTML += `</div>`;
-    formHTML += `<button class="btn-primary" onclick="checkAssignment('${submoduleId}')">Проверить задание</button>`;
-    formHTML += `<div id="feedback${submoduleId.replace('.', '_')}" class="feedback"></div>`;
-    formHTML += `</div>`;
-    
-    return formHTML;
-}
-
-// ИНИЦИАЛИЗАЦИЯ ТЕСТОВ ПРИ ЗАГРУЗКЕ СТРАНИЦЫ
-function initializeQuizzes() {
-    console.log("Инициализация тестов...");
-    
-    // Находим все контейнеры для тестов и создаем формы
-    Object.keys(knowledgeBase).forEach(submoduleId => {
-        const quizData = knowledgeBase[submoduleId]?.quiz;
-        if (quizData) {
-            const quizContainer = document.getElementById(`quiz-container-${submoduleId.replace('.', '_')}`);
-            if (quizContainer) {
-                quizContainer.innerHTML = createQuizForm(submoduleId, quizData);
-            }
-        }
-        
-        const assignmentData = knowledgeBase[submoduleId]?.assignment;
-        if (assignmentData) {
-            const assignmentContainer = document.getElementById(`assignment-container-${submoduleId.replace('.', '_')}`);
-            if (assignmentContainer) {
-                assignmentContainer.innerHTML = createAssignmentForm(submoduleId, assignmentData);
-            }
-        }
-    });
-}
-
-// СТИЛИ ДЛЯ ФОРМ И ОБРАТНОЙ СВЯЗИ
-const enhancedStyles = `
-<style>
-    /* СТИЛИ ДЛЯ ТЕСТОВ И ЗАДАНИЙ */
-    .quiz-question {
-        background: rgba(52, 152, 219, 0.05);
-        padding: 20px;
-        border-radius: 10px;
-        margin: 15px 0;
-        border-left: 4px solid #3498db;
-    }
-    
-    .assignment-question {
-        background: rgba(46, 204, 113, 0.05);
-        padding: 20px;
-        border-radius: 10px;
-        margin: 15px 0;
-        border-left: 4px solid #2ecc71;
-    }
-    
-    .option {
-        margin: 10px 0;
-        padding: 12px 15px;
-        background: rgba(255, 255, 255, 0.05);
-        border-radius: 8px;
-        transition: all 0.2s;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-    
-    .option:hover {
-        background: rgba(255, 255, 255, 0.1);
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-    
-    .option input[type="radio"],
-    .option input[type="checkbox"] {
-        margin-right: 12px;
-        transform: scale(1.2);
-        cursor: pointer;
-    }
-    
-    .option label {
-        cursor: pointer;
-        display: inline-block;
-        width: calc(100% - 40px);
-        vertical-align: middle;
-        font-size: 1.05em;
-    }
-    
-    .hint-box {
-        background: rgba(241, 196, 15, 0.1);
-        padding: 12px;
-        border-radius: 8px;
-        margin: 10px 0;
-        border-left: 3px solid #f1c40f;
-    }
-    
-    /* УЛУЧШЕННЫЕ СТИЛИ ДЛЯ ОБРАТНОЙ СВЯЗИ */
-    .feedback {
-        margin-top: 25px;
-        padding: 20px;
-        border-radius: 10px;
-        display: none;
-        animation: fadeIn 0.5s ease;
-        border: 1px solid;
-    }
-    
-    .feedback.success {
-        background: linear-gradient(135deg, rgba(46, 204, 113, 0.1) 0%, rgba(39, 174, 96, 0.1) 100%);
-        border-color: #2ecc71;
-        color: #27ae60;
-    }
-    
-    .feedback.error {
-        background: linear-gradient(135deg, rgba(231, 76, 60, 0.1) 0%, rgba(192, 57, 43, 0.1) 100%);
-        border-color: #e74c3c;
-        color: #c0392b;
-    }
-    
-    .feedback h4 {
-        margin-top: 0;
-        margin-bottom: 15px;
-        padding-bottom: 10px;
-        border-bottom: 2px solid;
-    }
-    
-    .feedback.success h4 {
-        border-color: rgba(46, 204, 113, 0.3);
-    }
-    
-    .feedback.error h4 {
-        border-color: rgba(231, 76, 60, 0.3);
-    }
-    
-    /* АНИМАЦИИ */
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-    
-    /* КНОПКИ */
-    .btn-primary {
-        background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
-        color: white;
-        border: none;
-        padding: 14px 28px;
-        border-radius: 8px;
-        font-size: 1.05em;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s;
-        margin-top: 15px;
-        display: inline-block;
-    }
-    
-    .btn-primary:hover {
-        background: linear-gradient(135deg, #2980b9 0%, #1f618d 100%);
-        transform: translateY(-2px);
-        box-shadow: 0 6px 12px rgba(52, 152, 219, 0.3);
-    }
-    
-    .btn-primary:active {
-        transform: translateY(0);
-    }
-    
-    /* ТЕКСТОВЫЕ ПОЛЯ */
-    textarea {
-        width: 100%;
-        min-height: 150px;
-        padding: 16px;
-        border: 2px solid rgba(255, 255, 255, 0.1);
-        background: rgba(255, 255, 255, 0.05);
-        border-radius: 8px;
-        color: var(--text-color);
-        font-family: inherit;
-        font-size: 1.05em;
-        line-height: 1.6;
-        resize: vertical;
-        transition: all 0.3s;
-        margin: 15px 0;
-    }
-    
-    textarea:focus {
-        outline: none;
-        border-color: #3498db;
-        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
-        background: rgba(255, 255, 255, 0.08);
-    }
-    
-    textarea::placeholder {
-        color: rgba(255, 255, 255, 0.4);
-    }
-    
-    /* СЧЕТЧИК СИМВОЛОВ (опционально) */
-    .char-counter {
-        text-align: right;
-        font-size: 0.85em;
-        color: #95a5a6;
-        margin-top: 5px;
-    }
-    
-    /* ПРОГРЕСС БАР */
-    .progress-bar {
-        width: 100%;
-        height: 8px;
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 4px;
-        margin: 10px 0;
-        overflow: hidden;
-    }
-    
-    .progress-fill {
-        height: 100%;
-        border-radius: 4px;
-        transition: width 0.5s ease;
-    }
-    
-    .progress-fill.good {
-        background: linear-gradient(90deg, #2ecc71, #27ae60);
-    }
-    
-    .progress-fill.medium {
-        background: linear-gradient(90deg, #f39c12, #d35400);
-    }
-    
-    .progress-fill.poor {
-        background: linear-gradient(90deg, #e74c3c, #c0392b);
-    }
-</style>
-`;
-
-// ДОБАВЛЯЕМ СТИЛИ В ДОКУМЕНТ
-document.head.insertAdjacentHTML('beforeend', enhancedStyles);
-
-// ИНИЦИАЛИЗИРУЕМ ТЕСТЫ ПРИ ЗАГРУЗКЕ СТРАНИЦЫ
-document.addEventListener('DOMContentLoaded', function() {
-    setTimeout(initializeQuizzes, 100);
-});
-
-// ЭКСПОРТ ФУНКЦИЙ
-window.knowledgeBase = knowledgeBase;
-window.checkAssignment = checkAssignment;
-window.checkQuiz = checkQuiz;
-window.createQuizForm = createQuizForm;
-window.createAssignmentForm = createAssignmentForm;
-window.initializeQuizzes = initializeQuizzes;
-
-console.log("✅ Улучшенная система проверки загружена!");
-console.log("✅ База знаний содержит модули: " + Object.keys(knowledgeBase).join(', '));
-console.log("✅ Функции проверки: checkAssignment(), checkQuiz()");
-console.log("✅ Функции создания форм: createQuizForm(), createAssignmentForm()");
-
-
 // Данные курса: модули, подмодули, задания  
 const courseData = {
     title: "Эмпатия и поддержка в общении",
@@ -869,142 +55,23 @@ const courseData = {
                 {
                     id: "1.1",
                     title: "Что такое эмпатия: Глубина понимания",
-                    content: `
-<div class="theory-block">
-    <picture>
-        <source media="(max-width: 1000px)" srcset="https://i.postimg.cc/QNwvfBPt/6d8b84cbd3fe11f0adb37e72a190c2a8-(2).jpg">
-        <img src="https://i.postimg.cc/4yzjyMhQ/6d8b84cbd3fe11f0adb37e72a190c2a8.jpg" alt="Эмпатия и понимание" class="responsive-image">
-    </picture>
-
-    <div class="quote-box">
-        <div class="quote">«Эмпатия — это способность разделить чувства другого, оставаясь собой»</div>
-        <p class="author">— Карл Роджерс</p>
-    </div>
-
-    <h3>Теория</h3>
-    <p><strong>Расширенная теория:</strong> Эмпатия часто путается с сочувствием (симпатией) или жалостью, но это фундаментально разные процессы.</p>
-    <ul>
-        <li><strong>Жалость:</strong> Позиция «сверху вниз». Вы смотрите на человека в беде и думаете: «Бедняжка, хорошо, что это не со мной». Это дистанцирует.</li>
-        <li><strong>Сочувствие (Sympathy):</strong> Это понимание того, что кому-то плохо, но без эмоционального вовлечения. Вы «чувствуете за» кого-то.</li>
-        <li><strong>Эмпатия (Empathy):</strong> Это способность «чувствовать вместе». Это позиция равного. Вы мысленно встаете на место человека, используя свой эмоциональный опыт, чтобы понять его боль. Эмпатия требует уязвимости, так как вы должны затронуть что-то внутри себя, что знает это чувство.</li>
-    </ul>
-    
-    <div class="definition-box">
-        <h4><span class="term">Термин:</span> Уязвимость</h4>
-        <p>Состояние открытости и принятия собственных чувств, которое позволяет понять чувства другого. Не слабость, а смелость быть настоящим.</p>
-    </div>
-    
-    <p><strong>Почему эмпатия важна в повседневной жизни:</strong></p>
-    <ul>
-        <li><strong>Укрепляет отношения:</strong> Люди чувствуют себя услышанными и понятыми</li>
-        <li><strong>Снижает конфликты:</strong> Понимание мотивов другого помогает избегать обвинений</li>
-        <li><strong>Помогает в воспитании:</strong> Дети, чувствуя эмпатию родителей, учатся управлять эмоциями</li>
-        <li><strong>Улучшает рабочую атмосферу:</strong> Коллеги, чувствующие поддержку, работают эффективнее</li>
-    </ul>
-    
-    <div class="source-box">
-        <h4>📚 Источник</h4>
-        <p><strong>APA Dictionary of Psychology</strong></p>
-        <p>Американская психологическая ассоциация. Эмпатия определяется как понимание эмоционального состояния другого человека с точки зрения этого человека, а также способность разделить его эмоции.</p>
-    </div>
-    
-    <h3>Практика: как хорошо vs как плохо</h3>
-    <table class="comparison-table">
-        <thead>
-            <tr>
-                <th>Как хорошо делать</th>
-                <th>Как плохо делать</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>«Похоже, тебе действительно тяжело. Я бы тоже расстроился на твоем месте»</td>
-                <td>«Не переживай, это ерунда»</td>
-            </tr>
-            <tr>
-                <td>«Я понимаю твою злость, это действительно несправедливо»</td>
-                <td>«Успокойся, не стоит злиться из-за такой мелочи»</td>
-            </tr>
-            <tr>
-                <td>«Должно быть, больно чувствовать себя непонятым»</td>
-                <td>«Бедняжка, как тебе не повезло»</td>
-            </tr>
-            <tr>
-                <td>Слушать без планирования ответа, полностью присутствуя</td>
-                <td>Слушать, думая о том, что сказать дальше</td>
-            </tr>
-        </tbody>
-    </table>
-    
-    <div class="practical-tip">
-        <h4>📌 Практический совет на сегодня:</h4>
-        <p>В течение дня попробуйте в одном разговоре вместо совета сказать: «Похоже, это действительно тяжело для тебя. Я бы тоже расстроился на твоем месте».</p>
-    </div>
-    
-    <h3>Задания для проверки знаний</h3>
-    
-    <div class="assignment">
-        <h4>Задание 1: Опишите разницу между «жалко» и «понимаю тебя»</h4>
-        <p>Приведите примеры двух фраз: одной, выражающей жалость, и другой, выражающей эмпатию, в ответ на ситуацию: «У меня провалился важный проект на работе».</p>
-        <textarea id="answer1_1" placeholder="Напишите ваши варианты фраз здесь..."></textarea>
-        <button class="btn-primary" onclick="checkAssignment('1.1')">Проверить задание</button>
-        <div id="feedback1_1" class="feedback"></div>
-    </div>
-    
-    <div class="quiz">
-        <h4>Задание 2: Выберите правильный ответ</h4>
-        <p><strong>Что является ключевым отличием эмпатии от жалости?</strong></p>
-        
-        <div class="quiz-options">
-            <div class="option">
-                <input type="radio" id="q1_option1" name="q1" value="a">
-                <label for="q1_option1">Эмпатия — это позиция сверху, жалость — позиция равных</label>
-            </div>
-            <div class="option">
-                <input type="radio" id="q1_option2" name="q1" value="b">
-                <label for="q1_option2">Эмпатия — это позиция равных, жалость — позиция сверху</label>
-            </div>
-            <div class="option">
-                <input type="radio" id="q1_option3" name="q1" value="c">
-                <label for="q1_option3">Между ними нет существенной разницы</label>
-            </div>
-        </div>
-        
-        <p><strong>Какие утверждения верны об эмпатии? (выберите все подходящие)</strong></p>
-        
-        <div class="quiz-options">
-            <div class="option">
-                <input type="checkbox" id="q2_option1" name="q2" value="a">
-                <label for="q2_option1">Требует уязвимости и открытости</label>
-            </div>
-            <div class="option">
-                <input type="checkbox" id="q2_option2" name="q2" value="b">
-                <label for="q2_option2">Это способ «чувствовать вместе»</label>
-            </div>
-            <div class="option">
-                <input type="checkbox" id="q2_option3" name="q2" value="c">
-                <label for="q2_option3">Всегда включает в себя решение проблемы за другого</label>
-            </div>
-            <div class="option">
-                <input type="checkbox" id="q2_option4" name="q2" value="d">
-                <label for="q2_option4">Укрепляет отношения</label>
-            </div>
-        </div>
-        
-        <button class="btn-secondary" onclick="checkQuiz('1.1')">Проверить тест</button>
-        <div id="quiz-feedback1_1" class="feedback"></div>
-    </div>
-    
-    <div class="additional-task">
-        <h5>Дополнительное задание (для практики):</h5>
-        <p>Ситуация: ребенок плачет, потому что сломал любимую игрушку.</p>
-        <p>1. Напишите реакцию жалости:</p>
-        <textarea id="extra1_1a" placeholder="Реакция жалости..."></textarea>
-        <p>2. Напишите эмпатическую реакцию:</p>
-        <textarea id="extra1_1b" placeholder="Эмпатическая реакция..."></textarea>
-        <button class="btn-secondary" onclick="checkExtraAssignment('1.1')">Проверить дополнительное задание</button>
-    </div>
-</div>
+                    tabs: {
+                        theory: {
+                            title: "Теория",
+                            content: `<div class="theory-block">
+<picture>
+    <!-- Для мобильных -->
+    <source 
+        media="(max-width: 1000px)" 
+        srcset="https://i.postimg.cc/QNwvfBPt/6d8b84cbd3fe11f0adb37e72a190c2a8-(2).jpg"
+    >
+    <!-- Для десктопов и фолбэк -->
+    <img 
+        src="https://i.postimg.cc/4yzjyMhQ/6d8b84cbd3fe11f0adb37e72a190c2a8.jpg" 
+        alt="Эмпатия и понимание"
+        class="responsive-image"
+    >
+</picture>
 
 <style>
     .responsive-image {
@@ -1016,6 +83,7 @@ const courseData = {
         display: block;
     }
     
+    /* Для мобильных устройств */
     @media (max-width: 1000px) {
         .responsive-image {
             width: 80% !important;
@@ -1024,256 +92,131 @@ const courseData = {
             margin-right: auto;
         }
     }
-    
-    .comparison-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin: 20px 0;
-        background: var(--card-bg);
-        border-radius: 10px;
-        overflow: hidden;
-    }
-    
-    .comparison-table th {
-        background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
-        color: white;
-        padding: 15px;
-        text-align: left;
-        font-weight: 600;
-    }
-    
-    .comparison-table td {
-        padding: 15px;
-        border-bottom: 1px solid rgba(255,255,255,0.1);
-    }
-    
-    .comparison-table tr:last-child td {
-        border-bottom: none;
-    }
-    
-    .quiz {
-        background: rgba(52, 152, 219, 0.1);
-        padding: 20px;
-        border-radius: 10px;
-        margin: 20px 0;
-    }
-    
-    .quiz-options {
-        margin: 15px 0;
-    }
-    
-    .option {
-        margin: 10px 0;
-        padding: 12px;
-        background: rgba(255,255,255,0.05);
-        border-radius: 8px;
-        transition: background 0.3s;
-    }
-    
-    .option:hover {
-        background: rgba(255,255,255,0.1);
-    }
-    
-    .option input[type="radio"],
-    .option input[type="checkbox"] {
-        margin-right: 10px;
-    }
-    
-    .option label {
-        cursor: pointer;
-        font-size: 1em;
-    }
-    
-    .quote-box {
-        background: linear-gradient(135deg, rgba(155, 89, 182, 0.1) 0%, rgba(142, 68, 173, 0.1) 100%);
-        border-left: 4px solid #9b59b6;
-        padding: 20px;
-        margin: 20px 0;
-        border-radius: 0 10px 10px 0;
-    }
-    
-    .quote {
-        font-size: 1.2em;
-        font-style: italic;
-        color: #f1c40f;
-        margin: 0;
-    }
-    
-    .author {
-        text-align: right;
-        color: #95a5a6;
-        margin: 10px 0 0 0;
-    }
-</style>`
+</style>
+                                <p><strong>Расширенная теория:</strong> Эмпатия часто путается с сочувствием (симпатией) или жалостью, но это фундаментально разные процессы.</p>
+                                <ul>
+                                    <li><strong>Жалость:</strong> Позиция «сверху вниз». Вы смотрите на человека в беде и думаете: «Бедняжка, хорошо, что это не со мной». Это дистанцирует.</li>
+                                    <li><strong>Сочувствие (Sympathy):</strong> Это понимание того, что кому-то плохо, но без эмоционального вовлечения. Вы «чувствуете за» кого-то.</li>
+                                    <li><strong>Эмпатия (Empathy):</strong> Это способность «чувствовать вместе». Это позиция равного. Вы мысленно встаете на место человека, используя свой эмоциональный опыт, чтобы понять его боль. Эмпатия требует уязвимости, так как вы должны затронуть что-то внутри себя, что знает это чувство.</li>
+                                </ul>
+                                
+                                <div class="definition-box">
+                                    <h4><span class="term">Термин:</span> Уязвимость</h4>
+                                    <p>Состояние открытости и принятия собственных чувств, которое позволяет понять чувства другого. Не слабость, а смелость быть настоящим.</p>
+                                </div>
+                                
+                                <p><strong>Почему эмпатия важна в повседневной жизни:</strong></p>
+                                <ul>
+                                    <li><strong>Укрепляет отношения:</strong> Люди чувствуют себя услышанными и понятыми</li>
+                                    <li><strong>Снижает конфликты:</strong> Понимание мотивов другого помогает избегать обвинений</li>
+                                    <li><strong>Помогает в воспитании:</strong> Дети, чувствуя эмпатию родителей, учатся управлять эмоциями</li>
+                                    <li><strong>Улучшает рабочую атмосферу:</strong> Коллеги, чувствующие поддержку, работают эффективнее</li>
+                                </ul>
+                                
+                                <p><strong>Как развить базовую эмпатию:</strong></p>
+                                <ol>
+                                    <li>Слушайте без планирования ответа</li>
+                                    <li>Задавайте уточняющие вопросы о чувствах</li>
+                                    <li>Представьте себя в ситуации другого</li>
+                                    <li>Признайте право человека на его чувства, даже если вы их не разделяете</li>
+                                </ol>
+                                
+                                <div class="check-question">
+                                    <h4>Вопросы для проверки:</h4>
+                                    <p>1. Какое утверждение описывает жалость, а не эмпатию?<br>
+                                    2. Нужно ли обязательно пережить точно такую же ситуацию, чтобы проявить эмпатию? (Ответ: Нет, нужно найти схожую эмоцию).<br>
+                                    3. Почему фраза «Хотя бы ты не заболел...» является блокиратором эмпатии?</p>
+                                </div>
+                                <p><strong>Ключевое отличие от сочувствия:</strong></p>
+                                <ul>
+                                    <li><strong>Сочувствие (жалость)</strong> — это чувство сожаления о несчастье другого, часто с позиции сверху вниз («мне жаль тебя»).</li>
+                                    <li><strong>Эмпатия (сопереживание)</strong> — это способность поставить себя на место другого и понять его переживания «изнутри» («я понимаю, что ты чувствуешь»).</li>
+                                </ul>
+                                
+                                <div class="practical-tip">
+                                    <h4>📌 Практический совет на сегодня:</h4>
+                                    <p>В течение дня попробуйте в одном разговоре вместо совета сказать: «Похоже, это действительно тяжело для тебя. Я бы тоже расстроился на твоем месте».</p>
+                                </div>
+                            </div>`
+                        },
+                        quote: {
+                            title: "Цитата",
+                            content: `<div class="quote">«Эмпатия — это способность разделить чувства другого, оставаясь собой»</div>
+                            <p class="author">— Карл Роджерс</p>`
+                        },
+                        source: {
+                            title: "Источник",
+                            content: `<div class="source">
+                                <p><strong>APA Dictionary of Psychology</strong></p>
+                                <p>Американская психологическая ассоциация. Эмпатия определяется как понимание эмоционального состояния другого человека с точки зрения этого человека, а также способность разделить его эмоции.</p>
+                            </div>`
+                        },
+                        assignment: {
+                            title: "Задание",
+                            content: `<div class="assignment">
+                                <h4>Опишите разницу между «жалко» и «понимаю тебя»</h4>
+                                <p>Приведите примеры двух фраз: одной, выражающей жалость, и другой, выражающей эмпатию, в ответ на ситуацию: «У меня провалился важный проект на работе».</p>
+                                <textarea id="answer1_1" placeholder="Напишите ваши варианты фраз здесь..."></textarea>
+                                <button class="btn-primary" onclick="checkAssignment('1.1')">Проверить задание</button>
+                                
+                                <div class="additional-task">
+                                    <h5>Дополнительное задание (для практики):</h5>
+                                    <p>Ситуация: ребенок плачет, потому что сломал любимую игрушку.</p>
+                                    <p>1. Напишите реакцию жалости:</p>
+                                    <textarea id="extra1_1a" placeholder="Реакция жалости..."></textarea>
+                                    <p>2. Напишите эмпатическую реакцию:</p>
+                                    <textarea id="extra1_1b" placeholder="Эмпатическая реакция..."></textarea>
+                                    <button class="btn-secondary" onclick="checkExtraAssignment('1.1')">Проверить дополнительное задание</button>
+                                </div>
+                                
+                                <div id="feedback1_1" class="feedback"></div>
+                            </div>`,
+                            check: function(answer) {
+                                const keywordsEmpathy = ["понимаю", "представляю", "должно быть", "чувствую", "разделяю", "поддержку"];
+                                const keywordsPity = ["жалко", "жалеешь", "бедный", "несчастный", "сожалею", "повезло бы"];
+                                
+                                let hasEmpathy = false;
+                                let hasPity = false;
+                                
+                                keywordsEmpathy.forEach(word => {
+                                    if (answer.toLowerCase().includes(word)) hasEmpathy = true;
+                                });
+                                
+                                keywordsPity.forEach(word => {
+                                    if (answer.toLowerCase().includes(word)) hasPity = true;
+                                });
+                                
+                                if (hasEmpathy && hasPity) {
+                                    return {correct: true, message: "Отлично! Вы четко разделили эмпатию («понимаю тебя») и жалость («жалко»)."};
+                                } else if (hasEmpathy) {
+                                    return {correct: true, message: "Хорошо! Вы привели пример эмпатии. Попробуйте также добавить пример жалости для контраста."};
+                                } else {
+                                    return {correct: false, message: "Попробуйте еще. Ищите разницу: жалость — это чувство сверху, эмпатия — разделение чувств на равных."};
+                                }
+                            }
+                        }
+                    }
                 },
                 {
                     id: "1.2",
                     title: "Виды эмпатии: Как работает наш мозг",
-                    content: `
-<div class="theory-block">
-    <picture>
-        <source media="(max-width: 1000px)" srcset="https://i.postimg.cc/0jyJy6jM/ac06b750d3ff11f08fd6b2f688e16018-(3).jpg">
-        <img src="https://i.postimg.cc/hGsw7wMv/ac06b750d3ff11f08fd6b2f688e16018-(1).jpg" alt="Виды эмпатии" class="responsive-image">
-    </picture>
-
-    <h3>Теория</h3>
-    <p><strong>Расширенная теория:</strong> Психологи выделяют три уровня эмпатии, которые задействуют разные участки мозга:</p>
-    <ul>
-        <li><strong>Когнитивная эмпатия («Я понимаю»):</strong> Вы интеллектуально понимаете точку зрения другого человека. Это навык переговорщиков. Риск: Можно понять, как манипулировать человеком, не сопереживая ему.</li>
-        <li><strong>Эмоциональная эмпатия («Я чувствую»):</strong> Вы физически ощущаете эмоции другого (списибо зеркальным нейронам). Если друг плачет, у вас тоже ком в горле. Риск: Если не иметь границ, это ведет к быстрому выгоранию.</li>
-        <li><strong>Сострадательная эмпатия (Эмпатическая забота):</strong> Баланс. Вы понимаете и чувствуете, но не тонете в чужих эмоциях, а испытываете импульс помочь. Это конструктивная форма поддержки.</li>
-    </ul>
-    
-    <div class="definition-box">
-        <h4><span class="term">Термин:</span> Зеркальные нейроны</h4>
-        <p>Специальные клетки мозга, которые активируются как при выполнении действия, так и при наблюдении за тем, как это действие выполняет другой. Основа эмоциональной эмпатии.</p>
-    </div>
-    
-    <div class="source-box">
-        <h4>📚 Источник</h4>
-        <p><strong>Greater Good Science Center, Калифорнийский университет в Беркли</strong></p>
-        <p>Исследования центра показывают, что сострадательная эмпатия наиболее эффективна для построения прочных отношений и оказания реальной помощи.</p>
-    </div>
-    
-    <h3>Практика: как хорошо vs как плохо</h3>
-    <table class="comparison-table">
-        <thead>
-            <tr>
-                <th>Как хорошо делать</th>
-                <th>Как плохо делать</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>Использовать все три вида эмпатии в зависимости от ситуации</td>
-                <td>Использовать только эмоциональную эмпатию и выгорать</td>
-            </tr>
-            <tr>
-                <td>Применять когнитивную эмпатию в переговорах</td>
-                <td>Использовать когнитивную эмпатию для манипуляций</td>
-            </tr>
-            <tr>
-                <td>Проявлять сострадательную эмпатию — понять, почувствовать и помочь конструктивно</td>
-                <td>Погружаться в чужие эмоции без границ</td>
-            </tr>
-            <tr>
-                <td>Балансировать между пониманием и эмоциональной вовлеченностью</td>
-                <td>Быть либо полностью холодным, либо полностью поглощенным чужими чувствами</td>
-            </tr>
-        </tbody>
-    </table>
-    
-    <p><strong>Какой вид эмпатии нужен в разных ситуациях:</strong></p>
-    <table class="empathy-table">
-        <tr>
-            <th>Ситуация</th>
-            <th>Наиболее подходящий вид эмпатии</th>
-            <th>Пример реакции</th>
-        </tr>
-        <tr>
-            <td>Коллега рассказывает о сложном проекте</td>
-            <td>Когнитивная</td>
-            <td>«Понимаю, какие сложные задачи тебе приходится решать»</td>
-        </tr>
-        <tr>
-            <td>Подруга плачет после расставания</td>
-            <td>Эмоциональная</td>
-            <td>«Мне тоже грустно это слышать» (с искренним сочувствием в голосе)</td>
-        </tr>
-        <tr>
-            <td>Соседка в депрессии не может выйти из дома</td>
-            <td>Сострадательная</td>
-            <td>«Похоже, тебе сейчас очень тяжело. Хочешь, я помогу с покупками?»</td>
-        </tr>
-    </table>
-    
-    <div class="practical-tip">
-        <h4>📌 Упражнение на неделю:</h4>
-        <p>В течение недели отмечайте, какой вид эмпатии вы проявляете в разных ситуациях. Вечером записывайте 1-2 примера.</p>
-    </div>
-    
-    <h3>Задания для проверки знаний</h3>
-    
-    <div class="assignment">
-        <h4>Задание 1: Приведите пример каждого вида эмпатии</h4>
-        <p>Представьте ситуацию: друг потерял работу. Как проявится каждый вид эмпатии?</p>
-        <textarea id="answer1_2" placeholder="Напишите ваши примеры здесь..."></textarea>
-        <button class="btn-primary" onclick="checkAssignment('1.2')">Проверить задание</button>
-        <div id="feedback1_2" class="feedback"></div>
-    </div>
-    
-    <div class="quiz">
-        <h4>Задание 2: Выберите правильный ответ</h4>
-        <p><strong>Какой вид эмпатии наиболее подвержен риску выгорания?</strong></p>
-        
-        <div class="quiz-options">
-            <div class="option">
-                <input type="radio" id="q1_2_option1" name="q1_2" value="a">
-                <label for="q1_2_option1">Когнитивная эмпатия</label>
-            </div>
-            <div class="option">
-                <input type="radio" id="q1_2_option2" name="q1_2" value="b">
-                <label for="q1_2_option2">Эмоциональная эмпатия</label>
-            </div>
-            <div class="option">
-                <input type="radio" id="q1_2_option3" name="q1_2" value="c">
-                <label for="q1_2_option3">Сострадательная эмпатия</label>
-            </div>
-        </div>
-        
-        <p><strong>Какие утверждения верны о зеркальных нейронах? (выберите все подходящие)</strong></p>
-        
-        <div class="quiz-options">
-            <div class="option">
-                <input type="checkbox" id="q2_2_option1" name="q2_2" value="a">
-                <label for="q2_2_option1">Активируются при выполнении действия</label>
-            </div>
-            <div class="option">
-                <input type="checkbox" id="q2_2_option2" name="q2_2" value="b">
-                <label for="q2_2_option2">Активируются при наблюдении за действием другого</label>
-            </div>
-            <div class="option">
-                <input type="checkbox" id="q2_2_option3" name="q2_2" value="c">
-                <label for="q2_2_option3">Отвечают только за логическое мышление</label>
-            </div>
-            <div class="option">
-                <input type="checkbox" id="q2_2_option4" name="q2_2" value="d">
-                <label for="q2_2_option4">Являются основой эмоциональной эмпатии</label>
-            </div>
-        </div>
-        
-        <p><strong>Какой вид эмпатии уместен при анализе договора с клиентом?</strong></p>
-        
-        <div class="quiz-options">
-            <div class="option">
-                <input type="radio" id="q3_2_option1" name="q3_2" value="a">
-                <label for="q3_2_option1">Эмоциональная эмпатия</label>
-            </div>
-            <div class="option">
-                <input type="radio" id="q3_2_option2" name="q3_2" value="b">
-                <label for="q3_2_option2">Когнитивная эмпатия</label>
-            </div>
-            <div class="option">
-                <input type="radio" id="q3_2_option3" name="q3_2" value="c">
-                <label for="q3_2_option3">Сострадательная эмпатия</label>
-            </div>
-        </div>
-        
-        <button class="btn-secondary" onclick="checkQuiz('1.2')">Проверить тест</button>
-        <div id="quiz-feedback1_2" class="feedback"></div>
-    </div>
-    
-    <div class="additional-task">
-        <h5>Дополнительное задание (ситуации для анализа):</h5>
-        <p>1. Ребенок боится идти к зубному. Какой вид эмпатии поможет больше всего?</p>
-        <textarea id="extra1_2a" placeholder="Ваш анализ..."></textarea>
-        <p>2. Пожилая соседка рассказывает, как скучает по умершему мужу. Какую эмпатию проявить?</p>
-        <textarea id="extra1_2b" placeholder="Ваш анализ..."></textarea>
-        <p>3. Коллега злится на начальника. Какой вид эмпатии уместен?</p>
-        <textarea id="extra1_2c" placeholder="Ваш анализ..."></textarea>
-        <button class="btn-secondary" onclick="checkExtraAssignment('1.2')">Проверить анализ</button>
-    </div>
-</div>
+                    tabs: {
+                        theory: {
+                            title: "Теория",
+                            content: `<div class="theory-block">
+<picture>
+    <!-- Для мобильных -->
+    <source 
+        media="(max-width: 1000px)" 
+        srcset="https://i.postimg.cc/0jyJy6jM/ac06b750d3ff11f08fd6b2f688e16018-(3).jpg"
+    >
+    <!-- Для десктопов и фолбэк -->
+    <img 
+        src="https://i.postimg.cc/hGsw7wMv/ac06b750d3ff11f08fd6b2f688e16018-(1).jpg" 
+        alt="Эмпатия и понимание"
+        class="responsive-image"
+    >
+</picture>
 
 <style>
     .responsive-image {
@@ -1285,6 +228,7 @@ const courseData = {
         display: block;
     }
     
+    /* Для мобильных устройств */
     @media (max-width: 1000px) {
         .responsive-image {
             width: 80% !important;
@@ -1293,211 +237,129 @@ const courseData = {
             margin-right: auto;
         }
     }
-    
-    .empathy-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin: 20px 0;
-        background: var(--card-bg);
-        border-radius: 10px;
-        overflow: hidden;
-    }
-    
-    .empathy-table th {
-        background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
-        color: white;
-        padding: 12px;
-        text-align: left;
-    }
-    
-    .empathy-table td {
-        padding: 12px;
-        border-bottom: 1px solid rgba(255,255,255,0.1);
-    }
-    
-    .empathy-table tr:hover {
-        background: rgba(52, 152, 219, 0.05);
-    }
-</style>`
+</style>
+
+                                <p><strong>Расширенная теория:</strong> Психологи выделяют три уровня эмпатии, которые задействуют разные участки мозга:</p>
+                                <ul>
+                                    <li><strong>Когнитивная эмпатия («Я понимаю»):</strong> Вы интеллектуально понимаете точку зрения другого человека. Это навык переговорщиков. Риск: Можно понять, как манипулировать человеком, не сопереживая ему.</li>
+                                    <li><strong>Эмоциональная эмпатия («Я чувствую»):</strong> Вы физически ощущаете эмоции другого (спасибо зеркальным нейронам). Если друг плачет, у вас тоже ком в горле. Риск: Если не иметь границ, это ведет к быстрому выгоранию.</li>
+                                    <li><strong>Сострадательная эмпатия (Эмпатическая забота):</strong> Баланс. Вы понимаете и чувствуете, но не тонете в чужих эмоциях, а испытываете импульс помочь. Это конструктивная форма поддержки.</li>
+                                </ul>
+                                
+                                <div class="definition-box">
+                                    <h4><span class="term">Термин:</span> Зеркальные нейроны</h4>
+                                    <p>Специальные клетки мозга, которые активируются как при выполнении действия, так и при наблюдении за тем, как это действие выполняет другой. Основа эмоциональной эмпатии.</p>
+                                </div>
+                                
+                                <p><strong>Какой вид эмпатии нужен в разных ситуациях:</strong></p>
+                                <table class="empathy-table">
+                                    <tr>
+                                        <th>Ситуация</th>
+                                        <th>Наиболее подходящий вид эмпатии</th>
+                                        <th>Пример реакции</th>
+                                    </tr>
+                                    <tr>
+                                        <td>Коллега рассказывает о сложном проекте</td>
+                                        <td>Когнитивная</td>
+                                        <td>«Понимаю, какие сложные задачи тебе приходится решать»</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Подруга плачет после расставания</td>
+                                        <td>Эмоциональная</td>
+                                        <td>«Мне тоже грустно это слышать» (с искренним сочувствием в голосе)</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Соседка в депрессии не может выйти из дома</td>
+                                        <td>Сострадательная</td>
+                                        <td>«Похоже, тебе сейчас очень тяжело. Хочешь, я помогу с покупками?»</td>
+                                    </tr>
+                                </table>
+                                
+                                <p><strong>Как тренировать разные виды эмпатии:</strong></p>
+                                <ol>
+                                    <li><strong>Когнитивную:</strong> Смотрите фильмы и пытайтесь предсказать, как поступят герои</li>
+                                    <li><strong>Эмоциональную:</strong> Обращайте внимание на свои телесные реакции при общении</li>
+                                    <li><strong>Сострадательную:</strong> Спросите себя: «Чем я могу быть полезен?», прежде чем бросаться помогать</li>
+                                </ol>
+                                
+                                <div class="check-question">
+                                    <h4>Вопросы для проверки:</h4>
+                                    <p>1. Если вы расплакались, увидев плачущего человека, какой вид эмпатии сработал?<br>
+                                    2. Какой вид эмпатии наиболее важен для врача или психолога, чтобы не выгореть?<br>
+                                    3. В чем опасность только когнитивной эмпатии?</p>
+                                </div>
+                                
+                                <div class="practical-tip">
+                                    <h4>📌 Упражнение на неделю:</h4>
+                                    <p>В течение недели отмечайте, какой вид эмпатии вы проявляете в разных ситуациях. Вечером записывайте 1-2 примера.</p>
+                                </div>
+                            </div>`
+                        },
+                        source: {
+                            title: "Источник",
+                            content: `<div class="source">
+                                <p><strong>Greater Good Science Center, Калифорнийский университет в Беркли</strong></p>
+                                <p>Исследования центра показывают, что сострадательная эмпатия наиболее эффективна для построения прочных отношений и оказания реальной помощи.</p>
+                            </div>`
+                        },
+                        assignment: {
+                            title: "Задание",
+                            content: `<div class="assignment">
+                                <h4>Приведите пример каждого вида эмпатии</h4>
+                                <p>Представьте ситуацию: друг потерял работу. Как проявится каждый вид эмпатии?</p>
+                                <textarea id="answer1_2" placeholder="Напишите ваши примеры здесь..."></textarea>
+                                <button class="btn-primary" onclick="checkAssignment('1.2')">Проверить задание</button>
+                                
+                                <div class="additional-task">
+                                    <h5>Дополнительное задание (ситуации для анализа):</h5>
+                                    <p>1. Ребенок боится идти к зубному. Какой вид эмпатии поможет больше всего?</p>
+                                    <textarea id="extra1_2a" placeholder="Ваш анализ..."></textarea>
+                                    <p>2. Пожилая соседка рассказывает, как скучает по умершему мужу. Какую эмпатию проявить?</p>
+                                    <textarea id="extra1_2b" placeholder="Ваш анализ..."></textarea>
+                                    <p>3. Коллега злится на начальника. Какой вид эмпатии уместен?</p>
+                                    <textarea id="extra1_2c" placeholder="Ваш анализ..."></textarea>
+                                    <button class="btn-secondary" onclick="checkExtraAssignment('1.2')">Проверить анализ</button>
+                                </div>
+                                
+                                <div id="feedback1_2" class="feedback"></div>
+                            </div>`,
+                            check: function(answer) {
+                                const types = ["когнитив", "эмоциональ", "сострада"];
+                                let foundTypes = 0;
+                                
+                                types.forEach(type => {
+                                    if (answer.toLowerCase().includes(type)) foundTypes++;
+                                });
+                                
+                                if (foundTypes >= 2) {
+                                    return {correct: true, message: "Хорошая работа! Вы правильно определили виды эмпатии."};
+                                } else {
+                                    return {correct: false, message: "Попробуйте включить в ответ упоминания когнитивной, эмоциональной и сострадательной эмпатии."};
+                                }
+                            }
+                        }
+                    }
                 },
                 {
                     id: "1.3",
                     title: "Эмпатия в невербалике",
-                    content: `
-<div class="theory-block">
-    <picture>
-        <source media="(max-width: 1000px)" srcset="https://i.postimg.cc/BvrZj5Wd/1ab6a8a8-cfbf-48b5-b695-95beab50.jpg">
-        <img src="https://i.postimg.cc/SxVzYvD4/1ab6a8a8-cfbf-48b5-b695-95beab503c1e.jpg" alt="Эмпатия в невербалике" class="responsive-image">
-    </picture>
-
-    <div class="quote-box">
-        <div class="quote">«Слушать — значит слышать не только слова, но и чувства»</div>
-        <p class="author">— Неизвестный автор</p>
-    </div>
-
-    <h3>Теория</h3>
-    <p><strong>Расширенная теория:</strong> По данным исследований (Мейерабиан и др.), слова передают лишь около 7% информации об эмоциях. Эмпатия считывается через:</p>
-    <ul>
-        <li><strong>Проксемику:</strong> Дистанция. Наклон корпуса в сторону собеседника (сигнал интереса) против откинутой назад позы (сигнал оценки/отстраненности).</li>
-        <li><strong>Паралингвистику:</strong> Тон, темп, громкость. Эмпатичный голос часто ниже, медленнее и теплее.</li>
-        <li><strong>Конгруэнтность:</strong> Соответствие ваших слов вашему лицу. Если вы говорите «Я тебе сочувствую» с каменным лицом или улыбкой, собеседник считает это как ложь или сарказм.</li>
-    </ul>
-    
-    <div class="definition-box">
-        <h4><span class="term">Термин:</span> Конгруэнтность</h4>
-        <p>Совпадение слов, тона голоса и языка тела. Когда вы говорите «мне жаль» с грустным выражением лица — это конгруэнтно. Когда с улыбкой — нет.</p>
-    </div>
-    
-    <h3>Практика: как хорошо vs как плохо</h3>
-    <table class="comparison-table">
-        <thead>
-            <tr>
-                <th>Как хорошо делать</th>
-                <th>Как плохо делать</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>Слегка наклоняться к собеседнику</td>
-                <td>Откидываться назад, скрещивать руки</td>
-            </tr>
-            <tr>
-                <td>Поддерживать умеренный зрительный контакт (60-70% времени)</td>
-                <td>Избегать взгляда или пристально смотреть</td>
-            </tr>
-            <tr>
-                <td>Говорить медленнее и тише, когда собеседник расстроен</td>
-                <td>Говорить быстро и громко, перебивать</td>
-            </tr>
-            <tr>
-                <td>Слегка отражать позу собеседника</td>
-                <td>Сидеть в закрытой позе (скрещенные руки/ноги)</td>
-            </tr>
-            <tr>
-                <td>Выражение лица соответствует словам</td>
-                <td>Улыбаться, когда говорите о грустном</td>
-            </tr>
-        </tbody>
-    </table>
-    
-    <p><strong>Типичные ошибки в невербальной эмпатии:</strong></p>
-    <table class="mistakes-table">
-        <tr>
-            <th>Ошибка</th>
-            <th>Как воспринимается</th>
-            <th>Как исправить</th>
-        </tr>
-        <tr>
-            <td>Скрещенные руки</td>
-            <td>Закрытость, защита</td>
-            <td>Опустите руки вдоль тела или используйте открытые жесты</td>
-        </tr>
-        <tr>
-            <td>Быстрый темп речи</td>
-            <td>Нетерпение, желание поскорее закончить</td>
-            <td>Сделайте паузу, дышите глубже, говорите медленнее</td>
-        </tr>
-        <tr>
-            <td>Отсутствие зрительного контакта</td>
-            <td>Неискренность, отсутствие интереса</td>
-            <td>Смотрите в глаза 60-70% времени, но не пристально</td>
-        </tr>
-        <tr>
-            <td>Проверка телефона</td>
-            <td>Полное отсутствие внимания</td>
-            <td>Уберите телефон, повернитесь к собеседнику всем телом</td>
-        </tr>
-    </table>
-    
-    <div class="practical-tip">
-        <h4>📌 Эксперимент на день:</h4>
-        <p>В одном разговоре сегодня сознательно наклонитесь немного вперед к собеседнику и следите за его реакцией. Обычно люди начинают больше раскрываться.</p>
-    </div>
-    
-    <h3>Задания для проверки знаний</h3>
-    
-    <div class="assignment">
-        <h4>Задание 1: Ответьте эмпатично</h4>
-        <p>Перед вами жалоба: «Я так устал от всего. На работе постоянный прессинг, дома тоже никто не понимает. Кажется, я вообще ни на что не способен.»</p>
-        <p>Напишите эмпатический ответ, который отразит чувства говорящего.</p>
-        <textarea id="answer1_3" placeholder="Напишите ваш ответ здесь..."></textarea>
-        <button class="btn-primary" onclick="checkAssignment('1.3')">Проверить задание</button>
-        <div id="feedback1_3" class="feedback"></div>
-    </div>
-    
-    <div class="quiz">
-        <h4>Задание 2: Выберите правильный ответ</h4>
-        <p><strong>Что такое конгруэнтность в общении?</strong></p>
-        
-        <div class="quiz-options">
-            <div class="option">
-                <input type="radio" id="q1_3_option1" name="q1_3" value="a">
-                <label for="q1_3_option1">Умение быстро отвечать</label>
-            </div>
-            <div class="option">
-                <input type="radio" id="q1_3_option2" name="q1_3" value="b">
-                <label for="q1_3_option2">Совпадение слов и невербальных сигналов</label>
-            </div>
-            <div class="option">
-                <input type="radio" id="q1_3_option3" name="q1_3" value="c">
-                <label for="q1_3_option3">Способность говорить красиво</label>
-            </div>
-        </div>
-        
-        <p><strong>Какие из этих невербальных сигналов показывают эмпатию? (выберите все подходящие)</strong></p>
-        
-        <div class="quiz-options">
-            <div class="option">
-                <input type="checkbox" id="q2_3_option1" name="q2_3" value="a">
-                <label for="q2_3_option1">Наклон тела к собеседнику</label>
-            </div>
-            <div class="option">
-                <input type="checkbox" id="q2_3_option2" name="q2_3" value="b">
-                <label for="q2_3_option2">Скрещенные руки на груди</label>
-            </div>
-            <div class="option">
-                <input type="checkbox" id="q2_3_option3" name="q2_3" value="c">
-                <label for="q2_3_option3">Умеренный зрительный контакт</label>
-            </div>
-            <div class="option">
-                <input type="checkbox" id="q2_3_option4" name="q2_3" value="d">
-                <label for="q2_3_option4">Проверка телефона во время разговора</label>
-            </div>
-        </div>
-        
-        <p><strong>Какой процент информации об эмоциях передается через слова по данным исследований?</strong></p>
-        
-        <div class="quiz-options">
-            <div class="option">
-                <input type="radio" id="q3_3_option1" name="q3_3" value="a">
-                <label for="q3_3_option1">Около 7%</label>
-            </div>
-            <div class="option">
-                <input type="radio" id="q3_3_option2" name="q3_3" value="b">
-                <label for="q3_3_option2">Около 50%</label>
-            </div>
-            <div class="option">
-                <input type="radio" id="q3_3_option3" name="q3_3" value="c">
-                <label for="q3_3_option3">Около 90%</label>
-            </div>
-        </div>
-        
-        <button class="btn-secondary" onclick="checkQuiz('1.3')">Проверить тест</button>
-        <div id="quiz-feedback1_3" class="feedback"></div>
-    </div>
-    
-    <div class="additional-task">
-        <h5>Дополнительное задание (анализ невербалики):</h5>
-        <p>Представьте, что вы разговариваете с этим человеком. Опишите:</p>
-        <p>1. Как должна звучать ваша интонация:</p>
-        <textarea id="extra1_3a" placeholder="Описание интонации..."></textarea>
-        <p>2. Какое выражение лица должно быть:</p>
-        <textarea id="extra1_3b" placeholder="Описание выражения лица..."></textarea>
-        <p>3. Какую позу лучше принять:</p>
-        <textarea id="extra1_3c" placeholder="Описание позы..."></textarea>
-        <button class="btn-secondary" onclick="checkExtraAssignment('1.3')">Проверить анализ</button>
-    </div>
-</div>
+                    tabs: {
+                        theory: {
+                            title: "Теория",
+                            content: `<div class="theory-block">
+<picture>
+    <!-- Для мобильных -->
+    <source 
+        media="(max-width: 1000px)" 
+        srcset="https://i.postimg.cc/BvrZj5Wd/1ab6a8a8-cfbf-48b5-b695-95beab50.jpg"
+    >
+    <!-- Для десктопов и фолбэк -->
+    <img 
+        src="https://i.postimg.cc/SxVzYvD4/1ab6a8a8-cfbf-48b5-b695-95beab503c1e.jpg" 
+        alt="Эмпатия и понимание"
+        class="responsive-image"
+    >
+</picture>
 
 <style>
     .responsive-image {
@@ -1509,6 +371,7 @@ const courseData = {
         display: block;
     }
     
+    /* Для мобильных устройств */
     @media (max-width: 1000px) {
         .responsive-image {
             width: 80% !important;
@@ -1517,38 +380,128 @@ const courseData = {
             margin-right: auto;
         }
     }
-    
-    .mistakes-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin: 20px 0;
-        background: var(--card-bg);
-        border-radius: 10px;
-        overflow: hidden;
-    }
-    
-    .mistakes-table th {
-        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
-        color: white;
-        padding: 12px;
-        text-align: left;
-    }
-    
-    .mistakes-table td {
-        padding: 12px;
-        border-bottom: 1px solid rgba(255,255,255,0.1);
-    }
-    
-    .mistakes-table tr:hover {
-        background: rgba(231, 76, 60, 0.05);
-    }
-</style>`
+</style>
+                                <p><strong>Расширенная теория:</strong> По данным исследований (Мейерабиан и др.), слова передают лишь около 7% информации об эмоциях. Эмпатия считывается через:</p>
+                                <ul>
+                                    <li><strong>Проксемику:</strong> Дистанция. Наклон корпуса в сторону собеседника (сигнал интереса) против откинутой назад позы (сигнал оценки/отстраненности).</li>
+                                    <li><strong>Паралингвистику:</strong> Тон, темп, громкость. Эмпатичный голос часто ниже, медленнее и теплее.</li>
+                                    <li><strong>Конгруэнтность:</strong> Соответствие ваших слов вашему лицу. Если вы говорите «Я тебе сочувствую» с каменным лицом или улыбкой, собеседник считает это как ложь или сарказм.</li>
+                                </ul>
+                                
+                                <div class="definition-box">
+                                    <h4><span class="term">Термин:</span> Конгруэнтность</h4>
+                                    <p>Совпадение слов, тона голоса и языка тела. Когда вы говорите «мне жаль» с грустным выражением лица — это конгруэнтно. Когда с улыбкой — нет.</p>
+                                </div>
+                                
+                                <p><strong>Эмпатия в общении проявляется не только через слова, но и через невербальные сигналы:</strong></p>
+                                <ul>
+                                    <li><strong>Тон голоса</strong> — спокойный, теплый, соответствующий настроению собеседника.</li>
+                                    <li><strong>Выражение лица</strong> — отзеркаливание эмоций (без преувеличения).</li>
+                                    <li><strong>Язык тела</strong> — открытая поза, наклон к собеседнику, кивки.</li>
+                                    <li><strong>Паузы и молчание</strong> — предоставление времени для выражения чувств.</li>
+                                </ul>
+                                
+                                <p><strong>Типичные ошибки в невербальной эмпатии:</strong></p>
+                                <table class="mistakes-table">
+                                    <tr>
+                                        <th>Ошибка</th>
+                                        <th>Как воспринимается</th>
+                                        <th>Как исправить</th>
+                                    </tr>
+                                    <tr>
+                                        <td>Скрещенные руки</td>
+                                        <td>Закрытость, защита</td>
+                                        <td>Опустите руки вдоль тела или используйте открытые жесты</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Быстрый темп речи</td>
+                                        <td>Нетерпение, желание поскорее закончить</td>
+                                        <td>Сделайте паузу, дышите глубже, говорите медленнее</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Отсутствие зрительного контакт</td>
+                                        <td>Неискренность, отсутствие интереса</td>
+                                        <td>Смотрите в глаза 60-70% времени, но не пристально</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Проверка телефона</td>
+                                        <td>Полное отсутствие внимания</td>
+                                        <td>Уберите телефон, повернитесь к собеседнику всем телом</td>
+                                    </tr>
+                                </table>
+                                
+                                <p><strong>Практические упражнения для развития невербальной эмпатии:</strong></p>
+                                <ol>
+                                    <li><strong>Упражнение «Отзеркаливание»:</strong> В спокойной беседе слегка отражайте позу собеседника (не пародируя!)</li>
+                                    <li><strong>Упражнение «Голосовая настройка»:</strong> Попробуйте говорить чуть тише и медленнее, когда собеседник расстроен</li>
+                                    <li><strong>Упражнение «Пауза»:</strong> После вопроса сделайте паузу 3 секунды, прежде чем говорить дальше</li>
+                                </ol>
+                                
+                                <div class="check-question">
+                                    <h4>Вопросы для проверки:</h4>
+                                    <p>1. Что такое конгруэнтность в общении?<br>
+                                    2. Как поза тела может противоречить эмпатичным словам?<br>
+                                    3. Почему быстрый темп речи может помешать человеку почувствовать поддержку?</p>
+                                </div>
+                                
+                                <div class="practical-tip">
+                                    <h4>📌 Эксперимент на день:</h4>
+                                    <p>В одном разговоре сегодня сознательно наклонитесь немного вперед к собеседнику и следите за его реакцией. Обычно люди начинают больше раскрываться.</p>
+                                </div>
+                            </div>`
+                        },
+                        quote: {
+                            title: "Цитата",
+                            content: `<div class="quote">«Слушать — значит слышать не только слова, но и чувства»</div>
+                            <p class="author">— Неизвестный автор</p>`
+                        },
+                        assignment: {
+                            title: "Задание",
+                            content: `<div class="assignment">
+                                <h4>Ответьте эмпатично</h4>
+                                <p>Перед вами жалоба: «Я так устал от всего. На работе постоянный прессинг, дома тоже никто не понимает. Кажется, я вообще ни на что не способен.»</p>
+                                <p>Напишите эмпатический ответ, который отразит чувства говорящего.</p>
+                                <textarea id="answer1_3" placeholder="Напишите ваш ответ здесь..."></textarea>
+                                <button class="btn-primary" onclick="checkAssignment('1.3')">Проверить задание</button>
+                                
+                                <div class="additional-task">
+                                    <h5>Дополнительное задание (анализ невербалики):</h5>
+                                    <p>Представьте, что вы разговариваете с этим человеком. Опишите:</p>
+                                    <p>1. Как должна звучать ваша интонация:</p>
+                                    <textarea id="extra1_3a" placeholder="Описание интонации..."></textarea>
+                                    <p>2. Какое выражение лица должно быть:</p>
+                                    <textarea id="extra1_3b" placeholder="Описание выражения лица..."></textarea>
+                                    <p>3. Какую позу лучше принять:</p>
+                                    <textarea id="extra1_3c" placeholder="Описание позы..."></textarea>
+                                    <button class="btn-secondary" onclick="checkExtraAssignment('1.3')">Проверить анализ</button>
+                                </div>
+                                
+                                <div id="feedback1_3" class="feedback"></div>
+                            </div>`,
+                            check: function(answer) {
+                                const reflectionWords = ["устал", "прессинг", "не понимает", "не способен", "тяжело", "сложно"];
+                                let reflectionCount = 0;
+                                
+                                reflectionWords.forEach(word => {
+                                    if (answer.toLowerCase().includes(word)) reflectionCount++;
+                                });
+                                
+                                if (reflectionCount >= 2 && !answer.toLowerCase().includes("не переживай") && !answer.toLowerCase().includes("все будет хорошо")) {
+                                    return {correct: true, message: "Отличный эмпатический ответ! Вы отразили чувства собеседника, не переходя в обесценивание или ложный оптимизм."};
+                                } else if (reflectionCount >= 1) {
+                                    return {correct: true, message: "Хорошо! Вы начали отражать чувства. Попробуйте также использовать слова, которые передают понимание эмоционального состояния."};
+                                } else {
+                                    return {correct: false, message: "Попробуйте использовать «отражение» — повторите ключевые эмоциональные слова из жалобы, чтобы показать, что вы действительно слышите чувства."};
+                                }
+                            }
+                        }
+                    }
                 }
             ],
             test: {
                 title: "Контрольная работа 1: Основы эмпатии",
                 description: "Тест по основам эмпатии и практическое задание",
-                timeLimit: 30,
+                timeLimit: 30, // минут
                 sections: [
                     {
                         title: "Теоретическая часть",
@@ -1692,194 +645,23 @@ const courseData = {
                 {
                     id: "2.1",
                     title: "Анатомия травмы",
-                    content: `
-<div class="theory-block">
-    <picture>
-        <source media="(max-width: 1000px)" srcset="https://i.postimg.cc/jqc1Sz7b/09f76f0d-eef4-41ff-9e59-80ac6197a099.jpg">
-        <img src="https://i.postimg.cc/PrBQXx2s/09f76f0d-eef4-41ff-9e59-80ac6197.jpg" alt="Анатомия травмы" class="responsive-image">
-    </picture>
-
-    <div class="quote-box">
-        <div class="quote">«Травма — это не то, что произошло, а то, что осталось внутри»</div>
-        <p class="author">— Джудит Герман</p>
-    </div>
-
-    <h3>Теория</h3>
-    <p><strong>Расширенная теория:</strong> Травма — это не само ужасное событие, а реакция нашей нервной системы на него.</p>
-    <ul>
-        <li><strong>Механизм:</strong> Когда ресурсов психики не хватает, чтобы переварить шок, опыт «застревает». Человек может жить в прошлом, реагируя на триггеры здесь и сейчас так, будто опасность все еще рядом.</li>
-        <li><strong>Влияние на общение:</strong> Человек в травме может быть гиперчувствительным, замкнутым или агрессивным. Это не «плохой характер», это работа миндалевидного тела (центра страха) в мозге.</li>
-        <li><strong>Задача собеседника:</strong> Не быть терапевтом, а быть «стабильным объектом». Ваше спокойствие помогает их нервной системе успокоиться (ко-регуляция).</li>
-    </ul>
-    
-    <div class="definition-box">
-        <h4><span class="term">Термин:</span> Триггер</h4>
-        <p>Стимул (звук, запах, ситуация), который вызывает воспоминание о травмирующем событии и эмоциональную реакцию.</p>
-    </div>
-    
-    <div class="definition-box">
-        <h4><span class="term">Термин:</span> Ко-регуляция</h4>
-        <p>Процесс, когда спокойное состояние одного человека помогает успокоиться другому. Основа безопасности в отношениях.</p>
-    </div>
-    
-    <div class="source-box">
-        <h4>📚 Источник</h4>
-        <p><strong>National Center for PTSD</strong></p>
-        <p>Посттравматическое стрессовое расстройство (ПТСР) может развиться после воздействия травмирующего события и включает симптомы повторного переживания, избегания и гипервозбуждения.</p>
-    </div>
-    
-    <h3>Практика: как хорошо vs как плохо</h3>
-    <table class="comparison-table">
-        <thead>
-            <tr>
-                <th>Как хорошо делать</th>
-                <th>Как плохо делать</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>Говорить спокойным, ровным голосом</td>
-                <td>Говорить громко или резко</td>
-            </tr>
-            <tr>
-                <td>Быть предсказуемым в своих реакциях</td>
-                <td>Неожиданно менять тему или настроение</td>
-            </tr>
-            <tr>
-                <td>Давать человеку пространство, не приближаться резко</td>
-                <td>Вторгаться в личное пространство</td>
-            </tr>
-            <tr>
-                <td>Спрашивать разрешения перед прикосновением</td>
-                <td>Прикасаться без предупреждения</td>
-            </tr>
-            <tr>
-                <td>Признавать право на любые чувства</td>
-                <td>Оценивать чувства как «правильные» или «неправильные»</td>
-            </tr>
-        </tbody>
-    </table>
-    
-    <p><strong>Как проявляется травма в повседневном общении:</strong></p>
-    <table class="trauma-table">
-        <tr>
-            <th>Проявление</th>
-            <th>Как это выглядит</th>
-            <th>Что НЕ говорить</th>
-            <th>Что сказать вместо этого</th>
-        </tr>
-        <tr>
-            <td>Повышенная тревожность</td>
-            <td>Постоянное ожидание плохого, невозможность расслабиться</td>
-            <td>«Не нервничай из-за ерунды»</td>
-            <td>«Похоже, тебе сейчас очень тревожно»</td>
-        </tr>
-        <tr>
-            <td>Эмоциональное онемение</td>
-            <td>Кажется равнодушным, не проявляет эмоций</td>
-            <td>«Да развесь же ты уши!»</td>
-            <td>«Иногда после тяжелого чувства притупляются, это нормально»</td>
-        </tr>
-        <tr>
-            <td>Вспышки гнева</td>
-            <td>Агрессивная реакция на мелкие раздражители</td>
-            <td>«Что ты как ненормальный!»</td>
-            <td>«Я вижу, ты очень зол. Хочешь об этом поговорить?»</td>
-        </tr>
-        <tr>
-            <td>Избегание</td>
-            <td>Отказывается от встреч, разговоров</td>
-            <td>«Ты что, затворником стал?»</td>
-            <td>«Я здесь, когда будешь готов пообщаться»</td>
-        </tr>
-    </table>
-    
-    <div class="practical-tip">
-        <h4>📌 Важное правило:</h4>
-        <p>Если вы не знаете, что сказать человеку, пережившему травму, лучше просто молча побыть рядом. Ваше присутствие иногда важнее слов.</p>
-    </div>
-    
-    <h3>Задания для проверки знаний</h3>
-    
-    <div class="assignment">
-        <h4>Задание 1: Объясните разницу между событием и травмой</h4>
-        <p>Приведите пример: как одно и то же событие (например, ДТП) может стать травмой для одного человека и не стать для другого?</p>
-        <textarea id="answer2_1" placeholder="Напишите ваш ответ здесь..."></textarea>
-        <button class="btn-primary" onclick="checkAssignment('2.1')">Проверить задание</button>
-        <div id="feedback2_1" class="feedback"></div>
-    </div>
-    
-    <div class="quiz">
-        <h4>Задание 2: Выберите правильный ответ</h4>
-        <p><strong>Что такое триггер в контексте травмы?</strong></p>
-        
-        <div class="quiz-options">
-            <div class="option">
-                <input type="radio" id="q1_2_1_option1" name="q1_2_1" value="a">
-                <label for="q1_2_1_option1">Лекарство от ПТСР</label>
-            </div>
-            <div class="option">
-                <input type="radio" id="q1_2_1_option2" name="q1_2_1" value="b">
-                <label for="q1_2_1_option2">Стимул, вызывающий воспоминание о травме</label>
-            </div>
-            <div class="option">
-                <input type="radio" id="q1_2_1_option3" name="q1_2_1" value="c">
-                <label for="q1_2_1_option3">Тип психотерапии</label>
-            </div>
-        </div>
-        
-        <p><strong>Какие утверждения верны о травме? (выберите все подходящие)</strong></p>
-        
-        <div class="quiz-options">
-            <div class="option">
-                <input type="checkbox" id="q2_2_1_option1" name="q2_2_1" value="a">
-                <label for="q2_2_1_option1">Травма — это реакция нервной системы на событие</label>
-            </div>
-            <div class="option">
-                <input type="checkbox" id="q2_2_1_option2" name="q2_2_1" value="b">
-                <label for="q2_2_1_option2">Все люди одинаково реагируют на одинаковые события</label>
-            </div>
-            <div class="option">
-                <input type="checkbox" id="q2_2_1_option3" name="q2_2_1" value="c">
-                <label for="q2_2_1_option3">Ко-регуляция помогает успокоить нервную систему</label>
-            </div>
-            <div class="option">
-                <input type="checkbox" id="q2_2_1_option4" name="q2_2_1" value="d">
-                <label for="q2_2_1_option4">Травма всегда проявляется одинаково у всех людей</label>
-            </div>
-        </div>
-        
-        <p><strong>Что важно при общении с человеком, пережившим травму?</strong></p>
-        
-        <div class="quiz-options">
-            <div class="option">
-                <input type="radio" id="q3_2_1_option1" name="q3_2_1" value="a">
-                <label for="q3_2_1_option1">Быть терапевтом и решать его проблемы</label>
-            </div>
-            <div class="option">
-                <input type="radio" id="q3_2_1_option2" name="q3_2_1" value="b">
-                <label for="q3_2_1_option2">Быть «стабильным объектом» и сохранять спокойствие</label>
-            </div>
-            <div class="option">
-                <input type="radio" id="q3_2_1_option3" name="q3_2_1" value="c">
-                <label for="q3_2_1_option3">Заставлять говорить о травме для «проработки»</label>
-            </div>
-        </div>
-        
-        <button class="btn-secondary" onclick="checkQuiz('2.1')">Проверить тест</button>
-        <div id="quiz-feedback2_1" class="feedback"></div>
-    </div>
-    
-    <div class="additional-task">
-        <h5>Дополнительное задание (анализ случаев):</h5>
-        <p>Прочитайте ситуации и определите, какие факторы могли превратить событие в травму:</p>
-        <p>1. Две подруги пережили развод. Одна через год вышла замуж снова, другая 5 лет боится отношений.</p>
-        <textarea id="extra2_1a" placeholder="Ваш анализ..."></textarea>
-        <p>2. Два студента провалили экзамен. Один через неделю пересдал, второй бросил учебу.</p>
-        <textarea id="extra2_1b" placeholder="Ваш анализ..."></textarea>
-        <button class="btn-secondary" onclick="checkExtraAssignment('2.1')">Проверить анализ</button>
-    </div>
-</div>
+                    tabs: {
+                        theory: {
+                            title: "Теория",
+                            content: `<div class="theory-block">
+<picture>
+    <!-- Для мобильных -->
+    <source 
+        media="(max-width: 1000px)" 
+        srcset="https://i.postimg.cc/jqc1Sz7b/09f76f0d-eef4-41ff-9e59-80ac6197a099.jpg"
+    >
+    <!-- Для десктопов и фолбэк -->
+    <img 
+        src="https://i.postimg.cc/PrBQXx2s/09f76f0d-eef4-41ff-9e59-80ac6197.jpg" 
+        alt="Эмпатия и понимание"
+        class="responsive-image"
+    >
+</picture>
 
 <style>
     .responsive-image {
@@ -1891,6 +673,7 @@ const courseData = {
         display: block;
     }
     
+    /* Для мобильных устройств */
     @media (max-width: 1000px) {
         .responsive-image {
             width: 80% !important;
@@ -1899,214 +682,158 @@ const courseData = {
             margin-right: auto;
         }
     }
-    
-    .trauma-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin: 20px 0;
-        background: var(--card-bg);
-        border-radius: 10px;
-        overflow: hidden;
-        font-size: 0.9em;
-    }
-    
-    .trauma-table th {
-        background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
-        color: white;
-        padding: 12px;
-        text-align: left;
-        white-space: nowrap;
-    }
-    
-    .trauma-table td {
-        padding: 12px;
-        border-bottom: 1px solid rgba(255,255,255,0.1);
-        vertical-align: top;
-    }
-    
-    .trauma-table tr:hover {
-        background: rgba(155, 89, 182, 0.05);
-    }
-</style>`
+</style>
+                                <p><strong>Расширенная теория:</strong> Травма — это не само ужасное событие, а реакция нашей нервной системы на него.</p>
+                                <ul>
+                                    <li><strong>Механизм:</strong> Когда ресурсов психики не хватает, чтобы переварить шок, опыт «застревает». Человек может жить в прошлом, реагируя на триггеры здесь и сейчас так, будто опасность все еще рядом.</li>
+                                    <li><strong>Влияние на общение:</strong> Человек в травме может быть гиперчувствительным, замкнутым или агрессивным. Это не «плохой характер», это работа миндалевидного тела (центра страха) в мозге.</li>
+                                    <li><strong>Задача собеседника:</strong> Не быть терапевтом, а быть «стабильным объектом». Ваше спокойствие помогает их нервной системе успокоиться (ко-регуляция).</li>
+                                </ul>
+                                
+                                <div class="definition-box">
+                                    <h4><span class="term">Термин:</span> Триггер</h4>
+                                    <p>Стимул (звук, запах, ситуация), который вызывает воспоминание о травмирующем событии и эмоциональную реакцию.</p>
+                                </div>
+                                
+                                <div class="definition-box">
+                                    <h4><span class="term">Термин:</span> Ко-регуляция</h4>
+                                    <p>Процесс, когда спокойное состояние одного человека помогает успокоиться другому. Основа безопасности в отношениях.</p>
+                                </div>
+                                
+                                <p><strong>Основное определение:</strong> Травма — это не просто событие, а его психологический след, который остается в человеке надолго.</p>
+                                <ul>
+                                    <li><strong>Травма ≠ событие:</strong> Два человека могут пережить одно и то же событие, но только у одного разовьется травма.</li>
+                                    <li><strong>Субъективное переживание:</strong> Важна не объективная тяжесть события, а то, как человек его воспринял.</li>
+                                    <li><strong>Долгосрочные последствия:</strong> Травма влияет на восприятие мира, отношения с другими и самооценку.</li>
+                                </ul>
+                                
+                                <p><strong>Как проявляется травма в повседневном общении:</strong></p>
+                                <table class="trauma-table">
+                                    <tr>
+                                        <th>Проявление</th>
+                                        <th>Как это выглядит</th>
+                                        <th>Что НЕ говорить</th>
+                                        <th>Что сказать вместо этого</th>
+                                    </tr>
+                                    <tr>
+                                        <td>Повышенная тревожность</td>
+                                        <td>Постоянное ожидание плохого, невозможность расслабиться</td>
+                                        <td>«Не нервничай из-за ерунды»</td>
+                                        <td>«Похоже, тебе сейчас очень тревожно»</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Эмоциональное онемение</td>
+                                        <td>Кажется равнодушным, не проявляет эмоций</td>
+                                        <td>«Да развесь же ты уши!»</td>
+                                        <td>«Иногда после тяжелого чувства притупляются, это нормально»</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Вспышки гнева</td>
+                                        <td>Агрессивная реакция на мелкие раздражители</td>
+                                        <td>«Что ты как ненормальный!»</td>
+                                        <td>«Я вижу, ты очень зол. Хочешь об этом поговорить?»</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Избегание</td>
+                                        <td>Отказывается от встреч, разговоров</td>
+                                        <td>«Ты что, затворником стал?»</td>
+                                        <td>«Я здесь, когда будешь готов пообщаться»</td>
+                                    </tr>
+                                </table>
+                                
+                                <p><strong>Что может быть травмирующим событием:</strong></p>
+                                <ul>
+                                    <li>Физическое или эмоциональное насилие</li>
+                                    <li>Неожиданная потеря близкого</li>
+                                    <li>Серьезная авария или катастрофа</li>
+                                    <li>Длительная болезнь (своя или близкого)</li>
+                                    <li>Предательство или болезненный развод</li>
+                                    <li>Буллинг или публичное унижение</li>
+                                    <li>Даже события, которые со стороны кажутся «не такими страшными»</li>
+                                </ul>
+                                
+                                <div class="check-question">
+                                    <h4>Вопросы для проверки:</h4>
+                                    <p>1. Верно ли, что травма — это всегда физическое увечье?<br>
+                                    2. Что означает термин «ко-регуляция»?<br>
+                                    3. Почему человек с травмой может реагировать агрессией на, казалось бы, простые слова?</p>
+                                </div>
+                                
+                                <div class="practical-tip">
+                                    <h4>📌 Важное правило:</h4>
+                                    <p>Если вы не знаете, что сказать человеку, пережившему травму, лучше просто молча побыть рядом. Ваше присутствие иногда важнее слов.</p>
+                                </div>
+                            </div>`
+                        },
+                        quote: {
+                            title: "Цитата",
+                            content: `<div class="quote">«Травма — это не то, что произошло, а то, что осталось внутри»</div>
+                            <p class="author">— Джудит Герман</p>`
+                        },
+                        source: {
+                            title: "Источник",
+                            content: `<div class="source">
+                                <p><strong>National Center for PTSD</strong></p>
+                                <p>Посттравматическое стрессовое расстройство (ПТСР) может развиться после воздействия травмирующего события и включает симптомы повторного переживания, избегания и гипервозбуждения.</p>
+                            </div>`
+                        },
+                        assignment: {
+                            title: "Задание",
+                            content: `<div class="assignment">
+                                <h4>Объясните разницу между событием и травмой</h4>
+                                <p>Приведите пример: как одно и то же событие (например, ДТП) может стать травмой для одного человека и не стать для другого?</p>
+                                <textarea id="answer2_1" placeholder="Напишите ваш ответ здесь..."></textarea>
+                                <button class="btn-primary" onclick="checkAssignment('2.1')">Проверить задание</button>
+                                
+                                <div class="additional-task">
+                                    <h5>Дополнительное задание (анализ случаев):</h5>
+                                    <p>Прочитайте ситуации и определите, какие факторы могли превратить событие в травму:</p>
+                                    <p>1. Две подруги пережили развод. Одна через год вышла замуж снова, другая 5 лет боится отношений.</p>
+                                    <textarea id="extra2_1a" placeholder="Ваш анализ..."></textarea>
+                                    <p>2. Два студента провалили экзамен. Один через неделю пересдал, второй бросил учебу.</p>
+                                    <textarea id="extra2_1b" placeholder="Ваш анализ..."></textarea>
+                                    <button class="btn-secondary" onclick="checkExtraAssignment('2.1')">Проверить анализ</button>
+                                </div>
+                                
+                                <div id="feedback2_1" class="feedback"></div>
+                            </div>`,
+                            check: function(answer) {
+                                const keywords = ["субъектив", "восприятие", "след", "последствия", "внутри", "переживание"];
+                                let keywordCount = 0;
+                                
+                                keywords.forEach(word => {
+                                    if (answer.toLowerCase().includes(word)) keywordCount++;
+                                });
+                                
+                                if (keywordCount >= 2) {
+                                    return {correct: true, message: "Отлично! Вы правильно поняли, что травма — это внутренний след события, а не само событие."};
+                                } else {
+                                    return {correct: false, message: "Попробуйте подчеркнуть, что травма — это то, как человек пережил событие внутри себя, а не само событие."};
+                                }
+                            }
+                        }
+                    }
                 },
                 {
                     id: "2.2",
                     title: "Токсичная позитивность и обесценивание",
-                    content: `
-<div class="theory-block">
-    <picture>
-        <source media="(max-width: 1000px)" srcset="https://i.postimg.cc/tRDVvgLW/production-images-aa115eb7-6edf.png">
-        <img src="https://i.postimg.cc/tJry3wv2/production-images-aa115eb7-6edf-4e9b-88c5-557eac318796.png" alt="Токсичная позитивность" class="responsive-image">
-    </picture>
-
-    <h3>Теория</h3>
-    <p><strong>Расширенная теория:</strong> Самые благие намерения часто наносят вред.</p>
-    <ul>
-        <li><strong>Токсичная позитивность:</strong> Это навязывание счастья и отрицание негатива. Фразы типа «Всё будет хорошо», «Улыбнись», «Ищи плюсы» говорят человеку: «Твои текущие чувства неправильные, скрой их». Это вызывает стыд и изоляцию.</li>
-        <li><strong>Обесценивание:</strong> Попытка уменьшить проблему, чтобы она казалась решаемой. «Да ерунда», «У других хуже». Это сигнал: «Твоя боль не важна».</li>
-        <li><strong>Сравнительное страдание:</strong> Вера в то, что если кто-то голодает в Африке, вы не имеете права грустить из-за увольнения. Эмпатия не конечный ресурс, она не заканчивается от того, что вы посочувствовали обоим.</li>
-    </ul>
-    
-    <div class="definition-box">
-        <h4><span class="term">Термин:</span> Токсичная позитивность</h4>
-        <p>Культура, требующая от человека быть позитивным всегда, даже когда это неуместно. Отрицает сложные эмоции и может усугублять страдания.</p>
-    </div>
-    
-    <div class="source-box">
-        <h4>📚 Источник</h4>
-        <p><strong>Психологические исследования травмы</strong></p>
-        <p>Исследования показывают, что неподдерживающие реакции (обесценивание, советы, токсичная позитивность) могут усилить симптомы ПТСР и замедлить восстановление.</p>
-    </div>
-    
-    <h3>Практика: как хорошо vs как плохо</h3>
-    <table class="comparison-table">
-        <thead>
-            <tr>
-                <th>Как хорошо делать</th>
-                <th>Как плохо делать</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>«Это действительно тяжело. Я с тобой»</td>
-                <td>«Не грусти, всё наладится»</td>
-            </tr>
-            <tr>
-                <td>«Твои чувства важны и имеют право на существование»</td>
-                <td>«У других проблемы серьезнее, тебе есть за что быть благодарным»</td>
-            </tr>
-            <tr>
-                <td>«Кажется, тебе действительно больно»</td>
-                <td>«Не плачь, возьми себя в руки»</td>
-            </tr>
-            <tr>
-                <td>«Иногда жизнь несправедлива, и это нормально злиться»</td>
-                <td>«Смотри на позитив, ищи плюсы»</td>
-            </tr>
-            <tr>
-                <td>Признавать сложность и боль ситуации</td>
-                <td>Требовать быстрого «движения дальше»</td>
-            </tr>
-        </tbody>
-    </table>
-    
-    <p><strong>Примеры вредных фраз и их влияние:</strong></p>
-    <table class="toxic-phrases-table">
-        <tr>
-            <th>Вредная фраза</th>
-            <th>Что слышит человек</th>
-            <th>Альтернатива</th>
-        </tr>
-        <tr>
-            <td>«Не думай об этом»</td>
-            <td>«Твои мысли неправильные, контролируй их»</td>
-            <td>«Это, должно быть, тяжело — постоянно об этом думать»</td>
-        </tr>
-        <tr>
-            <td>«Время лечит»</td>
-            <td>«Терпи, и все само пройдет»</td>
-            <td>«Каждый справляется в своем темпе»</td>
-        </tr>
-        <tr>
-            <td>«Ты сильный, справишься»</td>
-            <td>«Не показывай слабость»</td>
-            <td>«Это нормально — чувствовать себя слабым в такой ситуации»</td>
-        </tr>
-        <tr>
-            <td>«Забудь и живи дальше»</td>
-            <td>«Твоя боль не важна, просто игнорируй ее»</td>
-            <td>«Это часть твоей истории, и ты имеешь право чувствовать все, что чувствуешь»</td>
-        </tr>
-    </table>
-    
-    <div class="practical-tip">
-        <h4>📌 Упражнение на неделю:</h4>
-        <p>Запишите 3 фразы, которые вы обычно говорите, когда кому-то плохо. Проанализируйте, не содержат ли они токсичной позитивности или обесценивания.</p>
-    </div>
-    
-    <h3>Задания для проверки знаний</h3>
-    
-    <div class="assignment">
-        <h4>Задание 1: Составьте список фраз, которых стоит избегать</h4>
-        <p>Перечислите 4 фразы, которые представляют токсичную позитивность или обесценивание чувств человека, пережившего травму.</p>
-        <textarea id="answer2_2" placeholder="Напишите фразы здесь..."></textarea>
-        <button class="btn-primary" onclick="checkAssignment('2.2')">Проверить задание</button>
-        <div id="feedback2_2" class="feedback"></div>
-    </div>
-    
-    <div class="quiz">
-        <h4>Задание 2: Выберите правильный ответ</h4>
-        <p><strong>Что такое токсичная позитивность?</strong></p>
-        
-        <div class="quiz-options">
-            <div class="option">
-                <input type="radio" id="q1_2_2_option1" name="q1_2_2" value="a">
-                <label for="q1_2_2_option1">Позитивное мышление, которое всегда помогает</label>
-            </div>
-            <div class="option">
-                <input type="radio" id="q1_2_2_option2" name="q1_2_2" value="b">
-                <label for="q1_2_2_option2">Навязывание позитивных эмоций и отрицание негативных</label>
-            </div>
-            <div class="option">
-                <input type="radio" id="q1_2_2_option3" name="q1_2_2" value="c">
-                <label for="q1_2_2_option3">Способ быстро выйти из депрессии</label>
-            </div>
-        </div>
-        
-        <p><strong>Какие из этих фраз представляют токсичную позитивность? (выберите все подходящие)</strong></p>
-        
-        <div class="quiz-options">
-            <div class="option">
-                <input type="checkbox" id="q2_2_2_option1" name="q2_2_2" value="a">
-                <label for="q2_2_2_option1">«Все будет хорошо»</label>
-            </div>
-            <div class="option">
-                <input type="checkbox" id="q2_2_2_option2" name="q2_2_2" value="b">
-                <label for="q2_2_2_option2">«У других еще хуже»</label>
-            </div>
-            <div class="option">
-                <input type="checkbox" id="q2_2_2_option3" name="q2_2_2" value="c">
-                <label for="q2_2_2_option3">«Похоже, тебе действительно тяжело»</label>
-            </div>
-            <div class="option">
-                <input type="checkbox" id="q2_2_2_option4" name="q2_2_2" value="d">
-                <label for="q2_2_2_option4">«Улыбнись, не грусти»</label>
-            </div>
-        </div>
-        
-        <p><strong>Почему фраза «У других проблемы серьезнее» вредна?</strong></p>
-        
-        <div class="quiz-options">
-            <div class="option">
-                <input type="radio" id="q3_2_2_option1" name="q3_2_2" value="a">
-                <label for="q3_2_2_option1">Она обесценивает чувства человека</label>
-            </div>
-            <div class="option">
-                <input type="radio" id="q3_2_2_option2" name="q3_2_2" value="b">
-                <label for="q3_2_2_option2">Она заставляет чувствовать вину за свои переживания</label>
-            </div>
-            <div class="option">
-                <input type="radio" id="q3_2_2_option3" name="q3_2_2" value="c">
-                <label for="q3_2_2_option3">И то, и другое</label>
-            </div>
-        </div>
-        
-        <button class="btn-secondary" onclick="checkQuiz('2.2')">Проверить тест</button>
-        <div id="quiz-feedback2_2" class="feedback"></div>
-    </div>
-    
-    <div class="additional-task">
-        <h5>Дополнительное задание (трансформация фраз):</h5>
-        <p>Переформулируйте эти токсичные фразы в поддерживающие:</p>
-        <p>1. «Не плачь, все образуется» →</p>
-        <textarea id="extra2_2a" placeholder="Новая фраза..."></textarea>
-        <p>2. «У других проблемы серьезнее» →</p>
-        <textarea id="extra2_2b" placeholder="Новая фраза..."></textarea>
-        <p>3. «Хватит ныть, возьми себя в руки» →</p>
-        <textarea id="extra2_2c" placeholder="Новая фраза..."></textarea>
-        <button class="btn-secondary" onclick="checkExtraAssignment('2.2')">Проверить трансформацию</button>
-    </div>
-</div>
+                    tabs: {
+                        theory: {
+                            title: "Теория",
+                            content: `<div class="theory-block">
+<picture>
+    <!-- Для мобильных -->
+    <source 
+        media="(max-width: 1000px)" 
+        srcset="https://i.postimg.cc/tRDVvgLW/production-images-aa115eb7-6edf.png"
+    >
+    <!-- Для десктопов и фолбэк -->
+    <img 
+        src="https://i.postimg.cc/tJry3wv2/production-images-aa115eb7-6edf-4e9b-88c5-557eac318796.png" 
+        alt="Эмпатия и понимание"
+        class="responsive-image"
+    >
+</picture>
 
 <style>
     .responsive-image {
@@ -2118,6 +845,7 @@ const courseData = {
         display: block;
     }
     
+    /* Для мобильных устройств */
     @media (max-width: 1000px) {
         .responsive-image {
             width: 80% !important;
@@ -2126,212 +854,154 @@ const courseData = {
             margin-right: auto;
         }
     }
-    
-    .toxic-phrases-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin: 20px 0;
-        background: var(--card-bg);
-        border-radius: 10px;
-        overflow: hidden;
-        font-size: 0.9em;
-    }
-    
-    .toxic-phrases-table th {
-        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
-        color: white;
-        padding: 12px;
-        text-align: left;
-    }
-    
-    .toxic-phrases-table td {
-        padding: 12px;
-        border-bottom: 1px solid rgba(255,255,255,0.1);
-        vertical-align: top;
-    }
-    
-    .toxic-phrases-table tr:hover {
-        background: rgba(231, 76, 60, 0.05);
-    }
-</style>`
+</style>
+                                <p><strong>Расширенная теория:</strong> Самые благие намерения часто наносят вред.</p>
+                                <ul>
+                                    <li><strong>Токсичная позитивность:</strong> Это навязывание счастья и отрицание негатива. Фразы типа «Всё будет хорошо», «Улыбнись», «Ищи плюсы» говорят человеку: «Твои текущие чувства неправильные, скрой их». Это вызывает стыд и изоляцию.</li>
+                                    <li><strong>Обесценивание:</strong> Попытка уменьшить проблему, чтобы она казалась решаемой. «Да ерунда», «У других хуже». Это сигнал: «Твоя боль не важна».</li>
+                                    <li><strong>Сравнительное страдание:</strong> Вера в то, что если кто-то голодает в Африке, вы не имеете права грустить из-за увольнения. Эмпатия не конечный ресурс, она не заканчивается от того, что вы посочувствовали обоим.</li>
+                                </ul>
+                                
+                                <div class="definition-box">
+                                    <h4><span class="term">Термин:</span> Токсичная позитивность</h4>
+                                    <p>Культура, требующая от человека быть позитивным всегда, даже когда это неуместно. Отрицает сложные эмоции и может усугублять страдания.</p>
+                                </div>
+                                
+                                <p><strong>Наиболее частые и вредные ошибки при общении с пережившими травму:</strong></p>
+                                <ul>
+                                    <li><strong>Токсичная позитивность:</strong> «Все будет хорошо», «Смотри на позитив» — обесценивает реальные страдания.</li>
+                                    <li><strong>Обесценивание:</strong> «Другим еще хуже», «Это не так страшно» — отрицает право человека на свои чувства.</li>
+                                    <li><strong>Советы без запроса:</strong> «Тебе нужно...», «Просто сделай...» — лишает человека контроля.</li>
+                                    <li><strong>Давление на откровенность:</strong> «Расскажи подробнее» — может ретравматизировать.</li>
+                                </ul>
+                                
+                                <p><strong>Примеры вредных фраз и их влияние:</strong></p>
+                                <table class="toxic-phrases-table">
+                                    <tr>
+                                        <th>Вредная фраза</th>
+                                        <th>Что слышит человек</th>
+                                        <th>Альтернатива</th>
+                                    </tr>
+                                    <tr>
+                                        <td>«Не думай об этом»</td>
+                                        <td>«Твои мысли неправильные, контролируй их»</td>
+                                        <td>«Это, должно быть, тяжело — постоянно об этом думать»</td>
+                                    </tr>
+                                    <tr>
+                                        <td>«Время лечит»</td>
+                                        <td>«Терпи, и все само пройдет»</td>
+                                        <td>«Каждый справляется в своем темпе»</td>
+                                    </tr>
+                                    <tr>
+                                        <td>«Ты сильный, справишься»</td>
+                                        <td>«Не показывай слабость»</td>
+                                        <td>«Это нормально — чувствовать себя слабым в такой ситуации»</td>
+                                    </tr>
+                                    <tr>
+                                        <td>«Забудь и живи дальше»</td>
+                                        <td>«Твоя боль не важна, просто игнорируй ее»</td>
+                                        <td>«Это часть твоей истории, и ты имеешь право чувствовать все, что чувствуешь»</td>
+                                    </tr>
+                                </table>
+                                
+                                <p><strong>Почему мы говорим токсичные вещи, даже желая помочь:</strong></p>
+                                <ol>
+                                    <li><strong>Собственный дискомфорт:</strong> Нам тяжело видеть чужую боль, и мы пытаемся ее «исправить»</li>
+                                    <li><strong>Беспомощность:</strong> Не зная, что сказать, мы произносим банальности</li>
+                                    <li><strong>Культурные стереотипы:</strong> «Надо быть сильным», «Нельзя плакать»</li>
+                                    <li><strong>Страх:</strong> «А вдруг такое случится со мной?»</li>
+                                </ol>
+                                
+                                <p><strong>Что говорить вместо этого:</strong></p>
+                                <ul>
+                                    <li>«Я не знаю, что сказать, но я здесь с тобой»</li>
+                                    <li>«Это действительно ужасно. Мне жаль, что тебе пришлось через это пройти»</li>
+                                    <li>«Как я могу поддержать тебя сейчас?»</li>
+                                    <li>«Ты имеешь право чувствовать именно то, что чувствуешь»</li>
+                                    <li>Просто молчание и присутствие</li>
+                                </ul>
+                                
+                                <div class="check-question">
+                                    <h4>Вопросы для проверки:</h4>
+                                    <p>1. Преобразуйте фразу «Не грусти, всё наладится» в эмпатичное высказывание.<br>
+                                    2. Почему сравнение «А вот у Кати ситуация еще хуже» не помогает?<br>
+                                    3. В чем главная опасность токсичной позитивности?</p>
+                                </div>
+                                
+                                <div class="practical-tip">
+                                    <h4>📌 Упражнение на неделю:</h4>
+                                    <p>Запишите 3 фразы, которые вы обычно говорите, когда кому-то плохо. Проанализируйте, не содержат ли они токсичной позитивности или обесценивания.</p>
+                                </div>
+                            </div>`
+                        },
+                        source: {
+                            title: "Источник",
+                            content: `<div class="source">
+                                <p><strong>Психологические исследования травмы</strong></p>
+                                <p>Исследования показывают, что неподдерживающие реакции (обесценивание, советы, токсичная позитивность) могут усилить симптомы ПТСР и замедлить восстановление.</p>
+                            </div>`
+                        },
+                        assignment: {
+                            title: "Задание",
+                            content: `<div class="assignment">
+                                <h4>Составьте список фраз, которых стоит избегать</h4>
+                                <p>Перечислите 4 фразы, которые представляют токсичную позитивность или обесценивание чувств человека, пережившего травму.</p>
+                                <textarea id="answer2_2" placeholder="Напишите фразы здесь..."></textarea>
+                                <button class="btn-primary" onclick="checkAssignment('2.2')">Проверить задание</button>
+                                
+                                <div class="additional-task">
+                                    <h5>Дополнительное задание (трансформация фраз):</h5>
+                                    <p>Переформулируйте эти токсичные фразы в поддерживающие:</p>
+                                    <p>1. «Не плачь, все образуется» →</p>
+                                    <textarea id="extra2_2a" placeholder="Новая фраза..."></textarea>
+                                    <p>2. «У других проблемы серьезнее» →</p>
+                                    <textarea id="extra2_2b" placeholder="Новая фраза..."></textarea>
+                                    <p>3. «Хватит ныть, возьми себя в руки» →</p>
+                                    <textarea id="extra2_2c" placeholder="Новая фраза..."></textarea>
+                                    <button class="btn-secondary" onclick="checkExtraAssignment('2.2')">Проверить трансформацию</button>
+                                </div>
+                                
+                                <div id="feedback2_2" class="feedback"></div>
+                            </div>`,
+                            check: function(answer) {
+                                const bannedPhrases = ["все будет хорошо", "не переживай", "другим хуже", "возьми себя в руки", "пора двигаться", "забудь", "не думай об этом", "смотри на позитив"];
+                                
+                                let foundCount = 0;
+                                bannedPhrases.forEach(phrase => {
+                                    if (answer.toLowerCase().includes(phrase)) foundCount++;
+                                });
+                                
+                                if (foundCount >= 3) {
+                                    return {correct: true, message: "Верно! Вы правильно определили токсичные фразы, которые обесценивают переживания."};
+                                } else if (foundCount >= 1) {
+                                    return {correct: true, message: "Хорошо, но попробуйте найти больше фраз. Ищите выражения, которые призывают 'быть сильным' или 'не думать о плохом'."};
+                                } else {
+                                    return {correct: false, message: "Попробуйте включить фразы типа 'Все будет хорошо', 'Другим хуже', 'Пора двигаться дальше' — они представляют токсичную позитивность."};
+                                }
+                            }
+                        }
+                    }
                 },
                 {
                     id: "2.3",
                     title: "Создание безопасного пространства",
-                    content: `
-<div class="theory-block">
-    <picture>
-        <source media="(max-width: 1000px)" srcset="https://i.postimg.cc/h4xKhZ00/production-images-936ef6e8-aa91.png">
-        <img src="https://i.postimg.cc/XYWqV6Sg/production-images-936ef6e8-aa91-4742-ba60-1015cc7c97cf.png" alt="Безопасное пространство" class="responsive-image">
-    </picture>
-
-    <div class="quote-box">
-        <div class="quote">«Безопасность — не отсутствие угрозы, а присутствие связи»</div>
-        <p class="author">— Брюс Перри</p>
-    </div>
-
-    <h3>Теория</h3>
-    <p><strong>Расширенная теория:</strong> Безопасное пространство (Holding space) — это готовность быть с человеком, не осуждая его, не пытаясь его исправить и не влияя на исход ситуации.</p>
-    <ul>
-        <li><strong>Отсутствие оценки:</strong> Мы убираем внутреннего критика. Если человек говорит «Я ненавижу свою мать», мы не говорим «Так нельзя», мы принимаем это как факт его чувств сейчас.</li>
-        <li><strong>Конфиденциальность:</strong> Ощущение, что сказанное останется здесь.</li>
-        <li><strong>Предсказуемость:</strong> Вы не вскакиваете, не перебиваете, ваши реакции стабильны.</li>
-    </ul>
-    
-    <div class="definition-box">
-        <h4><span class="term">Термин:</span> Холдинг (holding)</h4>
-        <p>В психологии — способность «удерживать» эмоции другого, не разрушаясь под их тяжестью. Создание психологической «колыбели» для чувств.</p>
-    </div>
-    
-    <h3>Практика: как хорошо vs как плохо</h3>
-    <table class="comparison-table">
-        <thead>
-            <tr>
-                <th>Как хорошо делать</th>
-                <th>Как плохо делать</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>«Я здесь, просто побудь со мной»</td>
-                <td>«Давай я решу твою проблему»</td>
-            </tr>
-            <tr>
-                <td>Слушать без перебивания</td>
-                <td>Перебивать своими историями или советами</td>
-            </tr>
-            <tr>
-                <td>Сохранять спокойный, ровный тон</td>
-                <td>Показывать тревогу или раздражение</td>
-            </tr>
-            <tr>
-                <td>Уважать молчание и паузы</td>
-                <td>Заполнять тишину разговорами</td>
-            </tr>
-            <tr>
-                <td>Спрашивать: «Хочешь поговорить об этом?»</td>
-                <td>Давить: «Расскажи мне все подробно»</td>
-            </tr>
-        </tbody>
-    </table>
-    
-    <p><strong>Что разрушает безопасное пространство:</strong></p>
-    <table class="safety-breakers">
-        <tr>
-            <th>Действие</th>
-            <th>Почему разрушает</th>
-        </tr>
-        <tr>
-            <td>Перебивание</td>
-            <td>Сообщает: «Мое мнение важнее твоих чувств»</td>
-        </tr>
-        <tr>
-            <td>Рассказ о своем опыте</td>
-            <td>Уводит фокус с человека на вас</td>
-        </tr>
-        <tr>
-            <td>Советы без запроса</td>
-            <td>Лишает человека чувства контроля</td>
-        </tr>
-        <tr>
-            <td>Оценочные суждения</td>
-            <td>«Ты не должен так чувствовать» вызывает стыд</td>
-        </tr>
-        <tr>
-            <td>Нетерпение</td>
-            <td>Постукивание пальцами, взгляды на часы</td>
-        </tr>
-    </table>
-    
-    <div class="practical-tip">
-        <h4>📌 Практика для начинающих:</h4>
-        <p>Начните с малого: в следующем разговоре просто слушайте 3 минуты, не говоря ни слова (кроме поддерживающих «угу», «понимаю»). Отметьте, что изменилось в диалоге.</p>
-    </div>
-    
-    <h3>Задания для проверки знаний</h3>
-    
-    <div class="assignment">
-        <h4>Задание 1: Придумайте диалог с поддержкой без давления</h4>
-        <p>Ситуация: ваш друг пережил серьезную аварию месяц назад, до сих пор боится садиться в машину.</p>
-        <p>Напишите диалог, где вы поддерживаете друга, но не навязываете помощь и не давите.</p>
-        <textarea id="answer2_3" placeholder="Напишите диалог здесь..."></textarea>
-        <button class="btn-primary" onclick="checkAssignment('2.3')">Проверить задание</button>
-        <div id="feedback2_3" class="feedback"></div>
-    </div>
-    
-    <div class="quiz">
-        <h4>Задание 2: Выберите правильный ответ</h4>
-        <p><strong>Что важнее всего при создании безопасного пространства?</strong></p>
-        
-        <div class="quiz-options">
-            <div class="option">
-                <input type="radio" id="q1_2_3_option1" name="q1_2_3" value="a">
-                <label for="q1_2_3_option1">Быстро решить проблему человека</label>
-            </div>
-            <div class="option">
-                <input type="radio" id="q1_2_3_option2" name="q1_2_3" value="b">
-                <label for="q1_2_3_option2">Обеспечить контроль и выбор самому человеку</label>
-            </div>
-            <div class="option">
-                <input type="radio" id="q1_2_3_option3" name="q1_2_3" value="c">
-                <label for="q1_2_3_option3">Дать множество советов</label>
-            </div>
-        </div>
-        
-        <p><strong>Какие действия создают безопасное пространство? (выберите все подходящие)</strong></p>
-        
-        <div class="quiz-options">
-            <div class="option">
-                <input type="checkbox" id="q2_2_3_option1" name="q2_2_3" value="a">
-                <label for="q2_2_3_option1">Слушать без перебивания</label>
-            </div>
-            <div class="option">
-                <input type="checkbox" id="q2_2_3_option2" name="q2_2_3" value="b">
-                <label for="q2_2_3_option2">Сохранять конфиденциальность</label>
-            </div>
-            <div class="option">
-                <input type="checkbox" id="q2_2_3_option3" name="q2_2_3" value="c">
-                <label for="q2_2_3_option3">Оценивать чувства как правильные/неправильные</label>
-            </div>
-            <div class="option">
-                <input type="checkbox" id="q2_2_3_option4" name="q2_2_3" value="d">
-                <label for="q2_2_3_option4">Уважать паузы и молчание</label>
-            </div>
-        </div>
-        
-        <p><strong>Что такое «холдинг» в психологии?</strong></p>
-        
-        <div class="quiz-options">
-            <div class="option">
-                <input type="radio" id="q3_2_3_option1" name="q3_2_3" value="a">
-                <label for="q3_2_3_option1">Способность удерживать эмоции другого без разрушения</label>
-            </div>
-            <div class="option">
-                <input type="radio" id="q3_2_3_option2" name="q3_2_3" value="b">
-                <label for="q3_2_3_option2">Техника физического удерживания человека</label>
-            </div>
-            <div class="option">
-                <input type="radio" id="q3_2_3_option3" name="q3_2_3" value="c">
-                <label for="q3_2_3_option3">Метод быстрого решения проблем</label>
-            </div>
-        </div>
-        
-        <button class="btn-secondary" onclick="checkQuiz('2.3')">Проверить тест</button>
-        <div id="quiz-feedback2_3" class="feedback"></div>
-    </div>
-    
-    <div class="additional-task">
-        <h5>Дополнительное задание (анализ ситуаций):</h5>
-        <p>Проанализируйте, как создать безопасное пространство в этих ситуациях:</p>
-        <p>1. Ребенок боится темноты после просмотра страшного фильма.</p>
-        <textarea id="extra2_3a" placeholder="Ваш план..."></textarea>
-        <p>2. Пожилой человек потерял супруга и не хочет ни с кем общаться.</p>
-        <textarea id="extra2_3b" placeholder="Ваш план..."></textarea>
-        <p>3. Коллега переживает из-за публичного провала на совещании.</p>
-        <textarea id="extra2_3c" placeholder="Ваш план..."></textarea>
-        <button class="btn-secondary" onclick="checkExtraAssignment('2.3')">Проверить анализ</button>
-    </div>
-</div>
+                    tabs: {
+                        theory: {
+                            title: "Теория",
+                            content: `<div class="theory-block">
+<picture>
+    <!-- Для мобильных -->
+    <source
+        media="(max-width: 1000px)" 
+        srcset="https://i.postimg.cc/h4xKhZ00/production-images-936ef6e8-aa91.png"
+    >
+    <!-- Для десктопов и фолбэк -->
+    <img 
+        src="https://i.postimg.cc/XYWqV6Sg/production-images-936ef6e8-aa91-4742-ba60-1015cc7c97cf.png" 
+        alt="Эмпатия и понимание"
+        class="responsive-image"
+    >
+</picture>
 
 <style>
     .responsive-image {
@@ -2343,6 +1013,7 @@ const courseData = {
         display: block;
     }
     
+    /* Для мобильных устройств */
     @media (max-width: 1000px) {
         .responsive-image {
             width: 80% !important;
@@ -2351,32 +1022,149 @@ const courseData = {
             margin-right: auto;
         }
     }
-    
-    .safety-breakers {
-        width: 100%;
-        border-collapse: collapse;
-        margin: 20px 0;
-        background: var(--card-bg);
-        border-radius: 10px;
-        overflow: hidden;
-    }
-    
-    .safety-breakers th {
-        background: linear-gradient(135deg, #f39c12 0%, #d35400 100%);
-        color: white;
-        padding: 12px;
-        text-align: left;
-    }
-    
-    .safety-breakers td {
-        padding: 12px;
-        border-bottom: 1px solid rgba(255,255,255,0.1);
-    }
-    
-    .safety-breakers tr:hover {
-        background: rgba(243, 156, 18, 0.05);
-    }
-</style>`
+</style>
+                                <p><strong>Расширенная теория:</strong> Безопасное пространство (Holding space) — это готовность быть с человеком, не осуждая его, не пытаясь его исправить и не влияя на исход ситуации.</p>
+                                <ul>
+                                    <li><strong>Отсутствие оценки:</strong> Мы убираем внутреннего критика. Если человек говорит «Я ненавижу свою мать», мы не говорим «Так нельзя», мы принимаем это как факт его чувств сейчас.</li>
+                                    <li><strong>Конфиденциальность:</strong> Ощущение, что сказанное останется здесь.</li>
+                                    <li><strong>Предсказуемость:</strong> Вы не вскакиваете, не перебиваете, ваши реакции стабильны.</li>
+                                </ul>
+                                
+                                <div class="definition-box">
+                                    <h4><span class="term">Термин:</span> Холдинг (holding)</h4>
+                                    <p>В психологии — способность «удерживать» эмоции другого, не разрушаясь под их тяжестью. Создание психологической «колыбели» для чувств.</p>
+                                </div>
+                                
+                                <p><strong>Основные принципы создания безопасного пространства — основа помощи пережившему травму:</strong></p>
+                                <ul>
+                                    <li><strong>Безопасность:</strong> Физическая и эмоциональная защищенность.</li>
+                                    <li><strong>Доверие:</strong> Последовательность, надежность, конфиденциальность.</li>
+                                    <li><strong>Отсутствие давления:</strong> Не заставлять говорить или действовать.</li>
+                                    <li><strong>Валидация чувств:</strong> Признание права человека на любые эмоции.</li>
+                                    <li><strong>Контроль у человека:</strong> Он решает, что, когда и как делать.</li>
+                                </ul>
+                                
+                                <p><strong>Практические шаги для создания безопасности:</strong></p>
+                                <ol>
+                                    <li><strong>Настройтесь:</strong> Отложите телефон, выключите уведомления</li>
+                                    <li><strong>Подготовьте пространство:</strong> Уютное место, где вас не прервут</li>
+                                    <li><strong>Используйте открытые позы:</strong> Не скрещивайте руки и ноги</li>
+                                    <li><strong>Говорите спокойно и медленно:</strong> Ваш голос — якорь стабильности</li>
+                                    <li><strong>Не перебивайте:</strong> Даже если пауза длинная</li>
+                                    <li><strong>Отзеркаливайте:</strong> Кивайте, говорите «угу», «понимаю»</li>
+                                    <li><strong>Не давайте советов, если не просят:</strong> Чаще всего человеку нужно просто выговориться</li>
+                                </ol>
+                                
+                                <p><strong>Как понять, что пространство безопасно (признаки):</strong></p>
+                                <ul>
+                                    <li>Человек начинает говорить о более глубоких чувствах</li>
+                                    <li>Появляются слезы (это хорошо — значит, человек доверяет)</li>
+                                    <li>Расслабляется тело (расправляются плечи, дыхание становится глубже)</li>
+                                    <li>Человек сам задает вопросы или делится мыслями</li>
+                                </ul>
+                                
+                                <p><strong>Что разрушает безопасное пространство:</strong></p>
+                                <table class="safety-breakers">
+                                    <tr>
+                                        <th>Действие</th>
+                                        <th>Почему разрушает</th>
+                                    </tr>
+                                    <tr>
+                                        <td>Перебивание</td>
+                                        <td>Сообщает: «Мое мнение важнее твоих чувств»</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Рассказ о своем опыте</td>
+                                        <td>Уводит фокус с человека на вас</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Советы без запроса</td>
+                                        <td>Лишает человека чувства контроля</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Оценочные суждения</td>
+                                        <td>«Ты не должен так чувствовать» вызывает стыд</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Нетерпение</td>
+                                        <td>Постукивание пальцами, взгляды на часы</td>
+                                    </tr>
+                                </table>
+                                
+                                <p><strong>Специфика для разных ситуаций:</strong></p>
+                                <ul>
+                                    <li><strong>При недавней травме:</strong> Больше молчания, меньше слов</li>
+                                    <li><strong>При давней травме:</strong> Человек может нуждаться в помощи с интеграцией опыта</li>
+                                    <li><strong>С детьми:</strong> Используйте игру, рисунки, метафоры</li>
+                                    <li><strong>С пожилыми:</strong> Уважайте их опыт, не infantilize (не ведите себя как с детьми)</li>
+                                </ul>
+                                
+                                <div class="check-question">
+                                    <h4>Вопросы для проверки:</h4>
+                                    <p>1. Что значит «быть контейнером» для чужих эмоций?<br>
+                                    2. Как оценочные суждения разрушают безопасность?<br>
+                                    3. Выберите действие, создающее безопасность: дать совет или просто сидеть рядом?</p>
+                                </div>
+                                
+                                <div class="practical-tip">
+                                    <h4>📌 Практика для начинающих:</h4>
+                                    <p>Начните с малого: в следующем разговоре просто слушайте 3 минуты, не говоря ни слова (кроме поддерживающих «угу», «понимаю»). Отметьте, что изменилось в диалоге.</p>
+                                </div>
+                            </div>`
+                        },
+                        quote: {
+                            title: "Цитата",
+                            content: `<div class="quote">«Безопасность — не отсутствие угрозы, а присутствие связи»</div>
+                            <p class="author">— Брюс Перри</p>`
+                        },
+                        assignment: {
+                            title: "Задание",
+                            content: `<div class="assignment">
+                                <h4>Придумайте диалог с поддержкой без давления</h4>
+                                <p>Ситуация: ваш друг пережил серьезную аварию месяц назад, до сих пор боится садиться в машину.</p>
+                                <p>Напишите диалог, где вы поддерживаете друга, но не навязываете помощь и не давите.</p>
+                                <textarea id="answer2_3" placeholder="Напишите диалог здесь..."></textarea>
+                                <button class="btn-primary" onclick="checkAssignment('2.3')">Проверить задание</button>
+                                
+                                <div class="additional-task">
+                                    <h5>Дополнительное задание (анализ ситуаций):</h5>
+                                    <p>Проанализируйте, как создать безопасное пространство в этих ситуациях:</p>
+                                    <p>1. Ребенок боится темноты после просмотра страшного фильма.</p>
+                                    <textarea id="extra2_3a" placeholder="Ваш план..."></textarea>
+                                    <p>2. Пожилой человек потерял супруга и не хочет ни с кем общаться.</p>
+                                    <textarea id="extra2_3b" placeholder="Ваш план..."></textarea>
+                                    <p>3. Коллега переживает из-за публичного провала на совещании.</p>
+                                    <textarea id="extra2_3c" placeholder="Ваш план..."></textarea>
+                                    <button class="btn-secondary" onclick="checkExtraAssignment('2.3')">Проверить анализ</button>
+                                </div>
+                                
+                                <div id="feedback2_3" class="feedback"></div>
+                            </div>`,
+                            check: function(answer) {
+                                const openPhrases = ["хочешь поговорить", "как ты себя чувствуешь", "что тебе нужно", "чем я могу помочь", "хочешь ли ты", "если захочешь", "когда будешь готов"];
+                                const pressurePhrases = ["ты должен", "тебе нужно", "я сделаю за тебя", "просто сядь в машину", "преодолей страх"];
+                                
+                                let openCount = 0;
+                                let pressureCount = 0;
+                                
+                                openPhrases.forEach(phrase => {
+                                    if (answer.toLowerCase().includes(phrase)) openCount++;
+                                });
+                                
+                                pressurePhrases.forEach(phrase => {
+                                    if (answer.toLowerCase().includes(phrase)) pressureCount++;
+                                });
+                                
+                                if (openCount >= 2 && pressureCount === 0) {
+                                    return {correct: true, message: "Идеально! Вы создали безопасное пространство с открытыми вопросами и без давления."};
+                                } else if (openCount >= 1) {
+                                    return {correct: true, message: "Хорошо, но попробуйте добавить больше открытых предложений ('хочешь...', 'если захочешь...')."};
+                                } else {
+                                    return {correct: false, message: "В диалоге чувствуется давление. Используйте больше открытых вопросов и предложений, дающих выбор."};
+                                }
+                            }
+                        }
+                    }
                 }
             ],
             test: {
@@ -2525,176 +1313,23 @@ const courseData = {
                 {
                     id: "3.1",
                     title: "Техника отражения и перефразирования",
-                    content: `
-<div class="theory-block">
-    <picture>
-        <source media="(max-width: 1000px)" srcset="https://i.postimg.cc/T2zbGLLn/production-images-2476882b-49bb-(1).png">
-        <img src="https://i.postimg.cc/zBdy93mw/production-images-2476882b-49bb.png" alt="Техника отражения" class="responsive-image">
-    </picture>
-
-    <div class="quote-box">
-        <div class="quote">«Самое главное в общении — слышать то, что не сказано»</div>
-        <p class="author">— Питер Друкер</p>
-    </div>
-
-    <h3>Теория</h3>
-    <p><strong>Расширенная теория:</strong> Отражение — это возвращение собеседнику сути его слов, чтобы он услышал себя со стороны и понял, что вы его поняли.</p>
-    <ul>
-        <li><strong>Эхо-техника:</strong> Повторение последних слов (с вопросительной интонацией).<br><em>Клиент: «Я так устал от этой неопределенности».<br>Вы: «От неопределенности?..»</em></li>
-        <li><strong>Парафраз смысла:</strong> «Правильно ли я слышу, что ты чувствуешь... потому что...».</li>
-        <li><strong>Валидация:</strong> Подтверждение нормальности чувств. «Это совершенно естественно — злиться в такой ситуации».</li>
-    </ul>
-    
-    <div class="definition-box">
-        <h4><span class="term">Термин:</span> Валидация</h4>
-        <p>Подтверждение значимости и законности чувств другого человека. Не означает согласие, а означает: «Твои чувства имеют право на существование».</p>
-    </div>
-    
-    <h3>Практика: как хорошо vs как плохо</h3>
-    <table class="comparison-table">
-        <thead>
-            <tr>
-                <th>Как хорошо делать</th>
-                <th>Как плохо делать</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>«Похоже, ты чувствуешь разочарование»</td>
-                <td>«Не расстраивайся из-за ерунды»</td>
-            </tr>
-            <tr>
-                <td>«Если я правильно понял, тебе больно из-за...»</td>
-                <td>«Ты неправильно все понял»</td>
-            </tr>
-            <tr>
-                <td>«Ты говоришь, что чувствуешь себя одиноко»</td>
-                <td>«У тебя же есть друзья, что ты одинокий»</td>
-            </tr>
-            <tr>
-                <td>Использовать слова собеседника для отражения</td>
-                <td>Перефразировать так, что смысл искажается</td>
-            </tr>
-            <tr>
-                <td>Спрашивать: «Правильно ли я тебя понял?»</td>
-                <td>Утверждать: «Я знаю, что ты чувствуешь»</td>
-            </tr>
-        </tbody>
-    </table>
-    
-    <p><strong>Примеры правильного и неправильного отражения:</strong></p>
-    <table class="reflection-examples">
-        <tr>
-            <th>Что говорит человек</th>
-            <th>Неправильное отражение</th>
-            <th>Правильное отражение</th>
-        </tr>
-        <tr>
-            <td>«Я ненавижу свою работу»</td>
-            <td>«Не говори так, работа хорошая» (оценка)</td>
-            <td>«Ты чувствуешь сильное раздражение к своей работе» (отражение)</td>
-        </tr>
-        <tr>
-            <td>«Меня никто не понимает»</td>
-            <td>«Это неправда, я же тебя понимаю» (опровержение)</td>
-            <td>«Ты чувствуешь себя одиноко и непонятым» (отражение)</td>
-        </tr>
-        <tr>
-            <td>«Я не знаю, что делать»</td>
-            <td>«Просто сделай вот так...» (совет)</td>
-            <td>«Ты ощущаешь растерянность и неопределенность» (отражение)</td>
-        </tr>
-    </table>
-    
-    <div class="practical-tip">
-        <h4>📌 Практика на сегодня:</h4>
-        <p>В одном разговоре сегодня попробуйте использовать технику отражения хотя бы один раз. Просто скажите: «Если я правильно понял, ты чувствуешь...» и посмотрите на реакцию.</p>
-    </div>
-    
-    <h3>Задания для проверки знаний</h3>
-    
-    <div class="assignment">
-        <h4>Задание 1: Примените технику отражения</h4>
-        <p>Жалоба: «Меня постоянно критикует начальник. Даже когда я делаю все правильно, он находит к чему придраться. Я уже не знаю, как работать в таком стрессе.»</p>
-        <p>Напишите ответ, используя технику отражения.</p>
-        <textarea id="answer3_1" placeholder="Напишите ваш ответ здесь..."></textarea>
-        <button class="btn-primary" onclick="checkAssignment('3.1')">Проверить задание</button>
-        <div id="feedback3_1" class="feedback"></div>
-    </div>
-    
-    <div class="quiz">
-        <h4>Задание 2: Выберите правильный ответ</h4>
-        <p><strong>Что такое техника отражения?</strong></p>
-        
-        <div class="quiz-options">
-            <div class="option">
-                <input type="radio" id="q1_3_1_option1" name="q1_3_1" value="a">
-                <label for="q1_3_1_option1">Критика слов собеседника</label>
-            </div>
-            <div class="option">
-                <input type="radio" id="q1_3_1_option2" name="q1_3_1" value="b">
-                <label for="q1_3_1_option2">Повторение ключевых слов собеседника</label>
-            </div>
-            <div class="option">
-                <input type="radio" id="q1_3_1_option3" name="q1_3_1" value="c">
-                <label for="q1_3_1_option3">Рассказ о своем похожем опыте</label>
-            </div>
-        </div>
-        
-        <p><strong>Какие утверждения верны о валидации? (выберите все подходящие)</strong></p>
-        
-        <div class="quiz-options">
-            <div class="option">
-                <input type="checkbox" id="q2_3_1_option1" name="q2_3_1" value="a">
-                <label for="q2_3_1_option1">Подтверждает право человека на его чувства</label>
-            </div>
-            <div class="option">
-                <input type="checkbox" id="q2_3_1_option2" name="q2_3_1" value="b">
-                <label for="q2_3_1_option2">Означает согласие с поведением человека</label>
-            </div>
-            <div class="option">
-                <input type="checkbox" id="q2_3_1_option3" name="q2_3_1" value="c">
-                <label for="q2_3_1_option3">Помогает человеку чувствовать себя понятым</label>
-            </div>
-            <div class="option">
-                <input type="checkbox" id="q2_3_1_option4" name="q2_3_1" value="d">
-                <label for="q2_3_1_option4">Критикует эмоциональные реакции</label>
-            </div>
-        </div>
-        
-        <p><strong>Что такое «эхо-техника» в отражении?</strong></p>
-        
-        <div class="quiz-options">
-            <div class="option">
-                <input type="radio" id="q3_3_1_option1" name="q3_3_1" value="a">
-                <label for="q3_3_1_option1">Повторение последних слов с вопросительной интонацией</label>
-            </div>
-            <div class="option">
-                <input type="radio" id="q3_3_1_option2" name="q3_3_1" value="b">
-                <label for="q3_3_1_option2">Кричать, чтобы перекричать собеседника</label>
-            </div>
-            <div class="option">
-                <input type="radio" id="q3_3_1_option3" name="q3_3_1" value="c">
-                <label for="q3_3_1_option3">Игнорирование слов собеседника</label>
-            </div>
-        </div>
-        
-        <button class="btn-secondary" onclick="checkQuiz('3.1')">Проверить тест</button>
-        <div id="quiz-feedback3_1" class="feedback"></div>
-    </div>
-    
-    <div class="additional-task">
-        <h5>Дополнительное задание (практика отражения):</h5>
-        <p>Потренируйтесь отражать разные типы высказываний:</p>
-        <p>1. «Я так злюсь на мужа! Он опять забыл про нашу годовщину.»</p>
-        <textarea id="extra3_1a" placeholder="Ваше отражение..."></textarea>
-        <p>2. «У меня ничего не получается. Я неудачник.»</p>
-        <textarea id="extra3_1b" placeholder="Ваше отражение..."></textarea>
-        <p>3. «Я не знаю, радоваться мне или плакать. С одной стороны повысили, с другой — нагрузка удвоилась.»</p>
-        <textarea id="extra3_1c" placeholder="Ваше отражение..."></textarea>
-        <button class="btn-secondary" onclick="checkExtraAssignment('3.1')">Проверить отражения</button>
-    </div>
-</div>
+                    tabs: {
+                        theory: {
+                            title: "Теория",
+                            content: `<div class="theory-block">
+<picture>
+    <!-- Для мобильных -->
+    <source 
+        media="(max-width: 1000px)" 
+        srcset="https://i.postimg.cc/T2zbGLLn/production-images-2476882b-49bb-(1).png"
+    >
+    <!-- Для десктопов и фолбэк -->
+    <img 
+        src="https://i.postimg.cc/zBdy93mw/production-images-2476882b-49bb.png" 
+        alt="Эмпатия и понимание"
+        class="responsive-image"
+    >
+</picture>
 
 <style>
     .responsive-image {
@@ -2706,6 +1341,7 @@ const courseData = {
         display: block;
     }
     
+    /* Для мобильных устройств */
     @media (max-width: 1000px) {
         .responsive-image {
             width: 80% !important;
@@ -2714,219 +1350,165 @@ const courseData = {
             margin-right: auto;
         }
     }
-    
-    .reflection-examples {
-        width: 100%;
-        border-collapse: collapse;
-        margin: 20px 0;
-        background: var(--card-bg);
-        border-radius: 10px;
-        overflow: hidden;
-    }
-    
-    .reflection-examples th {
-        background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
-        color: white;
-        padding: 12px;
-        text-align: left;
-    }
-    
-    .reflection-examples td {
-        padding: 12px;
-        border-bottom: 1px solid rgba(255,255,255,0.1);
-        vertical-align: top;
-    }
-    
-    .reflection-examples tr:hover {
-        background: rgba(52, 152, 219, 0.05);
-    }
-</style>`
+</style>
+
+                                <p><strong>Расширенная теория:</strong> Отражение — это возвращение собеседнику сути его слов, чтобы он услышал себя со стороны и понял, что вы его поняли.</p>
+                                <ul>
+                                    <li><strong>Эхо-техника:</strong> Повторение последних слов (с вопросительной интонацией).<br><em>Клиент: «Я так устал от этой неопределенности».<br>Вы: «От неопределенности?..»</em></li>
+                                    <li><strong>Парафраз смысла:</strong> «Правильно ли я слышу, что ты чувствуешь... потому что...».</li>
+                                    <li><strong>Валидация:</strong> Подтверждение нормальности чувств. «Это совершенно естественно — злиться в такой ситуации».</li>
+                                </ul>
+                                
+                                <div class="definition-box">
+                                    <h4><span class="term">Термин:</span> Валидация</h4>
+                                    <p>Подтверждение значимости и законности чувств другого человека. Не означает согласие, а означает: «Твои чувства имеют право на существование».</p>
+                                </div>
+                                
+                                <p><strong>Основное определение:</strong> Техника отражения (рефлексивное слушание) — это повторение ключевых слов и смыслов говорящего, чтобы показать, что вы действительно слышите.</p>
+                                <ul>
+                                    <li><strong>Повторение ключевых слов:</strong> «Ты говоришь, что чувствуешь [слово из речи собеседника]»</li>
+                                    <li><strong>Перефразирование:</strong> «Если я правильно понял, ты ощущаешь...»</li>
+                                    <li><strong>Отражение эмоций:</strong> «Похоже, это вызывает у тебя [эмоция]»</li>
+                                    <li><strong>Важно:</strong> Не добавлять свои интерпретации, не давать советов, не перебивать.</li>
+                                </ul>
+                                
+                                <p><strong>Уровни отражения (от простого к сложному):</strong></p>
+                                <ol>
+                                    <li><strong>Повторение:</strong> «Ты говоришь, что устал»</li>
+                                    <li><strong>Перефразирование:</strong> «Если я правильно понимаю, ты чувствуешь истощение»</li>
+                                    <li><strong>Отражение чувств:</strong> «Похоже, это вызывает у тебя разочарование»</li>
+                                    <li><strong>Отражение глубинных потребностей:</strong> «Кажется, тебе нужно больше признания твоих усилий»</li>
+                                </ol>
+                                
+                                <p><strong>Примеры правильного и неправильного отражения:</strong></p>
+                                <table class="reflection-examples">
+                                    <tr>
+                                        <th>Что говорит человек</th>
+                                        <th>Неправильное отражение</th>
+                                        <th>Правильное отражение</th>
+                                    </tr>
+                                    <tr>
+                                        <td>«Я ненавижу свою работу»</td>
+                                        <td>«Не говори так, работа хорошая» (оценка)</td>
+                                        <td>«Ты чувствуешь сильное раздражение к своей работе» (отражение)</td>
+                                    </tr>
+                                    <tr>
+                                        <td>«Меня никто не понимает»</td>
+                                        <td>«Это неправда, я же тебя понимаю» (опровержение)</td>
+                                        <td>«Ты чувствуешь себя одиноко и непонятым» (отражение)</td>
+                                    </tr>
+                                    <tr>
+                                        <td>«Я не знаю, что делать»</td>
+                                        <td>«Просто сделай вот так...» (совет)</td>
+                                        <td>«Ты ощущаешь растерянность и неопределенность» (отражение)</td>
+                                    </tr>
+                                </table>
+                                
+                                <p><strong>Почему отражение работает:</strong></p>
+                                <ul>
+                                    <li>Человек чувствует, что его услышали</li>
+                                    <li>Помогает ему самому лучше понять свои чувства</li>
+                                    <li>Снижает защитную реакцию</li>
+                                    <li>Создает атмосферу доверия</li>
+                                    <li>Дает время подумать, прежде чем ответить</li>
+                                </ul>
+                                
+                                <p><strong>Типичные ошибки новичков:</strong></p>
+                                <ol>
+                                    <li><strong>Попугайничанье:</strong> Дословное повторение всей фразы звучит неестественно</li>
+                                    <li><strong>Механическое применение:</strong> Когда техника заметна, она теряет эффект</li>
+                                    <li><strong>Пропуск важного:</strong> Отражение поверхностных слов вместо глубинных чувств</li>
+                                    <li><strong>Слишком частое использование:</strong> На каждый второй реплики</li>
+                                </ol>
+                                
+                                <p><strong>Упражнения для тренировки:</strong></p>
+                                <ol>
+                                    <li>Смотрите интервью по ТВ и мысленно отражайте сказанное</li>
+                                    <li>Ведите дневник, где записываете диалоги и анализируете, что можно было отразить</li>
+                                    <li>Практикуйтесь с близким человеком, который знает о вашей практике</li>
+                                    <li>Начинайте с одного отражения за разговор, постепенно увеличивая</li>
+                                </ol>
+                                
+                                <div class="check-question">
+                                    <h4>Вопросы для проверки:</h4>
+                                    <p>1. В чем разница между «попугайничаньем» и качественным парафразом?<br>
+                                    2. Зачем нужно уточнять «Правильно ли я понял»?<br>
+                                    3. Какой эффект дает валидация эмоций собеседника?</p>
+                                </div>
+                                
+                                <div class="practical-tip">
+                                    <h4>📌 Практика на сегодня:</h4>
+                                    <p>В одном разговоре сегодня попробуйте использовать технику отражения хотя бы один раз. Просто скажите: «Если я правильно понял, ты чувствуешь...» и посмотрите на реакцию.</p>
+                                </div>
+                            </div>`
+                        },
+                        quote: {
+                            title: "Цитата",
+                            content: `<div class="quote">«Самое главное в общении — слышать то, что не сказано»</div>
+                            <p class="author">— Питер Друкер</p>`
+                        },
+                        assignment: {
+                            title: "Задание",
+                            content: `<div class="assignment">
+                                <h4>Примените технику отражения</h4>
+                                <p>Жалоба: «Меня постоянно критикует начальник. Даже когда я делаю все правильно, он находит к чему придраться. Я уже не знаю, как работать в таком стрессе.»</p>
+                                <p>Напишите ответ, используя технику отражения.</p>
+                                <textarea id="answer3_1" placeholder="Напишите ваш ответ здесь..."></textarea>
+                                <button class="btn-primary" onclick="checkAssignment('3.1')">Проверить задание</button>
+                                
+                                <div class="additional-task">
+                                    <h5>Дополнительное задание (практика отражения):</h5>
+                                    <p>Потренируйтесь отражать разные типы высказываний:</p>
+                                    <p>1. «Я так злюсь на мужа! Он опять забыл про нашу годовщину.»</p>
+                                    <textarea id="extra3_1a" placeholder="Ваше отражение..."></textarea>
+                                    <p>2. «У меня ничего не получается. Я неудачник.»</p>
+                                    <textarea id="extra3_1b" placeholder="Ваше отражение..."></textarea>
+                                    <p>3. «Я не знаю, радоваться мне или плакать. С одной стороны повысили, с другой — нагрузка удвоилась.»</p>
+                                    <textarea id="extra3_1c" placeholder="Ваше отражение..."></textarea>
+                                    <button class="btn-secondary" onclick="checkExtraAssignment('3.1')">Проверить отражения</button>
+                                </div>
+                                
+                                <div id="feedback3_1" class="feedback"></div>
+                            </div>`,
+                            check: function(answer) {
+                                const reflectionWords = ["критикует", "придраться", "стрессе", "начальник", "правильно"];
+                                let reflectionCount = 0;
+                                
+                                reflectionWords.forEach(word => {
+                                    if (answer.toLowerCase().includes(word)) reflectionCount++;
+                                });
+                                
+                                if (reflectionCount >= 3 && !answer.toLowerCase().includes("советую") && !answer.toLowerCase().includes("надо бы")) {
+                                    return {correct: true, message: "Отлично! Вы точно отразили ключевые слова и чувства собеседника без советов."};
+                                } else if (reflectionCount >= 2) {
+                                    return {correct: true, message: "Хорошо, но попробуйте отразить больше ключевых слов из жалобы."};
+                                } else {
+                                    return {correct: false, message: "Ответ не отражает жалобу. Попробуйте повторить ключевые слова: 'критикует', 'придраться', 'стресс'."};
+                                }
+                            }
+                        }
+                    }
                 },
                 {
                     id: "3.2",
                     title: "Уточняющие вопросы (Искусство задавания вопросов)",
-                    content: `
-<div class="theory-block">
-    <picture>
-        <source media="(max-width: 1000px)" srcset="https://i.postimg.cc/nznd3SZr/production-images-4326d45d-4c80-(1).png">
-        <img src="https://i.postimg.cc/yxVwSYWt/production-images-4326d45d-4c80.png" alt="Уточняющие вопросы" class="responsive-image">
-    </picture>
-
-    <h3>Теория</h3>
-    <p><strong>Расширенная теория:</strong></p>
-    <ul>
-        <li><strong>Открытые вопросы:</strong> Начинаются с «Что», «Как», «Каким образом». Они приглашают к рассказу.</li>
-        <li><strong>Закрытые вопросы:</strong> Требуют ответа «Да/Нет». Полезны для уточнения фактов, но убивают диалог о чувствах.</li>
-        <li><strong>Опасное «Почему»:</strong> Вопрос «Почему ты это сделал?» часто звучит как обвинение. Лучше заменить на «Что побудило тебя?..» или «Как так вышло, что?..».</li>
-    </ul>
-    
-    <div class="definition-box">
-        <h4><span class="term">Термин:</span> Открытые вопросы</h4>
-        <p>Вопросы, на которые нельзя ответить «да» или «нет». Они начинаются с: что, как, каким образом, расскажи, опиши, что чувствуешь и т.д.</p>
-    </div>
-    
-    <div class="source-box">
-        <h4>📚 Источник</h4>
-        <p><strong>MindTools: Active Listening</strong></p>
-        <p>Активное слушание включает 5 ключевых элементов: 1) Полное внимание, 2) Отражение, 3) Уточнение, 4) Резюмирование, 5) Отсроченная реакция. Уточняющие вопросы помогают избежать недопонимания.</p>
-    </div>
-    
-    <h3>Практика: как хорошо vs как плохо</h3>
-    <table class="comparison-table">
-        <thead>
-            <tr>
-                <th>Как хорошо делать</th>
-                <th>Как плохо делать</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>«Что ты чувствуешь сейчас?»</td>
-                <td>«Тебе плохо?»</td>
-            </tr>
-            <tr>
-                <td>«Как это на тебя повлияло?»</td>
-                <td>«Это было плохо?»</td>
-            </tr>
-            <tr>
-                <td>«Что было самым сложным?»</td>
-                <td>«Было сложно?»</td>
-            </tr>
-            <tr>
-                <td>«Что привело к такому решению?»</td>
-                <td>«Почему ты так поступил?»</td>
-            </tr>
-            <tr>
-                <td>«О чем ты думал в тот момент?»</td>
-                <td>«Ты думал об этом?»</td>
-            </tr>
-        </tbody>
-    </table>
-    
-    <p><strong>Типы открытых вопросов и когда их использовать:</strong></p>
-    <table class="question-types">
-        <tr>
-            <th>Тип вопроса</th>
-            <th>Пример</th>
-            <th>Когда использовать</th>
-        </tr>
-        <tr>
-            <td>Вопросы о фактах</td>
-            <td>«Что произошло?»</td>
-            <td>В начале разговора, для ясности</td>
-        </tr>
-        <tr>
-            <td>Вопросы о чувствах</td>
-            <td>«Что ты чувствовал в тот момент?»</td>
-            <td>Когда человек рассказывает о событии</td>
-        </tr>
-        <tr>
-            <td>Вопросы о мыслях</td>
-            <td>«О чем ты думал, когда это случилось?»</td>
-            <td>Для понимания когнитивной реакции</td>
-        </tr>
-        <tr>
-            <td>Вопросы о значении</td>
-            <td>«Что для тебя значит эта ситуация?»</td>
-            <td>Для понимания глубинного смысла</td>
-        </tr>
-        <tr>
-            <td>Вопросы о желаниях</td>
-            <td>«Чего ты хочешь сейчас?»</td>
-            <td>Для перехода к решению</td>
-        </tr>
-    </table>
-    
-    <div class="practical-tip">
-        <h4>📌 Упражнение на день:</h4>
-        <p>Сегодня в каждом разговоре попробуйте задать хотя бы один открытый вопрос, начинающийся с «Что» или «Как». Отметьте, как меняется диалог.</p>
-    </div>
-    
-    <h3>Задания для проверки знаний</h3>
-    
-    <div class="assignment">
-        <h4>Задание 1: Составьте список открытых вопросов</h4>
-        <p>Представьте, что друг говорит: «У меня проблемы в отношениях». Составьте 3 открытых вопроса, которые помогут ему лучше понять и выразить свои чувства.</p>
-        <textarea id="answer3_2" placeholder="Напишите ваши вопросы здесь..."></textarea>
-        <button class="btn-primary" onclick="checkAssignment('3.2')">Проверить задание</button>
-        <div id="feedback3_2" class="feedback"></div>
-    </div>
-    
-    <div class="quiz">
-        <h4>Задание 2: Выберите правильный ответ</h4>
-        <p><strong>Какой вопрос является открытым?</strong></p>
-        
-        <div class="quiz-options">
-            <div class="option">
-                <input type="radio" id="q1_3_2_option1" name="q1_3_2" value="a">
-                <label for="q1_3_2_option1">«Тебе плохо?»</label>
-            </div>
-            <div class="option">
-                <input type="radio" id="q1_3_2_option2" name="q1_3_2" value="b">
-                <label for="q1_3_2_option2">«Что ты чувствуешь сейчас?»</label>
-            </div>
-            <div class="option">
-                <input type="radio" id="q1_3_2_option3" name="q1_3_2" value="c">
-                <label for="q1_3_2_option3">«Ты злишься на начальника?»</label>
-            </div>
-        </div>
-        
-        <p><strong>Какие утверждения верны об открытых вопросах? (выберите все подходящие)</strong></p>
-        
-        <div class="quiz-options">
-            <div class="option">
-                <input type="checkbox" id="q2_3_2_option1" name="q2_3_2" value="a">
-                <label for="q2_3_2_option1">Начинаются с «что», «как», «расскажи»</label>
-            </div>
-            <div class="option">
-                <input type="checkbox" id="q2_3_2_option2" name="q2_3_2" value="b">
-                <label for="q2_3_2_option2">Требуют ответа «да» или «нет»</label>
-            </div>
-            <div class="option">
-                <input type="checkbox" id="q2_3_2_option3" name="q2_3_2" value="c">
-                <label for="q2_3_2_option3">Помогают человеку раскрыться</label>
-            </div>
-            <div class="option">
-                <input type="checkbox" id="q2_3_2_option4" name="q2_3_2" value="d">
-                <label for="q2_3_2_option4">Приглашают к развернутому ответу</label>
-            </div>
-        </div>
-        
-        <p><strong>Почему вопрос «почему» может быть проблемным?</strong></p>
-        
-        <div class="quiz-options">
-            <div class="option">
-                <input type="radio" id="q3_3_2_option1" name="q3_3_2" value="a">
-                <label for="q3_3_2_option1">Он слишком длинный</label>
-            </div>
-            <div class="option">
-                <input type="radio" id="q3_3_2_option2" name="q3_3_2" value="b">
-                <label for="q3_3_2_option2">Он звучит как обвинение</label>
-            </div>
-            <div class="option">
-                <input type="radio" id="q3_3_2_option3" name="q3_3_2" value="c">
-                <label for="q3_3_2_option3">На него нельзя ответить</label>
-            </div>
-        </div>
-        
-        <button class="btn-secondary" onclick="checkQuiz('3.2')">Проверить тест</button>
-        <div id="quiz-feedback3_2" class="feedback"></div>
-    </div>
-    
-    <div class="additional-task">
-        <h5>Дополнительное задание (трансформация вопросов):</h5>
-        <p>Преобразуйте закрытые вопросы в открытые:</p>
-        <p>1. «Ты злишься на начальника?» →</p>
-        <textarea id="extra3_2a" placeholder="Открытый вариант..."></textarea>
-        <p>2. «Тебе плохо?» →</p>
-        <textarea id="extra3_2b" placeholder="Открытый вариант..."></textarea>
-        <p>3. «Это случилось вчера?» →</p>
-        <textarea id="extra3_2c" placeholder="Открытый вариант..."></textarea>
-        <p>4. «Ты хочешь помочь?» →</p>
-        <textarea id="extra3_2d" placeholder="Открытый вариант..."></textarea>
-        <button class="btn-secondary" onclick="checkExtraAssignment('3.2')">Проверить трансформацию</button>
-    </div>
-</div>
+                    tabs: {
+                        theory: {
+                            title: "Теория",
+                            content: `<div class="theory-block">
+<picture>
+    <!-- Для мобильных -->
+    <source 
+        media="(max-width: 1000px)" 
+        srcset="https://i.postimg.cc/nznd3SZr/production-images-4326d45d-4c80-(1).png"
+    >
+    <!-- Для десктопов и фолбэк -->
+    <img 
+        src="https://i.postimg.cc/yxVwSYWt/production-images-4326d45d-4c80.png" 
+        alt="Эмпатия и понимание"
+        class="responsive-image"
+    >
+</picture>
 
 <style>
     .responsive-image {
@@ -2938,6 +1520,7 @@ const courseData = {
         display: block;
     }
     
+    /* Для мобильных устройств */
     @media (max-width: 1000px) {
         .responsive-image {
             width: 80% !important;
@@ -2946,224 +1529,184 @@ const courseData = {
             margin-right: auto;
         }
     }
-    
-    .question-types {
-        width: 100%;
-        border-collapse: collapse;
-        margin: 20px 0;
-        background: var(--card-bg);
-        border-radius: 10px;
-        overflow: hidden;
-        font-size: 0.9em;
-    }
-    
-    .question-types th {
-        background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
-        color: white;
-        padding: 12px;
-        text-align: left;
-    }
-    
-    .question-types td {
-        padding: 12px;
-        border-bottom: 1px solid rgba(255,255,255,0.1);
-        vertical-align: top;
-    }
-    
-    .question-types tr:hover {
-        background: rgba(46, 204, 113, 0.05);
-    }
-</style>`
+</style>
+                                <p><strong>Расширенная теория:</strong></p>
+                                <ul>
+                                    <li><strong>Открытые вопросы:</strong> Начинаются с «Что», «Как», «Каким образом». Они приглашают к рассказу.</li>
+                                    <li><strong>Закрытые вопросы:</strong> Требуют ответа «Да/Нет». Полезны для уточнения фактов, но убивают диалог о чувствах.</li>
+                                    <li><strong>Опасное «Почему»:</strong> Вопрос «Почему ты это сделал?» часто звучит как обвинение. Лучше заменить на «Что побудило тебя?..» или «Как так вышло, что?..».</li>
+                                </ul>
+                                
+                                <div class="definition-box">
+                                    <h4><span class="term">Термин:</span> Открытые вопросы</h4>
+                                    <p>Вопросы, на которые нельзя ответить «да» или «нет». Они начинаются с: что, как, каким образом, расскажи, опиши, что чувствуешь и т.д.</p>
+                                </div>
+                                
+                                <p><strong>Основные принципы:</strong> Уточняющие вопросы помогают глубже понять чувства и потребности собеседника:</p>
+                                <ul>
+                                    <li><strong>Открытые вопросы:</strong> «Что ты чувствуешь?», «Что для тебя самое сложное?», «Чего ты хочешь?»</li>
+                                    <li><strong>Уточняющие вопросы:</strong> «Ты имеешь в виду, что...?», «Правильно ли я понимаю, что...?»</li>
+                                    <li><strong>Вопросы о чувствах:</strong> «Какая эмоция сейчас самая сильная?», «Что вызывает самое болезненное чувство?»</li>
+                                    <li><strong>Избегайте:</strong> Закрытых вопросов («Да/Нет»), вопросов «почему» (могут звучать как обвинение).</li>
+                                </ul>
+                                
+                                <p><strong>Иерархия вопросов (от безопасных к более глубоким):</strong></p>
+                                <ol>
+                                    <li><strong>Фактические:</strong> «Когда это произошло?» (самые безопасные)</li>
+                                    <li><strong>О чувствах:</strong> «Что ты почувствовал, когда это случилось?»</li>
+                                    <li><strong>О смыслах:</strong> «Что для тебя это значит?»</li>
+                                    <li><strong>О потребностях:</strong> «Чего ты хочешь сейчас?»</li>
+                                    <li><strong>О ценностях:</strong> «Что для тебя в этом важно?» (самые глубокие)</li>
+                                </ol>
+                                
+                                <p><strong>Типы открытых вопросов и когда их использовать:</strong></p>
+                                <table class="question-types">
+                                    <tr>
+                                        <th>Тип вопроса</th>
+                                        <th>Пример</th>
+                                        <th>Когда использовать</th>
+                                    </tr>
+                                    <tr>
+                                        <td>Вопросы о фактах</td>
+                                        <td>«Что произошло?»</td>
+                                        <td>В начале разговора, для ясности</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Вопросы о чувствах</td>
+                                        <td>«Что ты чувствовал в тот момент?»</td>
+                                        <td>Когда человек рассказывает о событии</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Вопросы о мыслях</td>
+                                        <td>«О чем ты думал, когда это случилось?»</td>
+                                        <td>Для понимания когнитивной реакции</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Вопросы о значении</td>
+                                        <td>«Что для тебя значит эта ситуация?»</td>
+                                        <td>Для понимания глубинного смысла</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Вопросы о желаниях</td>
+                                        <td>«Чего ты хочешь сейчас?»</td>
+                                        <td>Для перехода к решению</td>
+                                    </tr>
+                                </table>
+                                
+                                <p><strong>Почему «почему» — опасное слово:</strong></p>
+                                <ul>
+                                    <li>Звучит как обвинение: «Почему ты это сделал?» = «Ты должен оправдаться»</li>
+                                    <li>Вызывает защитную реакцию</li>
+                                    <li>Часто человек и сам не знает «почему»</li>
+                                    <li>Альтернативы: «Что привело к этому?», «Как это получилось?»</li>
+                                </ul>
+                                
+                                <p><strong>Как задавать вопросы, чтобы не звучать как следователь:</strong></p>
+                                <ol>
+                                    <li>Смягчайте формулировки: «Можешь рассказать подробнее...» вместо «Расскажи подробнее»</li>
+                                    <li>Давайте выбор: «Хочешь об этом поговорить?»</li>
+                                    <li>Сочетайте с отражением: «Похоже, тебе тяжело. Хочешь рассказать, что случилось?»</li>
+                                    <li>Следите за тоном: вопросы должны звучать искренне, а не формально</li>
+                                </ol>
+                                
+                                <p><strong>Упражнения для развития навыка задавания вопросов:</strong></p>
+                                <ol>
+                                    <li>Превращайте закрытые вопросы в открытые:
+                                        <ul>
+                                            <li>«Ты расстроен?» → «Что ты чувствуешь?»</li>
+                                            <li>«Это было сложно?» → «Что было самым сложным?»</li>
+                                        </ul>
+                                    </li>
+                                    <li>Практикуйтесь на нейтральных темах: спросите о хобби, планах на выходные</li>
+                                    <li>Записывайте свои вопросы после разговора и анализируйте их</li>
+                                    <li>Игра «Только вопросы»: 5 минут общаться только вопросами (с согласия собеседника)</li>
+                                </ol>
+                                
+                                <div class="check-question">
+                                    <h4>Вопросы для проверки:</h4>
+                                    <p>1. Переделайте вопрос «Ты расстроился?» в открытый вопрос.<br>
+                                    2. Почему стоит избегать вопроса «Почему?» в эмоциональных беседах?<br>
+                                    3. Приведите пример вопроса, который помогает человеку раскрыться.</p>
+                                </div>
+                                
+                                <div class="practical-tip">
+                                    <h4>📌 Упражнение на день:</h4>
+                                    <p>Сегодня в каждом разговоре попробуйте задать хотя бы один открытый вопрос, начинающийся с «Что» или «Как». Отметьте, как меняется диалог.</p>
+                                </div>
+                            </div>`
+                        },
+                        source: {
+                            title: "Источник",
+                            content: `<div class="source">
+                                <p><strong>MindTools: Active Listening</strong></p>
+                                <p>Активное слушание включает 5 ключевых элементов: 1) Полное внимание, 2) Отражение, 3) Уточнение, 4) Резюмирование, 5) Отсроченная реакция. Уточняющие вопросы помогают избежать недопонимания.</p>
+                            </div>`
+                        },
+                        assignment: {
+                            title: "Задание",
+                            content: `<div class="assignment">
+                                <h4>Составьте список открытых вопросов</h4>
+                                <p>Представьте, что друг говорит: «У меня проблемы в отношениях». Составьте 3 открытых вопроса, которые помогут ему лучше понять и выразить свои чувства.</p>
+                                <textarea id="answer3_2" placeholder="Напишите ваши вопросы здесь..."></textarea>
+                                <button class="btn-primary" onclick="checkAssignment('3.2')">Проверить задание</button>
+                                
+                                <div class="additional-task">
+                                    <h5>Дополнительное задание (трансформация вопросов):</h5>
+                                    <p>Преобразуйте закрытые вопросы в открытые:</p>
+                                    <p>1. «Ты злишься на начальника?» →</p>
+                                    <textarea id="extra3_2a" placeholder="Открытый вариант..."></textarea>
+                                    <p>2. «Тебе плохо?» →</p>
+                                    <textarea id="extra3_2b" placeholder="Открытый вариант..."></textarea>
+                                    <p>3. «Это случилось вчера?» →</p>
+                                    <textarea id="extra3_2c" placeholder="Открытый вариант..."></textarea>
+                                    <p>4. «Ты хочешь помочь?» →</p>
+                                    <textarea id="extra3_2d" placeholder="Открытый вариант..."></textarea>
+                                    <button class="btn-secondary" onclick="checkExtraAssignment('3.2')">Проверить трансформацию</button>
+                                </div>
+                                
+                                <div id="feedback3_2" class="feedback"></div>
+                            </div>`,
+                            check: function(answer) {
+                                const questionIndicators = ["что", "как", "расскажи", "опиши", "какой", "какая"];
+                                let questionCount = 0;
+                                
+                                const questionMarkCount = (answer.match(/\?/g) || []).length;
+                                
+                                questionIndicators.forEach(word => {
+                                    if (answer.toLowerCase().includes(word)) questionCount++;
+                                });
+                                
+                                if (questionMarkCount >= 2 && questionCount >= 2) {
+                                    return {correct: true, message: "Отлично! Вы составили хорошие открытые вопросы, начинающиеся с 'что', 'как'."};
+                                } else if (questionMarkCount >= 1) {
+                                    return {correct: true, message: "Хорошо, но попробуйте добавить больше открытых вопросов, которые начинаются не с 'ты', а с 'что', 'как'."};
+                                } else {
+                                    return {correct: false, message: "Вопросы должны быть открытыми (не предполагать ответ 'да/нет'). Попробуйте начать с 'Что ты чувствуешь...', 'Как это проявляется...'."};
+                                }
+                            }
+                        }
+                    }
                 },
                 {
                     id: "3.3",
                     title: "Невербальное слушание и паузы",
-                    content: `
-<div class="theory-block">
-    <picture>
-        <source media="(max-width: 1000px)" srcset="https://i.postimg.cc/Hsm0GZhM/production-images-3dd3d439-2006-(1).png">
-        <img src="https://i.postimg.cc/Kc6q1DsD/production-images-3dd3d439-2006.png" alt="Невербальное слушание" class="responsive-image">
-    </picture>
-
-    <div class="quote-box">
-        <div class="quote">«Иногда молчание — лучший способ показать, что ты рядом»</div>
-        <p class="author">— Неизвестный автор</p>
-    </div>
-
-    <h3>Теория</h3>
-    <p><strong>Расширенная теория:</strong></p>
-    <ul>
-        <li><strong>Сила паузы:</strong> В паузах происходит осознание. Если человек замолчал, не спешите заполнять эфир. Дайте ему 3–5 секунд. Часто после паузы следует самое важное признание.</li>
-        <li><strong>Активное молчание:</strong> Это не проверка телефона. Это взгляд в глаза, кивки, звуки подтверждения («угу», «ммм»). Вы всем видом показываете: «Я здесь, продолжай».</li>
-    </ul>
-    
-    <div class="definition-box">
-        <h4><span class="term">Термин:</span> Активное молчание</h4>
-        <p>Состояние полного присутствия и внимания к собеседнику без слов. Включает зрительный контакт, кивки, соответствующее выражение лица.</p>
-    </div>
-    
-    <h3>Практика: как хорошо vs как плохо</h3>
-    <table class="comparison-table">
-        <thead>
-            <tr>
-                <th>Как хорошо делать</th>
-                <th>Как плохо делать</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>Слегка кивать, поддерживая зрительный контакт</td>
-                <td>Смотреть в телефон или по сторонам</td>
-            </tr>
-            <tr>
-                <td>Выдерживать паузы (3-5 секунд)</td>
-                <td>Заполнять каждую паузу словами</td>
-            </tr>
-            <tr>
-                <td>Использовать минимальные ответы: «угу», «понятно»</td>
-                <td>Перебивать своими историями</td>
-            </tr>
-            <tr>
-                <td>Наклоняться немного вперед к собеседнику</td>
-                <td>Откидываться назад, скрещивать руки</td>
-            </tr>
-            <tr>
-                <td>Выражение лица соответствует эмоциям собеседника</td>
-                <td>Улыбаться, когда человек плачет</td>
-            </tr>
-        </tbody>
-    </table>
-    
-    <p><strong>Элементы невербального слушания и их значение:</strong></p>
-    <table class="nonverbal-elements">
-        <tr>
-            <th>Элемент</th>
-            <th>Что показывает</th>
-            <th>Как правильно</th>
-            <th>Как неправильно</th>
-        </tr>
-        <tr>
-            <td>Зрительный контакт</td>
-            <td>Внимание, интерес</td>
-            <td>Смотреть в глаза 60-70% времени</td>
-            <td>Уставиться или избегать взгляда</td>
-        </tr>
-        <tr>
-            <td>Наклон тела</td>
-            <td>Вовлеченность</td>
-            <td>Легкий наклон вперед</td>
-            <td>Откинуться назад или отвернуться</td>
-        </tr>
-        <tr>
-            <td>Выражение лица</td>
-            <td>Эмпатия</td>
-            <td>Соответствовать эмоции собеседника</td>
-            <td>Показывать скуку или раздражение</td>
-        </tr>
-        <tr>
-            <td>Кивки</td>
-            <td>Понимание, согласие</td>
-            <td>Легкие кивки в такт речи</td>
-            <td>Быстрые частые кивки (нервность)</td>
-        </tr>
-        <tr>
-            <td>Жесты</td>
-            <td>Открытость</td>
-            <td>Расслабленные руки, открытые ладони</td>
-            <td>Скрещенные руки, закрытые позы</td>
-        </tr>
-    </table>
-    
-    <div class="practical-tip">
-        <h4>📌 Эксперимент на неделю:</h4>
-        <p>В одном разговоре в день сознательно используйте «активное молчание»: не говорите ничего, только кивайте и поддерживайте зрительный контакт. Запишите, что изменилось в диалоге.</p>
-    </div>
-    
-    <h3>Задания для проверки знаний</h3>
-    
-    <div class="assignment">
-        <h4>Задание 1: Опишите невербальные сигналы активного слушания</h4>
-        <p>Представьте ситуацию: ваш друг расстроен и рассказывает о проблеме. Опишите 3-4 невербальных сигнала, которые покажут, что вы активно слушаете.</p>
-        <textarea id="answer3_3" placeholder="Напишите ваше описание здесь..."></textarea>
-        <button class="btn-primary" onclick="checkAssignment('3.3')">Проверить задание</button>
-        <div id="feedback3_3" class="feedback"></div>
-    </div>
-    
-    <div class="quiz">
-        <h4>Задание 2: Выберите правильный ответ</h4>
-        <p><strong>Что такое активное молчание?</strong></p>
-        
-        <div class="quiz-options">
-            <div class="option">
-                <input type="radio" id="q1_3_3_option1" name="q1_3_3" value="a">
-                <label for="q1_3_3_option1">Полное отсутствие реакции на собеседника</label>
-            </div>
-            <div class="option">
-                <input type="radio" id="q1_3_3_option2" name="q1_3_3" value="b">
-                <label for="q1_3_3_option2">Полное присутствие без слов, но с невербальными сигналами</label>
-            </div>
-            <div class="option">
-                <input type="radio" id="q1_3_3_option3" name="q1_3_3" value="c">
-                <label for="q1_3_3_option3">Проверка телефона во время разговора</label>
-            </div>
-        </div>
-        
-        <p><strong>Какие невербальные сигналы показывают активное слушание? (выберите все подходящие)</strong></p>
-        
-        <div class="quiz-options">
-            <div class="option">
-                <input type="checkbox" id="q2_3_3_option1" name="q2_3_3" value="a">
-                <label for="q2_3_3_option1">Легкие кивки головой</label>
-            </div>
-            <div class="option">
-                <input type="checkbox" id="q2_3_3_option2" name="q2_3_3" value="b">
-                <label for="q2_3_3_option2">Наклон тела к собеседнику</label>
-            </div>
-            <div class="option">
-                <input type="checkbox" id="q2_3_3_option3" name="q2_3_3" value="c">
-                <label for="q2_3_3_option3">Скрещенные руки на груди</label>
-            </div>
-            <div class="option">
-                <input type="checkbox" id="q2_3_3_option4" name="q2_3_3" value="d">
-                <label for="q2_3_3_option4">Умеренный зрительный контакт</label>
-            </div>
-        </div>
-        
-        <p><strong>Почему паузы важны в разговоре?</strong></p>
-        
-        <div class="quiz-options">
-            <div class="option">
-                <input type="radio" id="q3_3_3_option1" name="q3_3_3" value="a">
-                <label for="q3_3_3_option1">Они создают неловкость</label>
-            </div>
-            <div class="option">
-                <input type="radio" id="q3_3_3_option2" name="q3_3_3" value="b">
-                <label for="q3_3_3_option2">Они дают время подумать и способствуют глубине</label>
-            </div>
-            <div class="option">
-                <input type="radio" id="q3_3_3_option3" name="q3_3_3" value="c">
-                <label for="q3_3_3_option3">Они показывают незаинтересованность</label>
-            </div>
-        </div>
-        
-        <button class="btn-secondary" onclick="checkQuiz('3.3')">Проверить тест</button>
-        <div id="quiz-feedback3_3" class="feedback"></div>
-    </div>
-    
-    <div class="additional-task">
-        <h5>Дополнительное задание (анализ видеозаписи):</h5>
-        <p>Посмотрите любое интервью (можно на YouTube) и проанализируйте невербальное поведение слушающего:</p>
-        <p>1. Как часто он кивает?</p>
-        <textarea id="extra3_3a" placeholder="Ваши наблюдения..."></textarea>
-        <p>2. Какое у него выражение лица?</p>
-        <textarea id="extra3_3b" placeholder="Ваши наблюдения..."></textarea>
-        <p>3. Как он использует паузы?</p>
-        <textarea id="extra3_3c" placeholder="Ваши наблюдения..."></textarea>
-        <p>4. Какие ошибки, если есть, вы заметили?</p>
-        <textarea id="extra3_3d" placeholder="Ваши наблюдения..."></textarea>
-        <button class="btn-secondary" onclick="checkExtraAssignment('3.3')">Проверить анализ</button>
-    </div>
-</div>
+                    tabs: {
+                        theory: {
+                            title: "Теория",
+                            content: `<div class="theory-block">
+<picture>
+    <!-- Для мобильных -->
+    <source 
+        media="(max-width: 1000px)" 
+        srcset="https://i.postimg.cc/Hsm0GZhM/production-images-3dd3d439-2006-(1).png"
+    >
+    <!-- Для десктопов и фолбэк -->
+    <img 
+        src="https://i.postimg.cc/Kc6q1DsD/production-images-3dd3d439-2006.png" 
+        alt="Эмпатия и понимание"
+        class="responsive-image"
+    >
+</picture>
 
 <style>
     .responsive-image {
@@ -3175,6 +1718,7 @@ const courseData = {
         display: block;
     }
     
+    /* Для мобильных устройств */
     @media (max-width: 1000px) {
         .responsive-image {
             width: 80% !important;
@@ -3183,35 +1727,163 @@ const courseData = {
             margin-right: auto;
         }
     }
-    
-    .nonverbal-elements {
-        width: 100%;
-        border-collapse: collapse;
-        margin: 20px 0;
-        background: var(--card-bg);
-        border-radius: 10px;
-        overflow: hidden;
-        font-size: 0.85em;
-    }
-    
-    .nonverbal-elements th {
-        background: linear-gradient(135deg, #f39c12 0%, #d35400 100%);
-        color: white;
-        padding: 10px;
-        text-align: left;
-        white-space: nowrap;
-    }
-    
-    .nonverbal-elements td {
-        padding: 10px;
-        border-bottom: 1px solid rgba(255,255,255,0.1);
-        vertical-align: top;
-    }
-    
-    .nonverbal-elements tr:hover {
-        background: rgba(243, 156, 18, 0.05);
-    }
-</style>`
+</style>
+                                <p><strong>Расширенная теория:</strong></p>
+                                <ul>
+                                    <li><strong>Сила паузы:</strong> В паузах происходит осознание. Если человек замолчал, не спешите заполнять эфир. Дайте ему 3–5 секунд. Часто после паузы следует самое важное признание.</li>
+                                    <li><strong>Активное молчание:</strong> Это не проверка телефона. Это взгляд в глаза, кивки, звуки подтверждения («угу», «ммм»). Вы всем видом показываете: «Я здесь, продолжай».</li>
+                                </ul>
+                                
+                                <div class="definition-box">
+                                    <h4><span class="term">Термин:</span> Активное молчание</h4>
+                                    <p>Состояние полного присутствия и внимания к собеседнику без слов. Включает зрительный контакт, кивки, соответствующее выражение лица.</p>
+                                </div>
+                                
+                                <p><strong>Основные принципы:</strong> Невербальные сигналы составляют до 70% коммуникации при активном слушании:</p>
+                                <ul>
+                                    <li><strong>Контакт глазами:</strong> Умеренный, не пристальный (60-70% времени).</li>
+                                    <li><strong>Кивки:</strong> Подтверждение, что вы следите за рассказом.</li>
+                                    <li><strong>Открытая поза:</strong> Руки не скрещены, наклон к собеседнику.</li>
+                                    <li><strong>Паузы:</strong> Дают время подумать и выразить чувства.</li>
+                                    <li><strong>Соответствующее выражение лица:</strong> Эмпатическое отзеркаливание эмоций.</li>
+                                </ul>
+                                
+                                <p><strong>Элементы невербального слушания и их значение:</strong></p>
+                                <table class="nonverbal-elements">
+                                    <tr>
+                                        <th>Элемент</th>
+                                        <th>Что показывает</th>
+                                        <th>Как правильно</th>
+                                        <th>Как неправильно</th>
+                                    </tr>
+                                    <tr>
+                                        <td>Зрительный контакт</td>
+                                        <td>Внимание, интерес</td>
+                                        <td>Смотреть в глаза 60-70% времени</td>
+                                        <td>Уставиться или избегать взгляда</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Наклон тела</td>
+                                        <td>Вовлеченность</td>
+                                        <td>Легкий наклон вперед</td>
+                                        <td>Откинуться назад или отвернуться</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Выражение лица</td>
+                                        <td>Эмпатия</td>
+                                        <td>Соответствовать эмоции собеседника</td>
+                                        <td>Показывать скуку или раздражение</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Кивки</td>
+                                        <td>Понимание, согласие</td>
+                                        <td>Легкие кивки в такт речи</td>
+                                        <td>Быстрые частые кивки (нервность)</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Жесты</td>
+                                        <td>Открытость</td>
+                                        <td>Расслабленные руки, открытые ладони</td>
+                                        <td>Скрещенные руки, закрытые позы</td>
+                                    </tr>
+                                </table>
+                                
+                                <p><strong>Искусство паузы: почему это так важно:</strong></p>
+                                <ul>
+                                    <li><strong>Дает время подумать:</strong> И вам, и собеседнику</li>
+                                    <li><strong>Показывает уважение:</strong> Вы не торопите человека</li>
+                                    <li><strong>Создает пространство для глубины:</strong> Поверхностные мысли сменяются более глубокими</li>
+                                    <li><strong>Снижает тревогу:</strong> Привычка заполнять паузы часто от тревоги</li>
+                                    <li><strong>Помогает услышать себя:</strong> В тишине человек лучше понимает свои чувства</li>
+                                </ul>
+                                
+                                <p><strong>Как выдержать паузу, если неловко:</strong></p>
+                                <ol>
+                                    <li>Считайте про себя до 5 прежде чем заговорить</li>
+                                    <li>Сделайте глубокий вдох и медленный выдох</li>
+                                    <li>Поддерживайте мягкий зрительный контакт</li>
+                                    <li>Можно сказать: «Давай помолчим немного, если хочешь»</li>
+                                    <li>Помните: пауза — это не ваш провал, а возможность для собеседника</li>
+                                </ol>
+                                
+                                <p><strong>Типичные ошибки в невербальном слушании:</strong></p>
+                                <ul>
+                                    <li><strong>«Глазами в телефон»:</strong> Даже быстрый взгляд разрушает доверие</li>
+                                    <li><strong>Нетерпеливые движения:</strong> Постукивание пальцами, покачивание ногой</li>
+                                    <li><strong>Несоответствие:</strong> Улыбка, когда человек плачет</li>
+                                    <li><strong>Чрезмерное отзеркаливание:</strong> Пародирование позы и жестов</li>
+                                    <li><strong>Пристальный взгляд:</strong> Создает ощущение допроса</li>
+                                </ul>
+                                
+                                <p><strong>Упражнения для развития невербального слушания:</strong></p>
+                                <ol>
+                                    <li><strong>Упражнение «Без слов»:</strong> 5 минут общаться только невербаликой (с согласия)</li>
+                                    <li><strong>Упражнение «Пауза»:</strong> После каждого вопроса собеседника ждать 5 секунд</li>
+                                    <li><strong>Упражнение «Зеркало»:</strong> Слегка отражать позу собеседника (не пародируя)</li>
+                                    <li><strong>Упражнение «Телефон в другой комнате»:</strong> На время разговора убирать телефон</li>
+                                    <li><strong>Видеозапись:</strong> Записать себя на видео во время разговора и проанализировать</li>
+                                </ol>
+                                
+                                <div class="check-question">
+                                    <h4>Вопросы для проверки:</h4>
+                                    <p>1. Сколько секунд рекомендуется выждать, прежде чем отвечать?<br>
+                                    2. Как собеседник понимает, что вы его слушаете, если вы молчите?<br>
+                                    3. Что делать, если пауза затянулась и стала неловкой?</p>
+                                </div>
+                                
+                                <div class="practical-tip">
+                                    <h4>📌 Эксперимент на неделю:</h4>
+                                    <p>В одном разговоре в день сознательно используйте «активное молчание»: не говорите ничего, только кивайте и поддерживайте зрительный контакт. Запишите, что изменилось в диалоге.</p>
+                                </div>
+                            </div>`
+                        },
+                        quote: {
+                            title: "Цитата",
+                            content: `<div class="quote">«Иногда молчание — лучший способ показать, что ты рядом»</div>
+                            <p class="author">— Неизвестный автор</p>`
+                        },
+                        assignment: {
+                            title: "Задание",
+                            content: `<div class="assignment">
+                                <h4>Опишите невербальные сигналы активного слушания</h4>
+                                <p>Представьте ситуацию: ваш друг расстроен и рассказывает о проблеме. Опишите 3-4 невербальных сигнала, которые покажут, что вы активно слушаете.</p>
+                                <textarea id="answer3_3" placeholder="Напишите ваше описание здесь..."></textarea>
+                                <button class="btn-primary" onclick="checkAssignment('3.3')">Проверить задание</button>
+                                
+                                <div class="additional-task">
+                                    <h5>Дополнительное задание (анализ видеозаписи):</h5>
+                                    <p>Посмотрите любое интервью (можно на YouTube) и проанализируйте невербальное поведение слушающего:</p>
+                                    <p>1. Как часто он кивает?</p>
+                                    <textarea id="extra3_3a" placeholder="Ваши наблюдения..."></textarea>
+                                    <p>2. Какое у него выражение лица?</p>
+                                    <textarea id="extra3_3b" placeholder="Ваши наблюдения..."></textarea>
+                                    <p>3. Как он использует паузы?</p>
+                                    <textarea id="extra3_3c" placeholder="Ваши наблюдения..."></textarea>
+                                    <p>4. Какие ошибки, если есть, вы заметили?</p>
+                                    <textarea id="extra3_3d" placeholder="Ваши наблюдения..."></textarea>
+                                    <button class="btn-secondary" onclick="checkExtraAssignment('3.3')">Проверить анализ</button>
+                                </div>
+                                
+                                <div id="feedback3_3" class="feedback"></div>
+                            </div>`,
+                            check: function(answer) {
+                                const nonverbalSignals = ["кив", "взгляд", "поза", "наклон", "выражение лица", "пауза", "молчание", "открытая поза"];
+                                let signalCount = 0;
+                                
+                                nonverbalSignals.forEach(signal => {
+                                    if (answer.toLowerCase().includes(signal)) signalCount++;
+                                });
+                                
+                                if (signalCount >= 3) {
+                                    return {correct: true, message: "Отлично! Вы хорошо описали ключевые невербальные сигналы активного слушания."};
+                                } else if (signalCount >= 2) {
+                                    return {correct: true, message: "Хорошо, но попробуйте добавить больше конкретных сигналов: кивки, открытая поза, соответствующий взгляд."};
+                                } else {
+                                    return {correct: false, message: "Попробуйте описать конкретные невербальные действия: кивки головой, наклон тела к собеседнику, соответствующий взгляд."};
+                                }
+                            }
+                        }
+                    }
                 }
             ],
             test: {
@@ -3357,181 +2029,23 @@ const courseData = {
                 {
                     id: "4.1",
                     title: "Треугольник Карпмана: Помощь vs Спасательство",
-                    content: `
-<div class="theory-block">
-    <picture>
-        <source media="(max-width: 1000px)" srcset="https://i.postimg.cc/7Y4xw4N1/production-images-72872d40-f7f3-(1).png">
-        <img src="https://i.postimg.cc/8z1PBGJL/production-images-72872d40-f7f3.png" alt="Треугольник Карпмана" class="responsive-image">
-    </picture>
-
-    <div class="quote-box">
-        <div class="quote">«Дайте человеку удочку, а не рыбу»</div>
-        <p class="author">— Китайская пословица</p>
-    </div>
-
-    <h3>Теория</h3>
-    <p><strong>Расширенная теория:</strong></p>
-    <ul>
-        <li><strong>Помощь (Партнерство):</strong> Вы даете удочку. Вы верите, что у человека есть силы справиться, вы лишь ассистируете. Ответственность остается на человеке.</li>
-        <li><strong>Спасательство (Треугольник Карпмана):</strong> Вы делаете за человека, даже когда он не просил. Вы считаете его беспомощным. Это тешит ваше эго («Я герой»), но делает другого зависимым. В итоге Спасатель часто становится Жертвой («Я для них всё, а они неблагодарные») или Преследователем.</li>
-    </ul>
-    
-    <div class="definition-box">
-        <h4><span class="term">Термин:</span> Треугольник Карпмана</h4>
-        <p>Модель созависимых отношений, где люди играют три роли: Спасатель (делает за других), Жертва (беспомощный) и Преследователь (обвинитель). Роли могут меняться.</p>
-    </div>
-    
-    <h3>Практика: как хорошо vs как плохо</h3>
-    <table class="comparison-table">
-        <thead>
-            <tr>
-                <th>Как хорошо делать (помощь)</th>
-                <th>Как плохо делать (спасение)</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>«Хочешь, помогу составить план?»</td>
-                <td>«Я сделаю это за тебя»</td>
-            </tr>
-            <tr>
-                <td>«Давай подумаем вместе, как ты можешь это исправить»</td>
-                <td>«Не волнуйся, я уже всё уладил»</td>
-            </tr>
-            <tr>
-                <td>«Каков твой план действий?»</td>
-                <td>«Вот тебе план, просто следуй ему»</td>
-            </tr>
-            <tr>
-                <td>«Чем именно я могу быть полезен?»</td>
-                <td>«Дай лучше я, а то ты не справишься»</td>
-            </tr>
-            <tr>
-                <td>Уважать отказ от помощи без обиды</td>
-                <td>Обижаться, если помощь отвергают</td>
-            </tr>
-        </tbody>
-    </table>
-    
-    <p><strong>Разница между помощью и спасением:</strong></p>
-    <table class="help-rescue-table">
-        <tr>
-            <th>Помощь (здоровая)</th>
-            <th>Спасение (нездоровое)</th>
-        </tr>
-        <tr>
-            <td>Поддержка самостоятельности</td>
-            <td>Лишение выбора и контроля</td>
-        </tr>
-        <tr>
-            <td>Уважение границ</td>
-            <td>Нарушение границ</td>
-        </tr>
-        <tr>
-            <td>Верит в способности человека</td>
-            <td>Считает человека беспомощным</td>
-        </tr>
-        <tr>
-            <td>Дает инструменты и знания</td>
-            <td>Решает проблему самостоятельно</td>
-        </tr>
-        <tr>
-            <td>Ответственность остается у человека</td>
-            <td>Берет ответственность на себя</td>
-        </tr>
-    </table>
-    
-    <div class="practical-tip">
-        <h4>📌 Самопроверка:</h4>
-        <p>Вспомните последний раз, когда вы помогали. Задайте себе вопросы: 1) Меня просили? 2) Я давал выбор? 3) Я верю, что человек справится сам? Если на все «да» — это помощь. Если есть «нет» — возможно, спасение.</p>
-    </div>
-    
-    <h3>Задания для проверки знаний</h3>
-    
-    <div class="assignment">
-        <h4>Задание 1: Определите, где помощь, а где спасение</h4>
-        <p>Прочитайте ситуации и определите, где проявляется здоровая помощь, а где — нездоровое спасение:</p>
-        <p>1. «Дай, я сам поговорю с твоим начальником о повышении.»</p>
-        <p>2. «Хочешь, вместе подготовимся к разговору с начальником?»</p>
-        <p>3. «Я знаю лучше, что тебе делать. Слушай меня.»</p>
-        <textarea id="answer4_1" placeholder="Напишите ваш анализ здесь..."></textarea>
-        <button class="btn-primary" onclick="checkAssignment('4.1')">Проверить задание</button>
-        <div id="feedback4_1" class="feedback"></div>
-    </div>
-    
-    <div class="quiz">
-        <h4>Задание 2: Выберите правильный ответ</h4>
-        <p><strong>Какая фраза предлагает помощь, а не спасение?</strong></p>
-        
-        <div class="quiz-options">
-            <div class="option">
-                <input type="radio" id="q1_4_1_option1" name="q1_4_1" value="a">
-                <label for="q1_4_1_option1">«Я все сделаю за тебя»</label>
-            </div>
-            <div class="option">
-                <input type="radio" id="q1_4_1_option2" name="q1_4_1" value="b">
-                <label for="q1_4_1_option2">«Хочешь, помогу составить план?»</label>
-            </div>
-            <div class="option">
-                <input type="radio" id="q1_4_1_option3" name="q1_4_1" value="c">
-                <label for="q1_4_1_option3">«Ты должен сделать это немедленно»</label>
-            </div>
-        </div>
-        
-        <p><strong>Какие утверждения верны о треугольнике Карпмана? (выберите все подходящие)</strong></p>
-        
-        <div class="quiz-options">
-            <div class="option">
-                <input type="checkbox" id="q2_4_1_option1" name="q2_4_1" value="a">
-                <label for="q2_4_1_option1">Включает роли Спасателя, Жертвы, Преследователя</label>
-            </div>
-            <div class="option">
-                <input type="checkbox" id="q2_4_1_option2" name="q2_4_1" value="b">
-                <label for="q2_4_1_option2">Роли всегда фиксированы и не меняются</label>
-            </div>
-            <div class="option">
-                <input type="checkbox" id="q2_4_1_option3" name="q2_4_1" value="c">
-                <label for="q2_4_1_option3">Представляет созависимые отношения</label>
-            </div>
-            <div class="option">
-                <input type="checkbox" id="q2_4_1_option4" name="q2_4_1" value="d">
-                <label for="q2_4_1_option4">Спасатель делает за других, даже когда не просят</label>
-            </div>
-        </div>
-        
-        <p><strong>Кто такие участники треугольника Карпмана?</strong></p>
-        
-        <div class="quiz-options">
-            <div class="option">
-                <input type="radio" id="q3_4_1_option1" name="q3_4_1" value="a">
-                <label for="q3_4_1_option1">Помощник, получатель, наблюдатель</label>
-            </div>
-            <div class="option">
-                <input type="radio" id="q3_4_1_option2" name="q3_4_1" value="b">
-                <label for="q3_4_1_option2">Спасатель, жертва, преследователь</label>
-            </div>
-            <div class="option">
-                <input type="radio" id="q3_4_1_option3" name="q3_4_1" value="c">
-                <label for="q3_4_1_option3">Лидер, последователь, оппозиционер</label>
-            </div>
-        </div>
-        
-        <button class="btn-secondary" onclick="checkQuiz('4.1')">Проверить тест</button>
-        <div id="quiz-feedback4_1" class="feedback"></div>
-    </div>
-    
-    <div class="additional-task">
-        <h5>Дополнительное задание (анализ ролей):</h5>
-        <p>Проанализируйте эти ситуации с точки зрения треугольника Карпмана:</p>
-        <p>1. Мама делает уроки за ребенка, потому что «он устал».</p>
-        <textarea id="extra4_1a" placeholder="Кто какую роль играет?"></textarea>
-        <p>2. Мужчина постоянно решает проблемы подруги, которая вечно попадает в неприятности.</p>
-        <textarea id="extra4_1b" placeholder="Кто какую роль играет?"></textarea>
-        <p>3. Женщина жалуется, что все пользуются ее добротой, но продолжает всем помогать.</p>
-        <textarea id="extra4_1c" placeholder="Кто какую роль играет?"></textarea>
-        <button class="btn-secondary" onclick="checkExtraAssignment('4.1')">Проверить анализ</button>
-    </div>
-</div>
+                    tabs: {
+                        theory: {
+                            title: "Теория",
+                            content: `<div class="theory-block">
+<picture>
+    <!-- Для мобильных -->
+    <source 
+        media="(max-width: 1000px)" 
+        srcset="https://i.postimg.cc/7Y4xw4N1/production-images-72872d40-f7f3-(1).png"
+    >
+    <!-- Для десктопов и фолбэк -->
+    <img 
+        src="https://i.postimg.cc/8z1PBGJL/production-images-72872d40-f7f3.png" 
+        alt="Эмпатия и понимание"
+        class="responsive-image"
+    >
+</picture>
 
 <style>
     .responsive-image {
@@ -3543,6 +2057,7 @@ const courseData = {
         display: block;
     }
     
+    /* Для мобильных устройств */
     @media (max-width: 1000px) {
         .responsive-image {
             width: 80% !important;
@@ -3551,213 +2066,243 @@ const courseData = {
             margin-right: auto;
         }
     }
-    
-    .help-rescue-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin: 20px 0;
-        background: var(--card-bg);
-        border-radius: 10px;
-        overflow: hidden;
-    }
-    
-    .help-rescue-table th {
-        background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
-        color: white;
-        padding: 12px;
-        text-align: left;
-    }
-    
-    .help-rescue-table td {
-        padding: 12px;
-        border-bottom: 1px solid rgba(255,255,255,0.1);
-    }
-    
-    .help-rescue-table tr:hover {
-        background: rgba(46, 204, 113, 0.05);
-    }
-</style>`
+</style>
+                                <p><strong>Расширенная теория:</strong></p>
+                                <ul>
+                                    <li><strong>Помощь (Партнерство):</strong> Вы даете удочку. Вы верите, что у человека есть силы справиться, вы лишь ассистируете. Ответственность остается на человеке.</li>
+                                    <li><strong>Спасательство (Треугольник Карпмана):</strong> Вы делаете за человека, даже когда он не просил. Вы считаете его беспомощным. Это тешит ваше эго («Я герой»), но делает другого зависимым. В итоге Спасатель часто становится Жертвой («Я для них всё, а они неблагодарные») или Преследователем.</li>
+                                </ul>
+                                
+                                <div class="definition-box">
+                                    <h4><span class="term">Термин:</span> Треугольник Карпмана</h4>
+                                    <p>Модель созависимых отношений, где люди играют три роли: Спасатель (делает за других), Жертва (беспомощный) и Преследователь (обвинитель). Роли могут меняться.</p>
+                                </div>
+                                
+                                <p><strong>Разница между помощью и спасением — принципиально разные подходы:</strong></p>
+                                <table class="help-rescue-table">
+                                    <tr>
+                                        <th>Помощь (здоровая)</th>
+                                        <th>Спасение (нездоровое)</th>
+                                    </tr>
+                                    <tr>
+                                        <td>Поддержка самостоятельности</td>
+                                        <td>Лишение выбора и контроля</td>
+                                    </tr>
+                                    <tr>
+                                        <td>«Хочешь, я помогу?»</td>
+                                        <td>«Я сделаю это за тебя»</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Уважение границ</td>
+                                        <td>Нарушение границ</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Верит в способности человека</td>
+                                        <td>Считает человека беспомощным</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Дает инструменты и знания для решения проблемы</td>
+                                        <td>Решает проблему самостоятельно, оставляя другого в неведении</td>
+                                    </tr>
+                                    <tr>
+                                        <td>«Давай подумаем вместе, как ты можешь это исправить»</td>
+                                        <td>«Не волнуйся, я уже всё уладил»</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Создает условия для роста и обучения</td>
+                                        <td>Создает зависимость и привычку полагаться на других</td>
+                                    </tr>
+                                    <tr>
+                                        <td>«Я рядом, если будут сложности»</td>
+                                        <td>«Дай лучше я, а то ты не справишься»</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Спрашивает: «Чем именно я могу быть полезен?»</td>
+                                        <td>Действует исходя из своих предположений о нуждах другого</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Принимает отказ от помощи без обиды</td>
+                                        <td>Настаивает и обижается, если помощь отвергают («Я же хотел как лучше!»)</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Помощь оказывается по запросу или с согласия</td>
+                                        <td>Вмешивается непрошено, оправдываясь чрезвычайными обстоятельствами</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Позволяет человеку прожить последствия своего выбора (там, где это безопасно)</td>
+                                        <td>Постоянно защищает от любых негативных последствий</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Эмоциональная поддержка: «Я понимаю, что это сложно для тебя»</td>
+                                        <td>Эмоциональное поглощение: «Я не могу спать, пока у тебя эта проблема»</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Фокус на процессе и усилиях человека</td>
+                                        <td>Фокус только на быстром результате любой ценой</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Ответственность за решение остается у того, кому помогают</td>
+                                        <td>«Спасатель» берет ответственность за процесс и результат на себя</td>
+                                    </tr>
+                                    <tr>
+                                        <td>«Каков твой план действий?»</td>
+                                        <td>«Вот тебе план, просто следуй ему»</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Усиливает уверенность человека в себе</td>
+                                        <td>Подрывает веру человека в свои силы</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Баланс: помогает, но не в ущерб своим нуждам и ресурсам</td>
+                                        <td>Жертвенность: помогает, истощая себя</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Признает право другого на ошибку</td>
+                                        <td>Воспринимает ошибки другого как свою личную неудачу</td>
+                                    </tr>
+                                </table>
+                                
+                                <p><strong>Треугольник Карпмана: как распознать, что вы в нем:</strong></p>
+                                <ul>
+                                    <li><strong>Спасатель:</strong> Чувствуете себя обязанным помочь, даже когда не просят. Обижаетесь, если вашу помощь не ценят.</li>
+                                    <li><strong>Жертва:</strong> Чувствуете себя беспомощным, ждете, чтобы вас спасли. Обвиняете других в своих проблемах.</li>
+                                    <li><strong>Преследователь:</strong> Критикуете, обвиняете, контролируете. Уверены, что знаете, как другим следует жить.</li>
+                                </ul>
+                                
+                                <p><strong>Почему мы попадаем в треугольник Карпмана:</strong></p>
+                                <ol>
+                                    <li><strong>Детские паттерны:</strong> Учились таким отношениям в семье</li>
+                                    <li><strong>Потребность в значимости:</strong> «Я нужен, когда я спасаю»</li>
+                                    <li><strong>Избегание собственных проблем:</strong> Легче решать чужие</li>
+                                    <li><strong>Страх конфликта:</strong> «Если не помогу, на меня обидятся»</li>
+                                    <li><strong>Низкая самооценка:</strong> Подтверждение своей ценности через помощь</li>
+                                </ol>
+                                
+                                <p><strong>Как выйти из треугольника (если вы Спасатель):</strong></p>
+                                <ol>
+                                    <li>Спросите себя: «Меня действительно просили о помощи?»</li>
+                                    <li>Спросите другого: «Чем именно я могу быть полезен?»</li>
+                                    <li>Уважайте отказ: «Хорошо, если передумаешь — я рядом»</li>
+                                    <li>Работайте со своей тревогой: «Это их жизнь, их выбор, их последствия»</li>
+                                    <li>Направляйте к специалистам, если проблема серьезная</li>
+                                </ol>
+                                
+                                <p><strong>Примеры здоровой помощи в разных ситуациях:</strong></p>
+                                <table class="healthy-help-examples">
+                                    <tr>
+                                        <th>Ситуация</th>
+                                        <th>Спасение</th>
+                                        <th>Помощь</th>
+                                    </tr>
+                                    <tr>
+                                        <td>Друг в депрессии не убирается дома</td>
+                                        <td>Прийти и убраться за него</td>
+                                        <td>«Хочешь, помогу составить план уборки? Могу прийти и просто быть рядом, пока ты убираешь»</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Ребенок не делает уроки</td>
+                                        <td>Сделать уроки за него</td>
+                                        <td>«Давай разберем, что именно сложно. Я помогу понять, но делать будешь сам»</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Коллега не справляется с проектом</td>
+                                        <td>Взять его работу на себя</td>
+                                        <td>«Какая часть самая сложная? Может, обсудим, как можно упростить?»</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Родственник в финансовых проблемах</td>
+                                        <td>Дать денег без условий</td>
+                                        <td>«Хочешь, помогу составить бюджет? Или поискать варианты дополнительного заработка?»</td>
+                                    </tr>
+                                </table>
+                                
+                                <div class="check-question">
+                                    <h4>Вопросы для проверки:</h4>
+                                    <p>1. В чем ключевое отличие спасателя от помощника?<br>
+                                    2. К чему в итоге приводит непрошеное спасательство?<br>
+                                    3. Как понять, что вы попали в роль Спасателя? (Маркер: вы работаете больше, чем сам клиент).</p>
+                                </div>
+                                
+                                <div class="practical-tip">
+                                    <h4>📌 Самопроверка:</h4>
+                                    <p>Вспомните последний раз, когда вы помогали. Задайте себе вопросы: 1) Меня просили? 2) Я давал выбор? 3) Я верю, что человек справится сам? Если на все «да» — это помощь. Если есть «нет» — возможно, спасение.</p>
+                                </div>
+                            </div>`
+                        },
+                        quote: {
+                            title: "Цитата",
+                            content: `<div class="quote">«Дайте человеку удочку, а не рыбу»</div>
+                            <p class="author">— Китайская пословица</p>`
+                        },
+                        assignment: {
+                            title: "Задание",
+                            content: `<div class="assignment">
+                                <h4>Определите, где помощь, а где спасение</h4>
+                                <p>Прочитайте ситуации и определите, где проявляется здоровая помощь, а где — нездоровое спасение:</p>
+                                <p>1. «Дай, я сам поговорю с твоим начальником о повышении.»</p>
+                                <p>2. «Хочешь, вместе подготовимся к разговору с начальником?»</p>
+                                <p>3. «Я знаю лучше, что тебе делать. Слушай меня.»</p>
+                                <textarea id="answer4_1" placeholder="Напишите ваш анализ здесь..."></textarea>
+                                <button class="btn-primary" onclick="checkAssignment('4.1')">Проверить задание</button>
+                                
+                                <div class="additional-task">
+                                    <h5>Дополнительное задание (анализ ролей):</h5>
+                                    <p>Проанализируйте эти ситуации с точки зрения треугольника Карпмана:</p>
+                                    <p>1. Мама делает уроки за ребенка, потому что «он устал».</p>
+                                    <textarea id="extra4_1a" placeholder="Кто какую роль играет?"></textarea>
+                                    <p>2. Мужчина постоянно решает проблемы подруги, которая вечно попадает в неприятности.</p>
+                                    <textarea id="extra4_1b" placeholder="Кто какую роль играет?"></textarea>
+                                    <p>3. Женщина жалуется, что все пользуются ее добротой, но продолжает всем помогать.</p>
+                                    <textarea id="extra4_1c" placeholder="Кто какую роль играет?"></textarea>
+                                    <button class="btn-secondary" onclick="checkExtraAssignment('4.1')">Проверить анализ</button>
+                                </div>
+                                
+                                <div id="feedback4_1" class="feedback"></div>
+                            </div>`,
+                            check: function(answer) {
+                                const helpKeywords = ["помощь", "выбор", "самостоятельность", "вместе", "поддержка"];
+                                const rescueKeywords = ["спасение", "замен", "контроль", "сам сделаю", "должен слушать"];
+                                
+                                let helpCount = 0;
+                                let rescueCount = 0;
+                                
+                                helpKeywords.forEach(word => {
+                                    if (answer.toLowerCase().includes(word)) helpCount++;
+                                });
+                                
+                                rescueKeywords.forEach(word => {
+                                    if (answer.toLowerCase().includes(word)) rescueCount++;
+                                });
+                                
+                                if (helpCount >= 2 || rescueCount >= 2) {
+                                    return {correct: true, message: "Хорошо! Вы различаете помощь и спасение. Помощь дает выбор, спасение — лишает его."};
+                                } else {
+                                    return {correct: false, message: "Попробуйте четче разделить: помощь = поддержка самостоятельности, спасение = лишение выбора."};
+                                }
+                            }
+                        }
+                    }
                 },
                 {
                     id: "4.2",
                     title: "Формулировка экологичных предложений",
-                    content: `
-<div class="theory-block">
-    <picture>
-        <source media="(max-width: 1000px)" srcset="https://i.postimg.cc/HW2N8CgP/production-images-e970a623-2c2c-(1).png">
-        <img src="https://i.postimg.cc/GpyN48L6/production-images-e970a623-2c2c.png" alt="Экологичные предложения" class="responsive-image">
-    </picture>
-
-    <h3>Теория</h3>
-    <p><strong>Расширенная теория:</strong> Экологичность общения — это уважение к субъектности (воле) другого.</p>
-    <ul>
-        <li><strong>Вопрос-разрешение:</strong> Прежде чем поддержать или дать совет, спросите: «Тебе сейчас нужно решение или просто выговориться?».</li>
-        <li><strong>Я-сообщения:</strong> Вместо директивного «Тебе надо поспать», используйте мягкое предложение: «Я переживаю за твое состояние, может быть, стоит отдохнуть?».</li>
-        <li><strong>Принцип выбора:</strong> Всегда оставляйте человеку право отказаться от помощи без чувства вины.</li>
-    </ul>
-    
-    <div class="definition-box">
-        <h4><span class="term">Термин:</span> Я-сообщения</h4>
-        <p>Способ говорить о своих чувствах и потребностях без обвинений. Формула: «Я чувствую... когда ты... потому что... я хотел бы...».</p>
-    </div>
-    
-    <div class="source-box">
-        <h4>📚 Источник</h4>
-        <p><strong>Психология помогающего поведения</strong></p>
-        <p>Исследования показывают, что помощь, предлагаемая с уважением к автономии, более эффективна и способствует реальным изменениям, чем спасение.</p>
-    </div>
-    
-    <h3>Практика: как хорошо vs как плохо</h3>
-    <table class="comparison-table">
-        <thead>
-            <tr>
-                <th>Как хорошо делать</th>
-                <th>Как плохо делать</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>«Хочешь, я помогу с этим? Как именно?»</td>
-                <td>«Я сделаю это за тебя»</td>
-            </tr>
-            <tr>
-                <td>«Я замечаю, что ты выглядишь уставшим. Может, отдохнешь?»</td>
-                <td>«Ты должен больше отдыхать»</td>
-            </tr>
-            <tr>
-                <td>«У меня есть идея, хочешь послушать?»</td>
-                <td>«Просто сделай так...»</td>
-            </tr>
-            <tr>
-                <td>«Сейчас у меня нет ресурса помочь, но верю, что ты справишься»</td>
-                <td>«Сам разбирайся со своими проблемами»</td>
-            </tr>
-            <tr>
-                <td>«Как ты смотришь на визит к врачу?»</td>
-                <td>«Ты должен пойти к врачу»</td>
-            </tr>
-        </tbody>
-    </table>
-    
-    <p><strong>Формулы экологичных предложений:</strong></p>
-    <table class="eco-formulas">
-        <tr>
-            <th>Ситуация</th>
-            <th>Нездоровая формулировка</th>
-            <th>Экологичная формулировка</th>
-        </tr>
-        <tr>
-            <td>Предложение помощи</td>
-            <td>«Я сделаю это за тебя»</td>
-            <td>«Хочешь, я помогу с этим? Если да, то как именно я могу быть полезен?»</td>
-        </tr>
-        <tr>
-            <td>Выражение заботы</td>
-            <td>«Ты должен больше отдыхать»</td>
-            <td>«Я замечаю, что ты выглядишь уставшим. Может, стоит немного отдохнуть?»</td>
-        </tr>
-        <tr>
-            <td>Предложение решения</td>
-            <td>«Просто сделай так...»</td>
-            <td>«У меня есть идея, хочешь послушать? Можешь использовать, если тебе откликнется»</td>
-        </tr>
-        <tr>
-            <td>Отказ в помощи</td>
-            <td>«Сам разбирайся со своими проблемами»</td>
-            <td>«Сейчас у меня нет ресурса помочь, но я верю, что ты справишься. Если будут сложности, можем обсудить позже»</td>
-        </tr>
-    </table>
-    
-    <div class="practical-tip">
-        <h4>📌 Практика на неделю:</h4>
-        <p>На этой неделе перед тем, как предложить помощь, всегда сначала спрашивайте: «Чем я могу быть полезен?» или «Хочешь, я помогу?» Запишите, как меняются реакции людей.</p>
-    </div>
-    
-    <h3>Задания для проверки знаний</h3>
-    
-    <div class="assignment">
-        <h4>Задание 1: Переформулируйте фразы спасения в фразы помощи</h4>
-        <p>1. «Не волнуйся, я сам поговорю с твоим начальником»</p>
-        <p>2. «Я знаю, что для тебя лучше, сделай так, как я говорю»</p>
-        <p>3. «Дай я все сделаю за тебя, ты все равно не справишься»</p>
-        <textarea id="answer4_2" placeholder="Напишите ваши варианты здесь..."></textarea>
-        <button class="btn-primary" onclick="checkAssignment('4.2')">Проверить задание</button>
-        <div id="feedback4_2" class="feedback"></div>
-    </div>
-    
-    <div class="quiz">
-        <h4>Задание 2: Выберите правильный ответ</h4>
-        <p><strong>Что такое я-сообщения?</strong></p>
-        
-        <div class="quiz-options">
-            <div class="option">
-                <input type="radio" id="q1_4_2_option1" name="q1_4_2" value="a">
-                <label for="q1_4_2_option1">Обвинения в форме «ты»</label>
-            </div>
-            <div class="option">
-                <input type="radio" id="q1_4_2_option2" name="q1_4_2" value="b">
-                <label for="q1_4_2_option2">Говорение о своих чувствах без обвинений</label>
-            </div>
-            <div class="option">
-                <input type="radio" id="q1_4_2_option3" name="q1_4_2" value="c">
-                <label for="q1_4_2_option3">Критика поведения других</label>
-            </div>
-        </div>
-        
-        <p><strong>Какие формулировки являются экологичными? (выберите все подходящие)</strong></p>
-        
-        <div class="quiz-options">
-            <div class="option">
-                <input type="checkbox" id="q2_4_2_option1" name="q2_4_2" value="a">
-                <label for="q2_4_2_option1">«Хочешь, я помогу?»</label>
-            </div>
-            <div class="option">
-                <input type="checkbox" id="q2_4_2_option2" name="q2_4_2" value="b">
-                <label for="q2_4_2_option2">«Я сделаю это за тебя»</label>
-            </div>
-            <div class="option">
-                <input type="checkbox" id="q2_4_2_option3" name="q2_4_2" value="c">
-                <label for="q2_4_2_option3">«Как ты смотришь на...?»</label>
-            </div>
-            <div class="option">
-                <input type="checkbox" id="q2_4_2_option4" name="q2_4_2" value="d">
-                <label for="q2_4_2_option4">«Ты должен...»</label>
-            </div>
-        </div>
-        
-        <p><strong>Почему важно спрашивать «Чем я могу быть полезен?»</strong></p>
-        
-        <div class="quiz-options">
-            <div class="option">
-                <input type="radio" id="q3_4_2_option1" name="q3_4_2" value="a">
-                <label for="q3_4_2_option1">Чтобы быстрее закончить разговор</label>
-            </div>
-            <div class="option">
-                <input type="radio" id="q3_4_2_option2" name="q3_4_2" value="b">
-                <label for="q3_4_2_option2">Чтобы сохранить контроль и выбор за человеком</label>
-            </div>
-            <div class="option">
-                <input type="radio" id="q3_4_2_option3" name="q3_4_2" value="c">
-                <label for="q3_4_2_option3">Чтобы показать свое превосходство</label>
-            </div>
-        </div>
-        
-        <button class="btn-secondary" onclick="checkQuiz('4.2')">Проверить тест</button>
-        <div id="quiz-feedback4_2" class="feedback"></div>
-    </div>
-    
-    <div class="additional-task">
-        <h5>Дополнительное задание (практика я-сообщений):</h5>
-        <p>Переформулируйте эти фразы в я-сообщения:</p>
-        <p>1. «Ты никогда меня не слушаешь!» →</p>
-        <textarea id="extra4_2a" placeholder="Я-сообщение..."></textarea>
-        <p>2. «Ты опять все испортил» →</p>
-        <textarea id="extra4_2b" placeholder="Я-сообщение..."></textarea>
-        <p>3. «Перестань ныть и действуй» →</p>
-        <textarea id="extra4_2c" placeholder="Я-сообщение..."></textarea>
-        <button class="btn-secondary" onclick="checkExtraAssignment('4.2')">Проверить я-сообщения</button>
-    </div>
-</div>
+                    tabs: {
+                        theory: {
+                            title: "Теория",
+                            content: `<div class="theory-block">
+<picture>
+    <!-- Для мобильных -->
+    <source 
+        media="(max-width: 1000px)" 
+        srcset="https://i.postimg.cc/HW2N8CgP/production-images-e970a623-2c2c-(1).png"
+    >
+    <!-- Для десктопов и фолбэк -->
+    <img 
+        src="https://i.postimg.cc/GpyN48L6/production-images-e970a623-2c2c.png" 
+        alt="Эмпатия и понимание"
+        class="responsive-image"
+    >
+</picture>
 
 <style>
     .responsive-image {
@@ -3769,6 +2314,7 @@ const courseData = {
         display: block;
     }
     
+    /* Для мобильных устройств */
     @media (max-width: 1000px) {
         .responsive-image {
             width: 80% !important;
@@ -3777,201 +2323,194 @@ const courseData = {
             margin-right: auto;
         }
     }
-    
-    .eco-formulas {
-        width: 100%;
-        border-collapse: collapse;
-        margin: 20px 0;
-        background: var(--card-bg);
-        border-radius: 10px;
-        overflow: hidden;
-        font-size: 0.9em;
-    }
-    
-    .eco-formulas th {
-        background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
-        color: white;
-        padding: 12px;
-        text-align: left;
-    }
-    
-    .eco-formulas td {
-        padding: 12px;
-        border-bottom: 1px solid rgba(255,255,255,0.1);
-        vertical-align: top;
-    }
-    
-    .eco-formulas tr:hover {
-        background: rgba(52, 152, 219, 0.05);
-    }
-</style>`
+</style>
+                                <p><strong>Расширенная теория:</strong> Экологичность общения — это уважение к субъектности (воле) другого.</p>
+                                <ul>
+                                    <li><strong>Вопрос-разрешение:</strong> Прежде чем поддержать или дать совет, спросите: «Тебе сейчас нужно решение или просто выговориться?».</li>
+                                    <li><strong>Я-сообщения:</strong> Вместо директивного «Тебе надо поспать», используйте мягкое предложение: «Я переживаю за твое состояние, может быть, стоит отдохнуть?».</li>
+                                    <li><strong>Принцип выбора:</strong> Всегда оставляйте человеку право отказаться от помощи без чувства вины.</li>
+                                </ul>
+                                
+                                <div class="definition-box">
+                                    <h4><span class="term">Термин:</span> Я-сообщения</h4>
+                                    <p>Способ говорить о своих чувствах и потребностях без обвинений. Формула: «Я чувствую... когда ты... потому что... я хотел бы...».</p>
+                                </div>
+                                
+                                <p><strong>Как правильно предлагать помощь:</strong></p>
+                                <ul>
+                                    <li><strong>Вопросительная форма:</strong> «Хочешь, я помогу с...?» вместо «Я сделаю...»</li>
+                                    <li><strong>Конкретные предложения:</strong> «Могу помочь с поиском терапевта» вместо «Я все улажу»</li>
+                                    <li><strong>Уважение отказа:</strong> «Хорошо, если передумаешь — я рядом»</li>
+                                    <li><strong>Совместное планирование:</strong> «Давай подумаем, какие есть варианты»</li>
+                                    <li><strong>Избегайте:</strong> Ультиматумов, манипуляций, чувства вины.</li>
+                                </ul>
+                                
+                                <p><strong>Формулы экологичных предложений:</strong></p>
+                                <table class="eco-formulas">
+                                    <tr>
+                                        <th>Ситуация</th>
+                                        <th>Нездоровая формулировка</th>
+                                        <th>Экологичная формулировка</th>
+                                    </tr>
+                                    <tr>
+                                        <td>Предложение помощи</td>
+                                        <td>«Я сделаю это за тебя»</td>
+                                        <td>«Хочешь, я помогу с этим? Если да, то как именно я могу быть полезен?»</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Выражение заботы</td>
+                                        <td>«Ты должен больше отдыхать»</td>
+                                        <td>«Я замечаю, что ты выглядишь уставшим. Может, стоит немного отдохнуть?»</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Предложение решения</td>
+                                        <td>«Просто сделай так...»</td>
+                                        <td>«У меня есть идея, хочешь послушать? Можешь использовать, если тебе откликнется»</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Отказ в помощи</td>
+                                        <td>«Сам разбирайся со своими проблемами»</td>
+                                        <td>«Сейчас у меня нет ресурса помочь, но я верю, что ты справишься. Если будут сложности, можем обсудить позже»</td>
+                                    </tr>
+                                </table>
+                                
+                                <p><strong>Магия вопроса «Чем я могу быть полезен?»:</strong></p>
+                                <ul>
+                                    <li>Дает человеку контроль: он решает, какая помощь нужна</li>
+                                    <li>Позволяет оказать именно ту помощь, которая нужна</li>
+                                    <li>Избегает непрошеных советов и действий</li>
+                                    <li>Показывает уважение к границам и компетенции</li>
+                                    <li>Часто человек отвечает: «Просто побудь со мной» — и это самая ценная помощь</li>
+                                </ul>
+                                
+                                <p><strong>Как сделать предложение, которое легко принять или отклонить:</strong></p>
+                                <ol>
+                                    <li>Начинайте с вопроса: «Хочешь...?», «Интересно ли тебе...?»</li>
+                                    <li>Давайте выбор: «У меня есть два варианта, какой тебе ближе?»</li>
+                                    <li>Оставляйте «дверь открытой»: «Если сейчас не готов, можешь вернуться к этому позже»</li>
+                                    <li>Снижайте важность: «Это просто идея, можешь не использовать»</li>
+                                    <li>Принимайте любой ответ: «Хорошо, понял» без давления</li>
+                                </ol>
+                                
+                                <p><strong>Ошибки в формулировках предложений:</strong></p>
+                                <ul>
+                                    <li><strong>Ультиматумы:</strong> «Или делаешь так, или я обижусь»</li>
+                                    <li><strong>Манипуляции:</strong> «Я же для тебя стараюсь, а ты...»</li>
+                                    <li><strong>Чувство вины:</strong> «Если бы ты меня любил, ты бы принял мою помощь»</li>
+                                    <li><strong>Обесценивание отказа:</strong> «Ну и зря, я же лучше знаю»</li>
+                                    <li><strong>Настойчивость:</strong> «Да ладно, прими уже помощь»</li>
+                                </ul>
+                                
+                                <p><strong>Я-сообщения в предложениях помощи:</strong></p>
+                                <p>Формула: <strong>«Я чувствую X, когда происходит Y, потому что Z. Я хотел бы W»</strong></p>
+                                <p>Примеры:</p>
+                                <ul>
+                                    <li>«Я волнуюсь, когда вижу, как ты перерабатываешь, потому что забочусь о твоем здоровье. Хотел бы предложить тебе помощь с распределением задач.»</li>
+                                    <li>«Я чувствую беспомощность, когда ты рассказываешь о своих проблемах, потому что хочу поддержать тебя. Могу я чем-то помочь?»</li>
+                                </ul>
+                                
+                                <p><strong>Упражнения для развития навыка экологичных предложений:</strong></p>
+                                <ol>
+                                    <li>Трансформируйте директивы в предложения:
+                                        <ul>
+                                            <li>«Ты должен пойти к врачу» → «Я беспокоюсь о твоем здоровье. Как ты смотришь на визит к врачу?»</li>
+                                        </ul>
+                                    </li>
+                                    <li>Практикуйтесь с безопасными темами: «Как насчет чашки чая?» вместо «Иди пить чай»</li>
+                                    <li>Записывайте свои предложения и анализируйте их на экологичность</li>
+                                    <li>Игра «Только вопросы и предложения»: общайтесь только в этой форме</li>
+                                </ol>
+                                
+                                <div class="check-question">
+                                    <h4>Вопросы для проверки:</h4>
+                                    <p>1. Почему важно спрашивать, какой вид поддержки нужен?<br>
+                                    2. Как предложить помощь так, чтобы человеку было легко отказаться?<br>
+                                    3. Переформулируйте директиву «Иди к врачу» в экологичное предложение.</p>
+                                </div>
+                                
+                                <div class="practical-tip">
+                                    <h4>📌 Практика на неделю:</h4>
+                                    <p>На этой неделе перед тем, как предложить помощь, всегда сначала спрашивайте: «Чем я могу быть полезен?» или «Хочешь, я помогу?» Запишите, как меняются реакции людей.</p>
+                                </div>
+                            </div>`
+                        },
+                        source: {
+                            title: "Источник",
+                            content: `<div class="source">
+                                <p><strong>Психология помогающего поведения</strong></p>
+                                <p>Исследования показывают, что помощь, предлагаемая с уважением к автономии, более эффективна и способствует реальным изменениям, чем спасение.</p>
+                            </div>`
+                        },
+                        assignment: {
+                            title: "Задание",
+                            content: `<div class="assignment">
+                                <h4>Переформулируйте фразы спасения в фразы помощи</h4>
+                                <p>1. «Не волнуйся, я сам поговорю с твоим начальником»</p>
+                                <p>2. «Я знаю, что для тебя лучше, сделай так, как я говорю»</p>
+                                <p>3. «Дай я все сделаю за тебя, ты все равно не справишься»</p>
+                                <textarea id="answer4_2" placeholder="Напишите ваши варианты здесь..."></textarea>
+                                <button class="btn-primary" onclick="checkAssignment('4.2')">Проверить задание</button>
+                                
+                                <div class="additional-task">
+                                    <h5>Дополнительное задание (практика я-сообщений):</h5>
+                                    <p>Переформулируйте эти фразы в я-сообщения:</p>
+                                    <p>1. «Ты никогда меня не слушаешь!» →</p>
+                                    <textarea id="extra4_2a" placeholder="Я-сообщение..."></textarea>
+                                    <p>2. «Ты опять все испортил» →</p>
+                                    <textarea id="extra4_2b" placeholder="Я-сообщение..."></textarea>
+                                    <p>3. «Перестань ныть и действуй» →</p>
+                                    <textarea id="extra4_2c" placeholder="Я-сообщение..."></textarea>
+                                    <button class="btn-secondary" onclick="checkExtraAssignment('4.2')">Проверить я-сообщения</button>
+                                </div>
+                                
+                                <div id="feedback4_2" class="feedback"></div>
+                            </div>`,
+                            check: function(answer) {
+                                const helpIndicators = ["хочешь", "может быть", "предлагаю", "давай подумаем", "если хочешь", "как ты считаешь"];
+                                const rescueIndicators = ["я сделаю", "ты должен", "надо", "обязательно", "лучше знаю"];
+                                
+                                let helpCount = 0;
+                                let rescueCount = 0;
+                                
+                                helpIndicators.forEach(phrase => {
+                                    if (answer.toLowerCase().includes(phrase)) helpCount++;
+                                });
+                                
+                                rescueIndicators.forEach(phrase => {
+                                    if (answer.toLowerCase().includes(phrase)) rescueCount++;
+                                });
+                                
+                                if (helpCount >= 2 && rescueCount === 0) {
+                                    return {correct: true, message: "Прекрасно! Вы правильно переформулировали спасение в помощь, сохраняя выбор за человеком."};
+                                } else if (helpCount >= 1) {
+                                    return {correct: true, message: "Хорошо, но есть еще место для улучшения. Используйте больше вопросительных форм и предложений выбора."};
+                                } else {
+                                    return {correct: false, message: "Ответ все еще содержит элементы спасения. Попробуйте начать с 'Хочешь...' или 'Может быть...'."};
+                                }
+                            }
+                        }
+                    }
                 },
                 {
                     id: "4.3",
                     title: "Баланс между заботой и автономией",
-                    content: `
-<div class="theory-block">
-    <picture>
-        <source media="(max-width: 1000px)" srcset="https://i.postimg.cc/25gbC5Tv/9bbfb80f-9429-4d20-896c-dbd6c199-(1).jpg">
-        <img src="https://i.postimg.cc/43yVJqGk/9bbfb80f-9429-4d20-896c-dbd6c199.jpg" alt="Баланс заботы и автономии" class="responsive-image">
-    </picture>
-
-    <div class="quote-box">
-        <div class="quote">«Можно вытащить человека из воды, но нельзя заставить его плавать»</div>
-        <p class="author">— Неизвестный автор</p>
-    </div>
-
-    <h3>Теория</h3>
-    <p><strong>Расширенная теория:</strong> Гиперопека — враг автономии.</p>
-    <ul>
-        <li><strong>Зона ближайшего развития:</strong> Поддерживать нужно там, где человек почти может сам, но ему чуть-чуть трудно. Делать то, что он может сам — значит инвалидизировать его.</li>
-        <li><strong>Уважение к «Нет»:</strong> Если человек отказывается от помощи, это проявление его силы, а не глупости. Принять отказ — высшая форма уважения.</li>
-    </ul>
-    
-    <div class="definition-box">
-        <h4><span class="term">Термин:</span> Зона ближайшего развития</h4>
-        <p>Концепция Выготского: задачи, которые человек может решить с помощью более опытного другого, но не может решить самостоятельно. Идеальное место для помощи.</p>
-    </div>
-    
-    <h3>Практика: как хорошо vs как плохо</h3>
-    <table class="comparison-table">
-        <thead>
-            <tr>
-                <th>Как хорошо делать</th>
-                <th>Как плохо делать</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>Спросить: «Тебе нужна поддержка?»</td>
-                <td>Навязать помощь, даже когда не просят</td>
-            </tr>
-            <tr>
-                <td>Уважать отказ: «Хорошо, если передумаешь — я рядом»</td>
-                <td>Обижаться или давить при отказе</td>
-            </tr>
-            <tr>
-                <td>Помогать в «зоне ближайшего развития»</td>
-                <td>Делать за человека то, что он может сам</td>
-            </tr>
-            <tr>
-                <td>Говорить о своих ограничениях: «Сейчас у меня мало сил»</td>
-                <td>Помогать в ущерб себе до выгорания</td>
-            </tr>
-            <tr>
-                <td>Направлять к специалистам при серьезных проблемах</td>
-                <td>Брать на себя роль терапевта</td>
-            </tr>
-        </tbody>
-    </table>
-    
-    <p><strong>Как найти баланс: не бросить, но и не душить заботой:</strong></p>
-    <table class="balance-table">
-        <tr>
-            <th>Перекос в сторону</th>
-            <th>Симптомы</th>
-            <th>Как исправить</th>
-        </tr>
-        <tr>
-            <td>Чрезмерная забота (гиперопека)</td>
-            <td>Делаете за других то, что они могут сами<br>Тревожитесь больше, чем они<br>Обижаетесь, если помощь не принимают</td>
-            <td>Спросить: «Это в твоей зоне компетенции?»<br>Сделать паузу перед помощью<br>Уважать отказ</td>
-        </tr>
-        <tr>
-            <td>Чрезмерная дистанция (холодность)</td>
-            <td>Не предлагаете помощь, даже когда явно нужна<br>Говорите «сам разбирайся»<br>Игнорируете сигналы о помощи</td>
-            <td>Спросить: «Тебе нужна поддержка?»<br>Предложить конкретную помощь<br>Быть рядом, даже если не можете помочь</td>
-        </tr>
-    </table>
-    
-    <div class="practical-tip">
-        <h4>📌 Тест на баланс:</h4>
-        <p>Спросите себя: 1) Я помогаю по запросу или навязываюсь? 2) После помощи я чувствую себя истощенным или наполненным? 3) Человек становится самостоятельнее или зависимее от моей помощи? Если больше ответов из первой части — баланс есть.</p>
-    </div>
-    
-    <h3>Задания для проверки знаний</h3>
-    
-    <div class="assignment">
-        <h4>Задание 1: Ситуация установления границ</h4>
-        <p>Ваш друг постоянно звонит вам среди ночи в слезах, и это длится уже месяц. Вы чувствуете выгорание. Как вы установите границы, сохраняя заботу?</p>
-        <textarea id="answer4_3" placeholder="Напишите ваш вариант здесь..."></textarea>
-        <button class="btn-primary" onclick="checkAssignment('4.3')">Проверить задание</button>
-        <div id="feedback4_3" class="feedback"></div>
-    </div>
-    
-    <div class="quiz">
-        <h4>Задание 2: Выберите правильный ответ</h4>
-        <p><strong>Что такое зона ближайшего развития?</strong></p>
-        
-        <div class="quiz-options">
-            <div class="option">
-                <input type="radio" id="q1_4_3_option1" name="q1_4_3" value="a">
-                <label for="q1_4_3_option1">Место, где человек отдыхает</label>
-            </div>
-            <div class="option">
-                <input type="radio" id="q1_4_3_option2" name="q1_4_3" value="b">
-                <label for="q1_4_3_option2">Задачи, которые человек может решить с помощью</label>
-            </div>
-            <div class="option">
-                <input type="radio" id="q1_4_3_option3" name="q1_4_3" value="c">
-                <label for="q1_4_3_option3">Территория, где запрещено помогать</label>
-            </div>
-        </div>
-        
-        <p><strong>Почему важно уважать отказ от помощи? (выберите все подходящие)</strong></p>
-        
-        <div class="quiz-options">
-            <div class="option">
-                <input type="checkbox" id="q2_4_3_option1" name="q2_4_3" value="a">
-                <label for="q2_4_3_option1">Чтобы сохранить контроль и выбор за человеком</label>
-            </div>
-            <div class="option">
-                <input type="checkbox" id="q2_4_3_option2" name="q2_4_3" value="b">
-                <label for="q2_4_3_option2">Отказ может быть проявлением силы</label>
-            </div>
-            <div class="option">
-                <input type="checkbox" id="q2_4_3_option3" name="q2_4_3" value="c">
-                <label for="q2_4_3_option3">Чтобы показать свое превосходство</label>
-            </div>
-            <div class="option">
-                <input type="checkbox" id="q2_4_3_option4" name="q2_4_3" value="d">
-                <label for="q2_4_3_option4">Чтобы не тратить свое время</label>
-            </div>
-        </div>
-        
-        <p><strong>В треугольнике Карпмана спасатель со временем часто становится:</strong></p>
-        
-        <div class="quiz-options">
-            <div class="option">
-                <input type="radio" id="q3_4_3_option1" name="q3_4_3" value="a">
-                <label for="q3_4_3_option1">Еще большим спасателем</label>
-            </div>
-            <div class="option">
-                <input type="radio" id="q3_4_3_option2" name="q3_4_3" value="b">
-                <label for="q3_4_3_option2">Жертвой или преследователем</label>
-            </div>
-            <div class="option">
-                <input type="radio" id="q3_4_3_option3" name="q3_4_3" value="c">
-                <label for="q3_4_3_option3">Нейтральным наблюдателем</label>
-            </div>
-        </div>
-        
-        <button class="btn-secondary" onclick="checkQuiz('4.3')">Проверить тест</button>
-        <div id="quiz-feedback4_3" class="feedback"></div>
-    </div>
-    
-    <div class="additional-task">
-        <h5>Дополнительное задание (практика баланса):</h5>
-        <p>Проанализируйте эти ситуации и предложите сбалансированный подход:</p>
-        <p>1. Ваш взрослый сын постоянно просит денег вместо того, чтобы искать работу.</p>
-        <textarea id="extra4_3a" placeholder="Ваш сбалансированный подход..."></textarea>
-        <p>2. Подруга в депрессии хочет, чтобы вы решали все за нее.</p>
-        <textarea id="extra4_3b" placeholder="Ваш сбалансированный подход..."></textarea>
-        <p>3. Коллега постоянно перекладывает на вас свою работу.</p>
-        <textarea id="extra4_3c" placeholder="Ваш сбалансированный подход..."></textarea>
-        <button class="btn-secondary" onclick="checkExtraAssignment('4.3')">Проверить подходы</button>
-    </div>
-</div>
+                    tabs: {
+                        theory: {
+                            title: "Теория",
+                            content: `<div class="theory-block">
+<picture>
+    <!-- Для мобильных -->
+    <source 
+        media="(max-width: 1000px)" 
+        srcset="https://i.postimg.cc/25gbC5Tv/9bbfb80f-9429-4d20-896c-dbd6c199-(1).jpg"
+    >
+    <!-- Для десктопов и фолбэк -->
+    <img 
+        src="https://i.postimg.cc/43yVJqGk/9bbfb80f-9429-4d20-896c-dbd6c199.jpg" 
+        alt="Эмпатия и понимание"
+        class="responsive-image"
+    >
+</picture>
 
 <style>
     .responsive-image {
@@ -3983,6 +2522,7 @@ const courseData = {
         display: block;
     }
     
+    /* Для мобильных устройств */
     @media (max-width: 1000px) {
         .responsive-image {
             width: 80% !important;
@@ -3991,34 +2531,160 @@ const courseData = {
             margin-right: auto;
         }
     }
-    
-    .balance-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin: 20px 0;
-        background: var(--card-bg);
-        border-radius: 10px;
-        overflow: hidden;
-        font-size: 0.9em;
-    }
-    
-    .balance-table th {
-        background: linear-gradient(135deg, #f39c12 0%, #d35400 100%);
-        color: white;
-        padding: 12px;
-        text-align: left;
-    }
-    
-    .balance-table td {
-        padding: 12px;
-        border-bottom: 1px solid rgba(255,255,255,0.1);
-        vertical-align: top;
-    }
-    
-    .balance-table tr:hover {
-        background: rgba(243, 156, 18, 0.05);
-    }
-</style>`
+</style>
+                                <p><strong>Расширенная теория:</strong> Гиперопека — враг автономии.</p>
+                                <ul>
+                                    <li><strong>Зона ближайшего развития:</strong> Поддерживать нужно там, где человек почти может сам, но ему чуть-чуть трудно. Делать то, что он может сам — значит инвалидизировать его.</li>
+                                    <li><strong>Уважение к «Нет»:</strong> Если человек отказывается от помощи, это проявление его силы, а не глупости. Принять отказ — высшая форма уважения.</li>
+                                </ul>
+                                
+                                <div class="definition-box">
+                                    <h4><span class="term">Термин:</span> Зона ближайшего развития</h4>
+                                    <p>Концепция Выготского: задачи, которые человек может решить с помощью более опытного другого, но не может решить самостоятельно. Идеальное место для помощи.</p>
+                                </div>
+                                
+                                <p><strong>Здоровые границы в поддержке:</strong></p>
+                                <ul>
+                                    <li><strong>Ваши ресурсы важны:</strong> Вы не можете помочь всем всегда.</li>
+                                    <li><strong>«Нет» — это нормально:</strong> Отказ от помощи ≠ отказ от человека.</li>
+                                    <li><strong>Распределение ответственности:</strong> Вы не отвечаете за счастье другого.</li>
+                                    <li><strong>Своевременность:</strong> Помощь уместна, когда человек готов ее принять.</li>
+                                    <li><strong>Профессиональные границы:</strong> Знать, когда направить к специалисту.</li>
+                                </ul>
+                                
+                                <p><strong>Как найти баланс: не бросить, но и не душить заботой:</strong></p>
+                                <table class="balance-table">
+                                    <tr>
+                                        <th>Перекос в сторону</th>
+                                        <th>Симптомы</th>
+                                        <th>Как исправить</th>
+                                    </tr>
+                                    <tr>
+                                        <td>Чрезмерная забота (гиперопека)</td>
+                                        <td>Делаете за других то, что они могут сами<br>Тревожитесь больше, чем они<br>Обижаетесь, если помощь не принимают</td>
+                                        <td>Спросить: «Это в твоей зоне компетенции?»<br>Сделать паузу перед помощью<br>Уважать отказ</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Чрезмерная дистанция (холодность)</td>
+                                        <td>Не предлагаете помощь, даже когда явно нужна<br>Говорите «сам разбирайся»<br>Игнорируете сигналы о помощи</td>
+                                        <td>Спросить: «Тебе нужна поддержка?»<br>Предложить конкретную помощь<br>Быть рядом, даже если не можете помочь</td>
+                                    </tr>
+                                </table>
+                                
+                                <p><strong>Признаки здорового баланса:</strong></p>
+                                <ul>
+                                    <li>Вы предлагаете помощь, но не настаиваете</li>
+                                    <li>Вы уважаете отказ без обиды</li>
+                                    <li>Вы не чувствуете себя ответственным за решение чужих проблем</li>
+                                    <li>Вы можете сказать «нет», когда у вас нет ресурсов</li>
+                                    <li>Вы верите, что другой способен справиться</li>
+                                    <li>Ваша помощь не истощает вас</li>
+                                    <li>Отношения становятся лучше, а не хуже, от вашей помощи</li>
+                                </ul>
+                                
+                                <p><strong>Как устанавливать границы в помощи:</strong></p>
+                                <ol>
+                                    <li><strong>Определите свои ресурсы:</strong> Время, энергию, эмоциональные силы</li>
+                                    <li><strong>Спрашивайте, прежде чем помогать:</strong> «Хочешь, я помогу?»</li>
+                                    <li><strong>Будьте конкретны:</strong> «Могу помочь сегодня вечером 2 часа» вместо «Я помогу»</li>
+                                    <li><strong>Говорите о своих ограничениях:</strong> «Сейчас у меня мало сил, но могу...»</li>
+                                    <li><strong>Направляйте к специалистам:</strong> «Я не эксперт в этом, но могу помочь найти того, кто разбирается»</li>
+                                    <li><strong>Помните о самопомощи:</strong> Вы не можете помочь другим, если сами на нуле</li>
+                                </ol>
+                                
+                                <p><strong>Особые ситуации и баланс в них:</strong></p>
+                                <ul>
+                                    <li><strong>С детьми:</strong> Помогать, но позволять делать самому то, что по возрасту</li>
+                                    <li><strong>С пожилыми родителями:</strong> Уважать их автономию, даже если беспокоитесь</li>
+                                    <li><strong>С друзьями в кризисе:</strong> Быть рядом, но не брать на себя их жизнь</li>
+                                    <li><strong>С коллегами:</strong> Помогать в рамках рабочих обязанностей</li>
+                                    <li><strong>С партнером:</strong> Поддерживать, но не решать проблемы за него</li>
+                                </ul>
+                                
+                                <p><strong>Как реагировать на отказ от помощи:</strong></p>
+                                <ul>
+                                    <li>Не принимать на свой счет: отказ от помощи ≠ отказ от вас</li>
+                                    <li>Сказать: «Хорошо, я уважаю твое решение»</li>
+                                    <li>Оставить «дверь открытой»: «Если передумаешь, я здесь»</li>
+                                    <li>Не пытаться доказать, что ваша помощь нужна</li>
+                                    <li>Проверить свои мотивы: почему вам так важно помочь?</li>
+                                    <li>Помнить: иногда людям нужно справиться самим, чтобы почувствовать свою силу</li>
+                                </ul>
+                                
+                                <p><strong>Упражнения для развития баланса:</strong></p>
+                                <ol>
+                                    <li><strong>Упражнение «Пауза»:</strong> Когда хотите помочь, подождите 10 минут прежде чем предложить</li>
+                                    <li><strong>Упражнение «Вопрос вместо действия»:</strong> Всегда сначала спрашивать, а не делать</li>
+                                    <li><strong>Упражнение «Мои ресурсы»:</strong> Вести журнал своих ресурсов и решать, кому и сколько можете дать</li>
+                                    <li><strong>Упражнение «Уважение отказа»:</strong> Практиковаться спокойно принимать «нет»</li>
+                                    <li><strong>Упражнение «Самопомощь прежде»:</strong> Перед тем как помочь другому, сделать что-то для себя</li>
+                                </ol>
+                                
+                                <div class="check-question">
+                                    <h4>Вопросы для проверки:</h4>
+                                    <p>1. Что такое инвалидизация через помощь?<br>
+                                    2. Почему принятие отказа — это тоже форма поддержки?<br>
+                                    3. Как определить границы, где помощь становится вредной?</p>
+                                </div>
+                                
+                                <div class="practical-tip">
+                                    <h4>📌 Тест на баланс:</h4>
+                                    <p>Спросите себя: 1) Я помогаю по запросу или навязываюсь? 2) После помощи я чувствую себя истощенным или наполненным? 3) Человек становится самостоятельнее или зависимее от моей помощи? Если больше ответов из первой части — баланс есть.</p>
+                                </div>
+                            </div>`
+                        },
+                        quote: {
+                            title: "Цитата",
+                            content: `<div class="quote">«Можно вытащить человека из воды, но нельзя заставить его плавать»</div>
+                            <p class="author">— Неизвестный автор</p>`
+                        },
+                        assignment: {
+                            title: "Задание",
+                            content: `<div class="assignment">
+                                <h4>Ситуация установления границ</h4>
+                                <p>Ваш друг постоянно звонит вам среди ночи в слезах, и это длится уже месяц. Вы чувствуете выгорание. Как вы установите границы, сохраняя заботу?</p>
+                                <textarea id="answer4_3" placeholder="Напишите ваш вариант здесь..."></textarea>
+                                <button class="btn-primary" onclick="checkAssignment('4.3')">Проверить задание</button>
+                                
+                                <div class="additional-task">
+                                    <h5>Дополнительное задание (практика баланса):</h5>
+                                    <p>Проанализируйте эти ситуации и предложите сбалансированный подход:</p>
+                                    <p>1. Ваш взрослый сын постоянно просит денег вместо того, чтобы искать работу.</p>
+                                    <textarea id="extra4_3a" placeholder="Ваш сбалансированный подход..."></textarea>
+                                    <p>2. Подруга в депрессии хочет, чтобы вы решали все за нее.</p>
+                                    <textarea id="extra4_3b" placeholder="Ваш сбалансированный подход..."></textarea>
+                                    <p>3. Коллега постоянно перекладывает на вас свою работу.</p>
+                                    <textarea id="extra4_3c" placeholder="Ваш сбалансированный подход..."></textarea>
+                                    <button class="btn-secondary" onclick="checkExtraAssignment('4.3')">Проверить подходы</button>
+                                </div>
+                                
+                                <div id="feedback4_3" class="feedback"></div>
+                            </div>`,
+                            check: function(answer) {
+                                const boundaryIndicators = ["границ", "не могу", "до", "после", "время", "ресурс", "устал", "выгора"];
+                                const careIndicators = ["забочусь", "помочь", "поддержать", "предлагаю", "альтернатив", "специалист"];
+                                
+                                let boundaryCount = 0;
+                                let careCount = 0;
+                                
+                                boundaryIndicators.forEach(word => {
+                                    if (answer.toLowerCase().includes(word)) boundaryCount++;
+                                });
+                                
+                                careIndicators.forEach(word => {
+                                    if (answer.toLowerCase().includes(word)) careCount++;
+                                });
+                                
+                                if (boundaryCount >= 2 && careCount >= 1) {
+                                    return {correct: true, message: "Отлично! Вы установили границы, не теряя заботы о друге."};
+                                } else if (boundaryCount >= 1) {
+                                    return {correct: true, message: "Хорошо, но попробуйте сочетать установление границ с предложением альтернативной помощи."};
+                                } else {
+                                    return {correct: false, message: "Попробуйте четко обозначить свои границы (время, ресурсы), но предложить альтернативную поддержку."};
+                                }
+                            }
+                        }
+                    }
                 }
             ],
             test: {
@@ -4148,12 +2814,802 @@ const courseData = {
                     "F": "Менее 30 баллов (Не сдано)"
                 }
             }
+        },
+        {
+            id: 5,
+            title: "Модуль 5. Самоподдержка и границы",
+            description: "Забота о себе и установление границ",
+            completed: false,
+            submodules: [
+                {
+                    id: "5.1",
+                    title: "Эмпатическое выгорание и усталость от сострадания",
+                    tabs: {
+                        theory: {
+                            title: "Теория",
+                            content: `<div class="theory-block">
+<picture>
+    <!-- Для мобильных -->
+    <source 
+        media="(max-width: 1000px)" 
+        srcset="https://i.postimg.cc/qRmFN9hx/2009f6fb-650c-403c-8953-d29cb84d-(1).jpg"
+    >
+    <!-- Для десктопов и фолбэк -->
+    <img 
+        src="https://i.postimg.cc/jdBGQ08g/2009f6fb-650c-403c-8953-d29cb84d.jpg" 
+        alt="Эмпатия и понимание"
+        class="responsive-image"
+    >
+</picture>
+
+<style>
+    .responsive-image {
+        width: 30%;
+        max-width: 30%;
+        height: auto;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        display: block;
+    }
+    
+    /* Для мобильных устройств */
+    @media (max-width: 1000px) {
+        .responsive-image {
+            width: 80% !important;
+            max-width: 80% !important;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    }
+</style>
+                                <p><strong>Расширенная теория:</strong></p>
+                                <ul>
+                                    <li><strong>Усталость от сострадания (Compassion Fatigue):</strong> Состояние физического и эмоционального истощения, специфичное для тех, кто много помогает. Симптомы: цинизм, раздражительность, апатия, ночные кошмары.</li>
+                                    <li><strong>Вторичная травматизация:</strong> Вы слушаете так глубоко, что травма собеседника начинает влиять на вас (вы начинаете бояться того же, чего и он).</li>
+                                    <li><strong>Физиология:</strong> Постоянная активация системы заботы истощает дофамин и серотонин.</li>
+                                </ul>
+                                
+                                <div class="definition-box">
+                                    <h4><span class="term">Термин:</span> Усталость от сострадания</h4>
+                                    <p>Состояние истощения у помогающих людей, когда способность к эмпатии снижается из-за постоянного контакта с чужими страданиями.</p>
+                                </div>
+                                
+                                <div class="definition-box">
+                                    <h4><span class="term">Термин:</span> Вторичная травма</h4>
+                                    <p>Психологические последствия от выслушивания травматического опыта других людей. Могут включать симптомы, похожие на ПТСР.</p>
+                                </div>
+                                
+                                <p><strong>Основное определение:</strong> Эмоциональное выгорание у помогающих специалистов и эмпатов:</p>
+                                <ul>
+                                    <li><strong>Три компонента:</strong> 1) Эмоциональное истощение, 2) Деперсонализация (цинизм), 3) Снижение профессиональной эффективности.</li>
+                                    <li><strong>Ранние признаки:</strong> Хроническая усталость, раздражительность, проблемы со сном, частые болезни.</li>
+                                    <li><strong>Факторы риска:</strong> Отсутствие границ, перфекционизм, неумение говорить «нет», недостаток поддержки.</li>
+                                    <li><strong>Профилактика:</strong> Регулярный отдых, хобби, супервизия, реалистичные ожидания.</li>
+                                </ul>
+                                
+                                <p><strong>Стадии эмпатического выгорания:</strong></p>
+                                <ol>
+                                    <li><strong>Медовый месяц:</strong> Энтузиазм, много энергии, желание помочь всем</li>
+                                    <li><strong>Нехватка топлива:</strong> Усталость, проблемы со сном, снижение эффективности</li>
+                                    <li><strong>Хронические симптомы:</strong> Раздражительность, цинизм, частые болезни</li>
+                                    <li><strong>Кризис:</strong> Апатия, отчаяние, мысли об уходе из помогающей профессии</li>
+                                    <li><strong>Привыкание к пустоте:</strong> Эмоциональное онемение, работа на автомате</li>
+                                </ol>
+                                
+                                <p><strong>Разница между обычной усталостью и выгоранием:</strong></p>
+                                <table class="burnout-differences">
+                                    <tr>
+                                        <th>Обычная усталость</th>
+                                        <th>Эмпатическое выгорание</th>
+                                    </tr>
+                                    <tr>
+                                        <td>Проходит после отдыха</td>
+                                        <td>Не проходит даже после отпуска</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Физическое истощение</td>
+                                        <td>Эмоциональное и моральное истощение</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Хочется отдохнуть</td>
+                                        <td>Хочется все бросить</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Сохраняется интерес к работе</td>
+                                        <td>Появляется цинизм, раздражение на тех, кому помогаешь</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Временное состояние</td>
+                                        <td>Хроническое состояние</td>
+                                    </tr>
+                                </table>
+                                
+                                <p><strong>Группы риска:</strong></p>
+                                <ul>
+                                    <li>Психологи, психотерапевты, социальные работники</li>
+                                    <li>Врачи и медсестры, особенно в отделениях интенсивной терапии</li>
+                                    <li>Учителя и воспитатели</li>
+                                    <li>Родственники тяжелобольных</li>
+                                    <li>Люди с высокой эмпатией без профессиональных границ</li>
+                                    <li>Волонтеры в кризисных ситуациях</li>
+                                    <li>Менеджеры по работе с персоналом</li>
+                                </ul>
+                                
+                                <p><strong>Профилактика выгорания (что делать, чтобы не сгореть):</strong></p>
+                                <ol>
+                                    <li><strong>Регулярные перерывы:</strong> 5-10 минут каждый час</li>
+                                    <li><strong>Физическая активность:</strong> Спорт, прогулки, танцы</li>
+                                    <li><strong>Хобби не связанные с помощью:</strong> Творчество, спорт, рукоделие</li>
+                                    <li><strong>Супервизия и супервизорские группы:</strong> Обсуждение сложных случаев с коллегами</li>
+                                    <li><strong>Личная терапия:</strong> Работа со своими проблемами</li>
+                                    <li><strong>Реалистичные ожидания:</strong> «Я не могу помочь всем всегда»</li>
+                                    <li><strong>Умение говорить «нет»:</strong> Защита своих границ</li>
+                                    <li><strong>Баланс работы и личной жизни:</strong> Отключаться после работы</li>
+                                    <li><strong>Практика благодарности:</strong> Замечать маленькие успехи</li>
+                                    <li><strong>Достаточный сон и питание:</strong> База физического здоровья</li>
+                                </ol>
+                                
+                                <p><strong>Если вы уже чувствуете симптомы выгорания:</strong></p>
+                                <ol>
+                                    <li>Признать проблему: «Да, я выгораю»</li>
+                                    <li>Снизить нагрузку: делегировать, отказываться от нового</li>
+                                    <li>Обратиться за помощью: к коллегам, супервизору, терапевту</li>
+                                    <li>Взять перерыв: даже короткий выходной может помочь</li>
+                                    <li>Пересмотреть приоритеты: что действительно важно?</li>
+                                    <li>Вернуться к основам: сон, еда, движение</li>
+                                    <li>Найти поддержку: группы для помогающих специалистов</li>
+                                </ol>
+                                
+                                <p><strong>Мифы о выгорании:</strong></p>
+                                <ul>
+                                    <li><strong>Миф:</strong> Выгорание — это слабость</li>
+                                    <li><strong>Правда:</strong> Выгорание — это сигнал о дисбалансе</li>
+                                    <li><strong>Миф:</strong> Настоящие профессионалы не выгорают</li>
+                                    <li><strong>Правда:</strong> Чем больше вы помогаете, тем выше риск</li>
+                                    <li><strong>Миф:</strong> От выгорания можно избавиться, просто взяв отпуск</li>
+                                    <li><strong>Правда:</strong> Нужны системные изменения в подходе к работе и жизни</li>
+                                </ul>
+                                
+                                <div class="check-question">
+                                    <h4>Вопросы для проверки:</h4>
+                                    <p>1. Назовите три ранних признака эмоционального выгорания.<br>
+                                    2. Чем усталость от сострадания отличается от обычной усталости?<br>
+                                    3. Что такое вторичная травма?</p>
+                                </div>
+                                
+                                <div class="practical-tip">
+                                    <h4>📌 Чек-лист самодиагностики:</h4>
+                                    <p>Ответьте «да» или «нет»: 1) Я часто чувствую усталость, даже после сна. 2) Мне сложно сосредоточиться. 3) Я стал(а) более циничным(ой). 4) Я часто болею. 5) Работа больше не приносит удовольствия. Если 3+ «да» — возможно, начинается выгорание.</p>
+                                </div>
+                            </div>`
+                        },
+                        source: {
+                            title: "Источник",
+                            content: `<div class="source">
+                                <p><strong>WHO Burnout Definition</strong></p>
+                                <p>Всемирная организация здравоохранения признала выгорание профессиональным феноменом (2019). Это синдром, возникающий в результате хронического стресса на рабочем месте, который не был успешно преодолен.</p>
+                            </div>`
+                        },
+                        assignment: {
+                            title: "Задание",
+                            content: `<div class="assignment">
+                                <h4>Определите признаки выгорания</h4>
+                                <p>Опишите 3 ранних признака эмоционального выгорания у помогающего специалиста. Как можно заметить их у себя?</p>
+                                <textarea id="answer5_1" placeholder="Напишите ваши наблюдения здесь..."></textarea>
+                                <button class="btn-primary" onclick="checkAssignment('5.1')">Проверить задание</button>
+                                
+                                <div class="additional-task">
+                                    <h5>Дополнительное задание (план профилактики):</h5>
+                                    <p>Составьте личный план профилактики выгорания на месяц:</p>
+                                    <p>1. Ежедневные практики (что буду делать каждый день):</p>
+                                    <textarea id="extra5_1a" placeholder="Ежедневные практики..."></textarea>
+                                    <p>2. Еженедельные практики (что буду делать раз в неделю):</p>
+                                    <textarea id="extra5_1b" placeholder="Еженедельные практики..."></textarea>
+                                    <p>3. Признаки, по которым пойму, что нужен перерыв:</p>
+                                    <textarea id="extra5_1c" placeholder="Признаки переутомления..."></textarea>
+                                    <p>4. К кому обращусь за помощью, если почувствую выгорание:</p>
+                                    <textarea id="extra5_1d" placeholder="Источники поддержки..."></textarea>
+                                    <button class="btn-secondary" onclick="checkExtraAssignment('5.1')">Проверить план</button>
+                                </div>
+                                
+                                <div id="feedback5_1" class="feedback"></div>
+                            </div>`,
+                            check: function(answer) {
+                                const burnoutSigns = ["усталость", "раздражительность", "сон", "болезнь", "цинизм", "эффективность", "истощение"];
+                                let signCount = 0;
+                                
+                                burnoutSigns.forEach(sign => {
+                                    if (answer.toLowerCase().includes(sign)) signCount++;
+                                });
+                                
+                                if (signCount >= 3) {
+                                    return {correct: true, message: "Отлично! Вы хорошо определили ключевые признаки выгорания."};
+                                } else if (signCount >= 2) {
+                                    return {correct: true, message: "Хорошо, но попробуйте добавить больше признаков: хроническая усталость, проблемы со сном, цинизм."};
+                                } else {
+                                    return {correct: false, message: "Попробуйте описать конкретные признаки: постоянная усталость, раздражительность, снижение эффективности работы."};
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    id: "5.2",
+                    title: "Цикл стресса и методы восстановления",
+                    tabs: {
+                        theory: {
+                            title: "Теория",
+                            content: `<div class="theory-block">
+<picture>
+    <!-- Для мобильных -->
+    <source 
+        media="(max-width: 1000px)" 
+        srcset="https://i.postimg.cc/1tH8wKsN/5-2-(1).png"
+    >
+    <!-- Для десктопов и фолбэк -->
+    <img 
+        src="https://i.postimg.cc/SQf6fWDT/5-2.png"
+        alt="Эмпатия и понимание"
+        class="responsive-image"
+    >
+</picture>
+
+<style>
+    .responsive-image {
+        width: 30%;
+        max-width: 30%;
+        height: auto;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        display: block;
+    }
+    
+    /* Для мобильных устройств */
+    @media (max-width: 1000px) {
+        .responsive-image {
+            width: 80% !important;
+            max-width: 80% !important;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    }
+</style>
+                                <p><strong>Расширенная теория:</strong> Стресс — это физиологический цикл. Просто «успокоиться головой» недостаточно, нужно вывести гормоны стресса из тела (теория Э. и А. Нагоски).</p>
+                                <ul>
+                                    <li><strong>Завершение цикла:</strong> Физическая активность, глубокое дыхание (выдох длиннее вдоха), смех, плач, творчество, объятия (20 секунд).</li>
+                                    <li><strong>Информационный детокс:</strong> Мозгу нужно время «блуждания» (default mode network), чтобы переварить эмоции. Скроллинг ленты не является отдыхом.</li>
+                                </ul>
+                                
+                                <div class="definition-box">
+                                    <h4><span class="term">Термин:</span> Цикл стресса</h4>
+                                    <p>Естественный физиологический процесс: 1) Возникновение стрессора, 2) Реакция организма, 3) Восстановление. Проблема возникает, когда цикл не завершается.</p>
+                                </div>
+                                
+                                <div class="definition-box">
+                                    <h4><span class="term">Термин:</span> Сеть пассивного режима работы мозга (Default Mode Network)</h4>
+                                    <p>Состояние мозга в покое, когда мы не фокусируемся на внешних задачах. Важно для обработки эмоций, творчества и восстановления.</p>
+                                </div>
+                                
+                                <p><strong>Эффективные методы восстановления для помогающих:</strong></p>
+                                <ul>
+                                    <li><strong>Физические:</strong> Сон 7-9 часов, регулярные прогулки, спорт, массаж.</li>
+                                    <li><strong>Эмоциональные:</strong> Ведение дневника, творчество, терапия, группы поддержки.</li>
+                                    <li><strong>Ментальные:</strong> Медитация, чтение не по работе, цифровой детокс.</li>
+                                    <li><strong>Социальные:</strong> Общение с непрофессиональным кругом, хобби, волонтерство в другой сфере.</li>
+                                    <li><strong>Профессиональные:</strong> Супервизия, повышение квалификации, расстановка приоритетов.</li>
+                                </ul>
+                                
+                                <p><strong>Физиология стресса и восстановления:</strong></p>
+                                <ol>
+                                    <li><strong>Стрессовая реакция:</strong> Адреналин и кортизол мобилизуют организм</li>
+                                    <li><strong>Незавершенный цикл:</strong> Если стресс не «разрядить», гормоны остаются в теле</li>
+                                    <li><strong>Хронический стресс:</strong> Постоянно высокий кортизол разрушает организм</li>
+                                    <li><strong>Завершение цикла:</strong> Физическая активность помогает вывести гормоны стресса</li>
+                                </ol>
+                                
+                                <p><strong>Как завершить цикл стресса (практические методы):</strong></p>
+                                <table class="stress-cycle-methods">
+                                    <tr>
+                                        <th>Метод</th>
+                                        <th>Как работает</th>
+                                        <th>Пример</th>
+                                    </tr>
+                                    <tr>
+                                        <td>Физическая активность</td>
+                                        <td>Сжигает гормоны стресса</td>
+                                        <td>20-минутная прогулка, танцы, растяжка</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Дыхательные практики</td>
+                                        <td>Активирует парасимпатическую систему</td>
+                                        <td>4-7-8 дыхание: вдох 4, задержка 7, выдох 8</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Позитивные социальные контакты</td>
+                                        <td>Выделяет окситоцин (гормон связи)</td>
+                                        <td>Объятия, разговор с другом, совместная деятельность</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Творчество</td>
+                                        <td>Переводит стресс в продуктивную энергию</td>
+                                        <td>Рисование, лепка, музыка, писательство</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Смех и слезы</td>
+                                        <td>Естественные механизмы разрядки</td>
+                                        <td>Посмеяться над комедией, поплакать под грустный фильм</td>
+                                    </tr>
+                                </table>
+                                
+                                <p><strong>Что НЕ является восстановлением (распространенные ошибки):</strong></p>
+                                <ul>
+                                    <li><strong>Скроллинг соцсетей:</strong> Перегружает мозг информацией</li>
+                                    <li><strong>Пассивный отдых перед экраном:</strong> Не дает мозгу перейти в режим восстановления</li>
+                                    <li><strong>Алкоголь и переедание:</strong> Маскируют стресс, но не снимают его</li>
+                                    <li><strong>Работа до изнеможения:</strong> Приводит к хронической усталости</li>
+                                    <li><strong>Игнорирование симптомов:</strong> «Само пройдет» — не пройдет</li>
+                                </ul>
+                                
+                                <p><strong>Восстановление в течение дня (микро-практики):</strong></p>
+                                <ul>
+                                    <li><strong>Утром:</strong> 5 минут глубокого дыхания, планирование дня с учетом ресурсов</li>
+                                    <li><strong>Между встречами:</strong> 2-3 минуты растяжки, стакан воды</li>
+                                    <li><strong>После сложного разговора:</strong> 5-минутная прогулка, запись в дневник</li>
+                                    <li><strong>В обед:</strong> Прием пищи без телефона, короткая прогулка</li>
+                                    <li><strong>Вечером:</strong> Ритуал завершения дня, отключение от работы</li>
+                                    <li><strong>Перед сном:</strong> Техника «заземления», чтение, медитация</li>
+                                </ul>
+                                
+                                <p><strong>Специфические методы для помогающих профессий:</strong></p>
+                                <ol>
+                                    <li><strong>Супервизия и интервизия:</strong> Обсуждение сложных случаев с коллегами</li>
+                                    <li><strong>Профессиональные границы:</strong> Не работать сверхурочно, не брать работу на дом</li>
+                                    <li><strong>Баланс случаев:</strong> Чередовать сложные и более легкие случаи</li>
+                                    <li><strong>Рефлексивная практика:</strong> Регулярно анализировать свою работу и эмоции</li>
+                                    <li><strong>Постоянное обучение:</strong> Чувство роста и развития помогает от выгорания</li>
+                                </ol>
+                                
+                                <p><strong>Создание личной системы восстановления:</strong></p>
+                                <ol>
+                                    <li>Определите, что вас наполняет (составьте список)</li>
+                                    <li>Распределите практики по времени: ежедневные, еженедельные, ежемесячные</li>
+                                    <li>Создайте ритуалы: утренние, вечерние, переходные между работой и домой</li>
+                                    <li>Настройте окружение: поддерживающие люди, комфортное рабочее место</li>
+                                    <li>Будьте гибкими: система должна адаптироваться к изменениям</li>
+                                    <li>Отслеживайте эффективность: что работает, а что нет?</li>
+                                </ol>
+                                
+                                <div class="check-question">
+                                    <h4>Вопросы для проверки:</h4>
+                                    <p>1. Почему лежание на диване с телефоном не всегда восстанавливает?<br>
+                                    2. Назовите 3 способа физически завершить цикл стресса.<br>
+                                    3. Как дыхание влияет на парасимпатическую нервную систему?</p>
+                                </div>
+                                
+                                <div class="practical-tip">
+                                    <h4>📌 Экстренная помощь при стрессе:</h4>
+                                    <p>Если чувствуете, что накрывает: 1) Встаньте и пройдитесь 2) Умойтесь холодной водой 3) Сделайте 10 глубоких вдохов-выдохов 4) Назовите 5 предметов вокруг вас. Это заземлит и снизит интенсивность.</p>
+                                </div>
+                            </div>`
+                        },
+                        quote: {
+                            title: "Цитата",
+                            content: `<div class="quote">«Нельзя выливать из пустой чашки»</div>
+                            <p class="author">— Элеонора Рузвельт</p>`
+                        },
+                        assignment: {
+                            title: "Задание",
+                            content: `<div class="assignment">
+                                <h4>Составьте свой план восстановления</h4>
+                                <p>Составьте список из 5-7 конкретных действий, которые вы будете делать для профилактики выгорания. Укажите регулярность (ежедневно, еженедельно, при необходимости).</p>
+                                <textarea id="answer5_2" placeholder="Напишите ваш план здесь..."></textarea>
+                                <button class="btn-primary" onclick="checkAssignment('5.2')">Проверить задание</button>
+                                
+                                <div class="additional-task">
+                                    <h5>Дополнительное задание (ритуалы восстановления):</h5>
+                                    <p>Создайте три ритуала восстановления:</p>
+                                    <p>1. Утренний ритуал (5-10 минут):</p>
+                                    <textarea id="extra5_2a" placeholder="Утренний ритуал..."></textarea>
+                                    <p>2. Ритуал после работы (переход домой):</p>
+                                    <textarea id="extra5_2b" placeholder="Ритуал перехода..."></textarea>
+                                    <p>3. Вечерний ритуал (подготовка ко сну):</p>
+                                    <textarea id="extra5_2c" placeholder="Вечерний ритуал..."></textarea>
+                                    <button class="btn-secondary" onclick="checkExtraAssignment('5.2')">Проверить ритуалы</button>
+                                </div>
+                                
+                                <div id="feedback5_2" class="feedback"></div>
+                            </div>`,
+                            check: function(answer) {
+                                const recoveryMethods = ["сон", "прогулка", "спорт", "медитация", "дневник", "хобби", "отдых", "общение", "терапия", "массаж"];
+                                let methodCount = 0;
+                                
+                                recoveryMethods.forEach(method => {
+                                    if (answer.toLowerCase().includes(method)) methodCount++;
+                                });
+                                
+                                if (methodCount >= 3 && answer.length > 50) {
+                                    return {correct: true, message: "Отличный план! Вы включили разнообразные методы восстановления."};
+                                } else if (methodCount >= 1) {
+                                    return {correct: true, message: "Хорошее начало. Попробуйте добавить больше конкретных действий с указанием регулярности."};
+                                } else {
+                                    return {correct: false, message: "План слишком общий. Попробуйте указать конкретные действия: 'ежедневная 20-минутная прогулка', '8 часов сна' и т.д."};
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    id: "5.3",
+                    title: "Личные границы как инструмент эмпатии",
+                    tabs: {
+                        theory: {
+                            title: "Теория",
+                            content: `<div class="theory-block">
+<picture>
+    <!-- Для мобильных -->
+    <source 
+        media="(max-width: 1000px)" 
+        srcset="https://i.postimg.cc/7bvrLpd1/c5931846-f37a-4cc7-8dfa-94e66f31-(1).jpg"
+    >
+    <!-- Для десктопов и фолбэк -->
+    <img 
+        src="https://i.postimg.cc/c1zsjz9s/c5931846-f37a-4cc7-8dfa-94e66f31.jpg" 
+        alt="Эмпатия и понимание"
+        class="responsive-image"
+    >
+</picture>
+
+<style>
+    .responsive-image {
+        width: 30%;
+        max-width: 30%;
+        height: auto;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        display: block;
+    }
+    
+    /* Для мобильных устройств */
+    @media (max-width: 1000px) {
+        .responsive-image {
+            width: 80% !important;
+            max-width: 80% !important;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    }
+</style>
+                                <p><strong>Расширенная теория:</strong> Брене Браун вывела формулу: «Самые эмпатичные люди — это люди с самыми жесткими границами».</p>
+                                <ul>
+                                    <li><strong>Парадокс:</strong> Нельзя быть эмпатичным 24/7. Если вы не защищаете свой ресурс, вы начинаете ненавидеть тех, кому помогаете.</li>
+                                    <li><strong>Как говорить «Нет»:</strong> «Я слышу, как тебе тяжело, но прямо сейчас у меня нет ресурсу выслушать это качественно. Давай поговорим вечером?». Это честнее, чем слушать вполуха.</li>
+                                </ul>
+                                
+                                <div class="definition-box">
+                                    <h4><span class="term">Термин:</span> Личные границы</h4>
+                                    <p>Правила и ограничения, которые мы устанавливаем для защиты своего физического, эмоционального и ментального пространства. Не стены, а двери, которые мы контролируем.</p>
+                                </div>
+                                
+                                <p><strong>Установление и защита личных границ:</strong></p>
+                                <ul>
+                                    <li><strong>Виды границ:</strong> Физические, эмоциональные, временные, интеллектуальные, материальные.</li>
+                                    <li><strong>Как устанавливать:</strong> Четко, спокойно, без оправданий. «Мне некомфортно обсуждать это».</li>
+                                    <li><strong>Как защищать:</strong> Повторять, не поддаваться на манипуляции, уходить при нарушении.</li>
+                                    <li><strong>Чувство вины:</strong> Нормально при установлении границ, но не повод от них отказываться.</li>
+                                    <li><strong>Границы ≠ жестокость:</strong> Это забота о себе и отношениях.</li>
+                                </ul>
+                                
+                                <p><strong>Почему границы делают эмпатию возможной:</strong></p>
+                                <ol>
+                                    <li><strong>Предотвращают выгорание:</strong> Вы можете быть эмпатичным, потому что знаете свои пределы</li>
+                                    <li><strong>Создают безопасность:</strong> Четкие границы делают отношения предсказуемыми</li>
+                                    <li><strong>Позволяют быть настоящим:</strong> Вы не делаете то, что не хотите, из чувства долга</li>
+                                    <li><strong>Учат других уважать вас:</strong> Люди учатся, как с вами можно обращаться</li>
+                                    <li><strong>Освобождают энергию для настоящей помощи:</strong> Вы не тратите силы на сопротивление</li>
+                                </ol>
+                                
+                                <p><strong>Виды границ и примеры их установления:</strong></p>
+                                <table class="boundaries-types">
+                                    <tr>
+                                        <th>Тип границ</th>
+                                        <th>Примеры нарушений</th>
+                                        <th>Как установить</th>
+                                    </tr>
+                                    <tr>
+                                        <td>Физические</td>
+                                        <td>Ненужные прикосновения, нарушение личного пространства</td>
+                                        <td>«Мне некомфортно, когда ты так близко. Пожалуйста, отойди немного»</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Эмоциональные</td>
+                                        <td>Вываливание проблем без согласия, манипуляции чувствами</td>
+                                        <td>«Сейчас у меня нет ресурса это выслушать. Можем поговорить завтра?»</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Временные</td>
+                                        <td>Звонки среди ночи, ожидание немедленного ответа</td>
+                                        <td>«Я не отвечаю на звонки после 21:00. Если что-то срочное, напиши сообщение»</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Интеллектуальные</td>
+                                        <td>Обесценивание мнения, навязывание точки зрения</td>
+                                        <td>«Я уважаю твое мнение, но у меня другое. Давай согласимся, что мы не согласны»</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Материальные</td>
+                                        <td>Просьбы одолжить деньги, порча вещей</td>
+                                        <td>«Я не даю деньги в долг. Могу помочь по-другому»</td>
+                                    </tr>
+                                </table>
+                                
+                                <p><strong>Как говорить «нет» эмпатично:</strong></p>
+                                <ul>
+                                    <li><strong>Признайте потребность:</strong> «Я понимаю, что тебе важна эта помощь»</li>
+                                    <li><strong>Объясните причину (кратко):</strong> «Но сейчас у меня нет на это ресурсов»</li>
+                                    <li><strong>Предложите альтернативу (если хотите):</strong> «Могу помочь в следующий раз» или «Могу помочь вот так...»</li>
+                                    <li><strong>Будьте тверды, но добры:</strong> Не извиняйтесь за свои границы</li>
+                                    <li><strong>Пример:</strong> «Я вижу, как тебе тяжело, и хотел бы поддержать тебя. Но сегодня вечером у меня уже есть планы. Можем поговорить завтра утром?»</li>
+                                </ul>
+                                
+                                <p><strong>Типичные трудности в установлении границ и как их преодолеть:</strong></p>
+                                <table class="boundaries-difficulties">
+                                    <tr>
+                                        <th>Трудность</th>
+                                        <th>Почему возникает</th>
+                                        <th>Как преодолеть</th>
+                                    </tr>
+                                    <tr>
+                                        <td>Страх обидеть</td>
+                                        <td>В детстве учили, что отказ = плохо</td>
+                                        <td>Напомнить себе: мои потребности тоже важны</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Чувство вины</td>
+                                        <td>«Я должен помогать всем всегда»</td>
+                                        <td>Спросить: «А кто позаботится обо мне?»</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Боязнь конфликта</td>
+                                        <td>Опыт, когда границы приводили к ссорам</td>
+                                        <td>Учиться устанавливать границы мягко, но твердо</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Желание быть хорошим</td>
+                                        <td>Подтверждение ценности через помощь</td>
+                                        <td>Найти другие способы чувствовать себя ценным</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Отсутствие примера</td>
+                                        <td>В семье границ не было</td>
+                                        <td>Учиться у людей с здоровыми границами</td>
+                                    </tr>
+                                </table>
+                                
+                                <p><strong>Как реагировать на нарушение границ:</strong></p>
+                                <ol>
+                                    <li><strong>Заметить:</strong> «Мои границы нарушают»</li>
+                                    <li><strong>Назвать:</strong> «Когда ты..., я чувствую...»</li>
+                                    <li><strong>Попросить изменить поведение:</strong> «Пожалуйста, в будущем...»</li>
+                                    <li><strong>Объяснить последствия:</strong> «Если это повторится, я...»</li>
+                                    <li><strong>Выполнить:</strong> Сделать то, что обещали, если границы снова нарушат</li>
+                                </ol>
+                                
+                                <p><strong>Границы в разных отношениях:</strong></p>
+                                <ul>
+                                    <li><strong>С семьей:</strong> Самые сложные, потому что старые паттерны. Важно быть последовательным.</li>
+                                    <li><strong>С друзьями:</strong> Легче, но тоже требует ясности. Дружба должна быть взаимной.</li>
+                                    <li><strong>На работе:</strong> Четкие профессиональные границы предотвращают выгорание.</li>
+                                    <li><strong>С партнером:</strong> Здоровые границы делают отношения крепче.</li>
+                                    <li><strong>С детьми:</strong> Учат их уважению и самоуважению.</li>
+                                </ul>
+                                
+                                <p><strong>Упражнения для развития навыка установления границ:</strong></p>
+                                <ol>
+                                    <li><strong>Упражнение «Мои границы»:</strong> Составьте список своих границ в разных сферах</li>
+                                    <li><strong>Упражнение «Нет без объяснений»:</strong> Практиковаться говорить «нет» без долгих оправданий</li>
+                                    <li><strong>Упражнение «Маленькие границы»:</strong> Начинать с малого: не брать трубку сразу, не отвечать на сообщения мгновенно</li>
+                                    <li><strong>Упражнение «Ролевая игра»:</strong> Проигрывать сложные ситуации с другом</li>
+                                    <li><strong>Упражнение «Дневник границ»:</strong> Записывать, когда границы нарушали и как вы отреагировали</li>
+                                </ol>
+                                
+                                <div class="check-question">
+                                    <h4>Вопросы для проверки:</h4>
+                                    <p>1. Почему без границ невозможна долгая эмпатия?<br>
+                                    2. Как корректно отказать в разговоре, если у вас нет сил?<br>
+                                    3. Связаны ли границы с эгоизмом? (Ответ: Нет, это забота о сохранности отношений).</p>
+                                </div>
+                                
+                                <div class="practical-tip">
+                                    <h4>📌 Практика на неделю:</h4>
+                                    <p>Каждый день устанавливайте одну маленькую границу: не брать дополнительную работу, не задерживаться на 5 минут, не обсуждать тему, которая вам неприятна. Записывайте свои чувства и реакции других.</p>
+                                </div>
+                            </div>`
+                        },
+                        quote: {
+                            title: "Цитата",
+                            content: `<div class="quote">«Нет — это тоже забота о себе»</div>
+                            <p class="author">— Неизвестный автор</p>`
+                        },
+                        assignment: {
+                            title: "Задание",
+                            content: `<div class="assignment">
+                                <h4>Практика установления границ</h4>
+                                <p>Ситуация: коллега постоянно сбрасывает на вас свою работу, ссылаясь на вашу «доброту». Вы на грани выгорания. Напишите, как вы установите границу.</p>
+                                <textarea id="answer5_3" placeholder="Напишите ваш ответ здесь..."></textarea>
+                                <button class="btn-primary" onclick="checkAssignment('5.3')">Проверить задание</button>
+                                
+                                <div class="additional-task">
+                                    <h5>Дополнительное задание (практика в разных ситуациях):</h5>
+                                    <p>Напишите, как вы установите границы в этих ситуациях:</p>
+                                    <p>1. Родственник постоянно дает непрошеные советы по воспитанию ваших детей.</p>
+                                    <textarea id="extra5_3a" placeholder="Ваш ответ..."></textarea>
+                                    <p>2. Друг регулярно опаздывает на встречи на 30-40 минут.</p>
+                                    <textarea id="extra5_3b" placeholder="Ваш ответ..."></textarea>
+                                    <p>3. Партнер читает ваши сообщения без спроса.</p>
+                                    <textarea id="extra5_3c" placeholder="Ваш ответ..."></textarea>
+                                    <p>4. Начальник звонит в выходные с рабочими вопросами.</p>
+                                    <textarea id="extra5_3d" placeholder="Ваш ответ..."></textarea>
+                                    <button class="btn-secondary" onclick="checkExtraAssignment('5.3')">Проверить ответы</button>
+                                </div>
+                                
+                                <div id="feedback5_3" class="feedback"></div>
+                            </div>`,
+                            check: function(answer) {
+                                const boundaryWords = ["не могу", "границ", "откажусь", "нет", "извини", "но", "ресурс", "выгора"];
+                                let boundaryCount = 0;
+                                
+                                boundaryWords.forEach(word => {
+                                    if (answer.toLowerCase().includes(word)) boundaryCount++;
+                                });
+                                
+                                if (boundaryCount >= 3 && !answer.toLowerCase().includes("я должен")) {
+                                    return {correct: true, message: "Отлично! Вы четко установили границы, заботясь о своих ресурсах."};
+                                } else if (boundaryCount >= 2) {
+                                    return {correct: true, message: "Хорошо, но можно сделать формулировку более уверенной. Используйте 'я не могу' вместо 'мне неудобно'."};
+                                } else {
+                                    return {correct: false, message: "Попробуйте четче обозначить свою позицию: 'Я не могу взять эту работу, потому что...', 'Мои ресурсы ограничены'."};
+                                }
+                            }
+                        }
+                    }
+                }
+            ],
+            test: {
+                title: "Контрольная работа 5: Самоподдержка и границы",
+                description: "Тест по самоподдержке и границам",
+                timeLimit: 30,
+                sections: [
+                    {
+                        title: "Теоретическая часть",
+                        type: "theory",
+                        questions: [
+                            {
+                                type: "multiple-choice",
+                                question: "Какой из перечисленных признаков НЕ относится к эмоциональному выгоранию?",
+                                options: [
+                                    "Энтузиазм и повышенная работоспособность",
+                                    "Хроническая усталость",
+                                    "Циничное отношение к тем, кому помогаешь",
+                                    "Частые простудные заболевания"
+                                ],
+                                correct: 0,
+                                explanation: "Энтузиазм — это признак «медового месяца» работы, а не выгорания. Выгорание начинается, когда энтузиазм сменяется истощением, цинизмом и снижением эффективности."
+                            },
+                            {
+                                type: "multiple-choice",
+                                question: "Почему важно уметь говорить «нет»?",
+                                options: [
+                                    "Чтобы показать свою власть",
+                                    "Чтобы защитить свои ресурсы и избежать выгорания",
+                                    "Чтобы обидеть других людей",
+                                    "Чтобы меньше работать"
+                                ],
+                                correct: 1,
+                                explanation: "«Нет» — это не про власть или обиду. Это инструмент защиты своих ресурсов (времени, энергии, эмоций). Без умения говорить «нет» невозможно долго помогать другим."
+                            },
+                            {
+                                type: "true-false",
+                                question: "Вторичная травма — это когда человек сам переживает травматическое событие.",
+                                correct: false,
+                                explanation: "Вторичная травма (vicarious trauma) — это когда человек, выслушивая травматические истории других, начинает испытывать симптомы, похожие на ПТСР. Это профессиональный риск помогающих специалистов."
+                            },
+                            {
+                                type: "multiple-choice",
+                                question: "Что такое сеть пассивного режима работы мозга?",
+                                options: [
+                                    "Состояние глубокого сна",
+                                    "Состояние мозга в покое, важное для восстановления",
+                                    "Режим работы при стрессе",
+                                    "Состояние концентрации на задаче"
+                                ],
+                                correct: 1,
+                                explanation: "Сеть пассивного режима (Default Mode Network) активируется, когда мы не фокусируемся на внешних задачах. В этом состоянии мозг обрабатывает эмоции, творит, восстанавливается. Скроллинг соцсетей не дает мозгу перейти в этот режим."
+                            },
+                            {
+                                type: "multiple-choice",
+                                question: "Что такое цикл стресса?",
+                                options: [
+                                    "Постоянное состояние тревоги",
+                                    "Естественный процесс: стресс → реакция → восстановление",
+                                    "Бесконечная цепь стрессовых событий",
+                                    "Метод управления стрессом"
+                                ],
+                                correct: 1,
+                                explanation: "Здоровый цикл стресса: 1) Стрессор, 2) Реакция (адреналин, кортизол), 3) Восстановление (гормоны выводятся). Проблема возникает, когда цикл не завершается, и гормоны стресса накапливаются."
+                            }
+                        ]
+                    },
+                    {
+                        title: "Практический анализ",
+                        type: "practical",
+                        questions: [
+                            {
+                                type: "plan",
+                                question: "Составьте личный план профилактики выгорания на месяц. Включите:",
+                                requirements: [
+                                    "1) Ежедневные практики",
+                                    "2) Еженедельные ритуалы", 
+                                    "3) Признаки, по которым поймете, что нужен перерыв",
+                                    "4) К кому обратитесь за помощью"
+                                ],
+                                modelAnswer: `1) Ежедневно: 20 мин. прогулка, 10 мин. медитация, отключение рабочих уведомлений после 19:00.
+2) Еженедельно: одна встреча с друзьями без разговоров о работе, 3 часа на хобби, анализ недели (что истощало, что наполняло).
+3) Признаки переутомления: раздражительность, бессонница, частые простуды, ощущение «не могу».
+4) За помощью: к супервизору, к психологу, к коллеге для взаимной поддержки.`,
+                                points: 15,
+                                evaluationCriteria: [
+                                    "Конкретность и реалистичность практик - 4 балла",
+                                    "Разнообразие методов восстановления - 3 балла",
+                                    "Осознание признаков переутомления - 3 балла",
+                                    "Наличие плана обращения за помощью - 3 балла",
+                                    "Структурированность и полнота - 2 балла"
+                                ]
+                            },
+                            {
+                                type: "boundary-setting",
+                                question: "Ситуация: ваш друг звонит вам каждый день поздно вечером, чтобы «выговориться» о своих проблемах. Вы чувствуете истощение. Напишите, как вы установите границы, сохраняя заботу о друге.",
+                                modelAnswer: "«Я очень ценю наше общение и хочу быть для тебя поддержкой. Но звонки поздно вечером каждый день меня истощают, и я не могу быть действительно полезным, когда устал. Давай договоримся о конкретном времени для разговоров, например, дважды в неделю в 19:00. Или можем переписываться в мессенджере, когда тебе нужно выговориться. Как тебе такой вариант?»",
+                                points: 10,
+                                evaluationCriteria: [
+                                    "Четко устанавливает границы - 3 балла",
+                                    "Сохраняет заботу и уважение - 2 балла",
+                                    "Предлагает конкретные альтернативы - 2 балла",
+                                    "Дает выбор - 2 балла",
+                                    "Объясняет причину - 1 балл"
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        title: "Практическое задание",
+                        type: "assignment",
+                        task: "Коллега постоянно сбрасывает на вас свою работу, ссылаясь на вашу «доброту и отзывчивость». Вы чувствуете, что на грани выгорания. Напишите, как вы установите границу в этой ситуации.",
+                        modelAnswer: "«Я ценю, что ты доверяешь мне, но сейчас я не могу брать дополнительную работу. Я уже на пределе своих ресурсов и рискую выгореть. Давай подумаем, как ты можешь справиться со своей частью задач, или обсудим с руководителем распределение нагрузки.»",
+                        scoringCriteria: [
+                            {criteria: "Использует Я-сообщение", points: 3},
+                            {criteria: "Четко говорит о своих пределах", points: 3},
+                            {criteria: "Предлагает конструктивные альтернативы", points: 2},
+                            {criteria: "Сохраняет уважительный тон", points: 2}
+                        ],
+                        maxPoints: 10
+                    }
+                ],
+                totalPoints: 50,
+                passingScore: 35,
+                gradingScale: {
+                    "A": "45-50 баллов (Отлично)",
+                    "B": "40-44 балла (Очень хорошо)",
+                    "C": "35-39 баллов (Хорошо)",
+                    "D": "30-34 балла (Удовлетворительно)",
+                    "F": "Менее 30 баллов (Не сдано)"
+                }
+            }
         }
     ],
     finalExam: {
         title: "Итоговый экзамен по курсу «Эмпатия и поддержка в общении»",
         description: "Комплексная проверка знаний по всем 5 модулям курса",
-        timeLimit: 90,
+        timeLimit: 90, // минут
         sections: [
             {
                 title: "Теоретическая часть (30 баллов)",
@@ -4457,151 +3913,26 @@ const courseData = {
 // Экспорт данных курса
 window.courseData = courseData;
 
-// Функции для проверки заданий с выбором ответа
-function checkQuiz(submoduleId) {
-    console.log("=== ПРОВЕРКА ТЕСТА ===");
-    
-    const moduleId = userProgress.currentModule;
-    const module = courseData.modules.find(m => m.id === moduleId);
-    const submodule = module.submodules.find(s => s.id === submoduleId);
-    
-    if (!module || !submodule) {
-        console.error("Модуль или подмодуль не найдены");
-        return;
-    }
-    
-    const feedbackId = 'quiz-feedback' + submoduleId.replace('.', '_');
-    const feedbackElement = document.getElementById(feedbackId);
-    
-    if (!feedbackElement) return;
-    
-    // Получаем все вопросы для этого подмодуля
-    let score = 0;
-    let totalQuestions = 0;
-    let feedbackHTML = "<h4>Результаты теста:</h4>";
-    
-    // Определяем правильные ответы в зависимости от подмодуля
-    const correctAnswers = getCorrectAnswersForSubmodule(submoduleId);
-    
-    // Проверяем каждый вопрос
-    correctAnswers.forEach((question, index) => {
-        totalQuestions++;
-        const questionNumber = index + 1;
-        const userAnswers = getUserAnswers(submoduleId, questionNumber, question.type);
-        
-        if (question.type === 'single') {
-            // Одиночный выбор
-            if (userAnswers === question.correct) {
-                score++;
-                feedbackHTML += `<p>✅ Вопрос ${questionNumber}: Верно! ${question.explanation}</p>`;
-            } else {
-                feedbackHTML += `<p>❌ Вопрос ${questionNumber}: Неверно. ${question.explanation}</p>`;
-            }
-        } else if (question.type === 'multiple') {
-            // Множественный выбор
-            const isCorrect = arraysEqual(userAnswers.sort(), question.correct.sort());
-            if (isCorrect) {
-                score++;
-                feedbackHTML += `<p>✅ Вопрос ${questionNumber}: Верно! ${question.explanation}</p>`;
-            } else {
-                feedbackHTML += `<p>❌ Вопрос ${questionNumber}: Неверно. ${question.explanation}</p>`;
-            }
-        }
-    });
-    
-    const percentage = Math.round((score / totalQuestions) * 100);
-    
-    feedbackHTML += `<p><strong>Итог: ${score} из ${totalQuestions} (${percentage}%)</strong></p>`;
-    
-    if (percentage >= 70) {
-        feedbackHTML += `<p style="color: #2ecc71;">🎉 Отлично! Вы хорошо усвоили материал.</p>`;
-    } else if (percentage >= 50) {
-        feedbackHTML += `<p style="color: #f39c12;">📚 Хорошо, но можно лучше. Рекомендуем повторить материал.</p>`;
-    } else {
-        feedbackHTML += `<p style="color: #e74c3c;">📖 Нужно повторить материал. Обратите внимание на теорию.</p>`;
-    }
-    
-    feedbackElement.innerHTML = feedbackHTML;
-    feedbackElement.className = 'feedback success';
-}
-
-function getUserAnswers(submoduleId, questionNumber, questionType) {
-    if (questionType === 'single') {
-        // Одиночный выбор
-        const radios = document.querySelectorAll(`input[name="q${questionNumber}_${submoduleId.replace('.', '_')}"]`);
-        for (let radio of radios) {
-            if (radio.checked) {
-                return radio.value;
-            }
-        }
-        return null;
-    } else if (questionType === 'multiple') {
-        // Множественный выбор
-        const checkboxes = document.querySelectorAll(`input[name="q${questionNumber}_${submoduleId.replace('.', '_')}"]`);
-        const selected = [];
-        checkboxes.forEach(cb => {
-            if (cb.checked) {
-                selected.push(cb.value);
-            }
-        });
-        return selected;
-    }
-}
-
-function getCorrectAnswersForSubmodule(submoduleId) {
-    // Возвращаем правильные ответы для каждого подмодуля
-    // В реальном приложении это должно быть в данных курса
-    const answers = {
-        "1.1": [
-            { type: 'single', correct: 'b', explanation: 'Эмпатия — это позиция равных, жалость — позиция сверху.' },
-            { type: 'multiple', correct: ['a', 'b', 'd'], explanation: 'Эмпатия требует уязвимости, это способ «чувствовать вместе» и укрепляет отношения.' }
-        ],
-        "1.2": [
-            { type: 'single', correct: 'b', explanation: 'Эмоциональная эмпатия наиболее подвержена выгоранию из-за сильного эмоционального вовлечения.' },
-            { type: 'multiple', correct: ['a', 'b', 'd'], explanation: 'Зеркальные нейроны активируются при выполнении и наблюдении действий, являются основой эмоциональной эмпатии.' },
-            { type: 'single', correct: 'b', explanation: 'При анализе договора уместна когнитивная эмпатия — интеллектуальное понимание позиции другой стороны.' }
-        ],
-        // Добавьте ответы для остальных подмодулей...
-    };
-    
-    return answers[submoduleId] || [];
-}
-
-function arraysEqual(arr1, arr2) {
-    if (arr1.length !== arr2.length) return false;
-    for (let i = 0; i < arr1.length; i++) {
-        if (arr1[i] !== arr2[i]) return false;
-    }
-    return true;
-}
-
-// Функция для показа обратной связи
-function showFeedback(element, message, isSuccess) {
-    element.innerHTML = message;
-    element.className = isSuccess ? 'feedback success' : 'feedback error';
-    element.style.display = 'block';
-}
-
 console.log("✅ Данные курса загружены. Всего модулей: " + courseData.modules.length);
-console.log("✅ Все подмодули обновлены: добавлены задания с выбором ответа, таблицы сравнения, объединены все вкладки");
 console.log("✅ Итоговый экзамен включает: " + courseData.finalExam.sections[0].questions.length + " теоретических вопросов, " + courseData.finalExam.sections[1].tasks.length + " практических заданий, " + courseData.finalExam.sections[2].tasks.length + " ситуационный анализ");
 
-// Добавляем стили для красивых таблиц и элементов
+// Добавляем стили для красивых таблиц
 const tableStyles = `
 <style>
     /* Основные стили для таблиц */
-    .comparison-table {
+    table {
         width: 100%;
         border-collapse: collapse;
         margin: 20px 0;
-        background: var(--card-bg);
+        font-size: 0.95em;
         border-radius: 10px;
         overflow: hidden;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        background: var(--card-bg);
     }
     
-    .comparison-table th {
-        background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+    table th {
+        background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
         color: white;
         font-weight: 600;
         text-align: left;
@@ -4611,189 +3942,301 @@ const tableStyles = `
         letter-spacing: 0.5px;
     }
     
-    .comparison-table td {
+    table td {
         padding: 14px 12px;
         border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         color: var(--text-color);
         vertical-align: top;
     }
     
-    .comparison-table tr:last-child td {
+    table tr:last-child td {
         border-bottom: none;
     }
     
-    .comparison-table tr:nth-child(even) {
+    table tr:nth-child(even) {
         background: rgba(255, 255, 255, 0.03);
     }
     
-    .comparison-table tr:hover {
-        background: rgba(46, 204, 113, 0.08);
+    table tr:hover {
+        background: rgba(52, 152, 219, 0.08);
         transition: background 0.2s ease;
     }
     
-    /* Стили для разных типов таблиц */
-    .empathy-table th,
-    .mistakes-table th,
+    /* Специальные стили для разных типов таблиц */
+    .empathy-table th:first-child,
+    .mistakes-table th:first-child,
     .trauma-table th:first-child,
     .toxic-phrases-table th:first-child {
         background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
     }
     
     .help-rescue-table th {
-        background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+        background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
     }
     
     .balance-table th:first-child {
         background: linear-gradient(135deg, #f39c12 0%, #d35400 100%);
     }
     
-    .eco-formulas th {
+    .burnout-differences th:first-child {
         background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
     }
     
-    .nonverbal-elements th {
-        background: linear-gradient(135deg, #1abc9c 0%, #16a085 100%);
+    /* Стили для мобильных устройств */
+    @media (max-width: 768px) {
+        table {
+            font-size: 0.85em;
+        }
+        
+        table th, 
+        table td {
+            padding: 10px 8px;
+        }
+        
+        .table-responsive {
+            overflow-x: auto;
+            margin: 15px -15px;
+            padding: 0 15px;
+        }
+        
+        .table-responsive table {
+            min-width: 600px;
+        }
     }
     
-    .question-types th {
-        background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
-    }
-    
-    /* Стили для заданий с выбором ответа */
-    .quiz {
-        background: rgba(52, 152, 219, 0.1);
+    /* Стили для контрольных работ */
+    .test-section {
+        margin: 30px 0;
         padding: 25px;
+        background: var(--card-bg);
         border-radius: 12px;
-        margin: 25px 0;
         border-left: 5px solid #3498db;
     }
     
-    .quiz h4 {
+    .test-section-title {
         color: #3498db;
-        margin-top: 0;
-        margin-bottom: 20px;
-        font-size: 1.2em;
-    }
-    
-    .quiz-options {
-        margin: 20px 0;
-    }
-    
-    .option {
-        margin: 12px 0;
-        padding: 15px;
-        background: rgba(255, 255, 255, 0.05);
-        border-radius: 8px;
-        transition: all 0.3s;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-    
-    .option:hover {
-        background: rgba(255, 255, 255, 0.1);
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-    
-    .option input[type="radio"],
-    .option input[type="checkbox"] {
-        margin-right: 15px;
-        transform: scale(1.2);
-        cursor: pointer;
-    }
-    
-    .option label {
-        cursor: pointer;
-        font-size: 1.05em;
-        color: var(--text-color);
-        display: inline-block;
-        width: calc(100% - 40px);
-        vertical-align: middle;
-    }
-    
-    /* Стили для цитат и определений */
-    .quote-box {
-        background: linear-gradient(135deg, rgba(155, 89, 182, 0.15) 0%, rgba(142, 68, 173, 0.15) 100%);
-        border-left: 5px solid #9b59b6;
-        padding: 25px;
-        margin: 25px 0;
-        border-radius: 0 12px 12px 0;
-    }
-    
-    .quote {
         font-size: 1.3em;
-        font-style: italic;
-        color: #f1c40f;
-        margin: 0;
-        line-height: 1.5;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid rgba(52, 152, 219, 0.2);
     }
     
-    .author {
-        text-align: right;
-        color: #95a5a6;
-        margin: 15px 0 0 0;
-        font-size: 0.95em;
-    }
-    
-    .definition-box {
-        background: rgba(52, 152, 219, 0.1);
-        border-left: 4px solid #3498db;
-        padding: 20px;
-        margin: 20px 0;
-        border-radius: 0 10px 10px 0;
-    }
-    
-    .definition-box h4 {
-        color: #3498db;
-        margin-top: 0;
-    }
-    
-    .term {
-        color: #f1c40f;
-        font-weight: bold;
-    }
-    
-    .source-box {
+    .scoring-criteria {
         background: rgba(46, 204, 113, 0.1);
         border-left: 4px solid #2ecc71;
-        padding: 20px;
-        margin: 20px 0;
-        border-radius: 0 10px 10px 0;
+        padding: 15px;
+        margin: 15px 0;
+        border-radius: 0 8px 8px 0;
     }
     
-    .source-box h4 {
+    .scoring-criteria ul {
+        margin: 0;
+        padding-left: 20px;
+    }
+    
+    .scoring-criteria li {
+        margin-bottom: 8px;
+        color: #e0e0e0;
+    }
+    
+    .scoring-criteria strong {
         color: #2ecc71;
-        margin-top: 0;
     }
     
-    /* Стили для заданий */
-    .assignment {
-        background: rgba(243, 156, 18, 0.1);
-        padding: 25px;
-        border-radius: 12px;
-        margin: 25px 0;
-        border-left: 5px solid #f39c12;
+    /* Стили для заданий контрольных работ */
+    .test-task {
+        background: rgba(41, 128, 185, 0.1);
+        padding: 20px;
+        border-radius: 8px;
+        margin: 20px 0;
+        border: 1px solid rgba(52, 152, 219, 0.2);
     }
     
-    .assignment h4 {
-        color: #f39c12;
+    .test-task h4 {
+        color: #3498db;
         margin-top: 0;
         margin-bottom: 15px;
     }
     
-    .additional-task {
-        background: rgba(149, 165, 166, 0.1);
+    .test-task p {
+        margin: 10px 0;
+    }
+    
+    /* Стили для ответов на контрольные работы */
+    .test-response-area {
+        margin: 20px 0;
+    }
+    
+    .test-response-area textarea {
+        width: 100%;
+        min-height: 150px;
+        padding: 15px;
+        border-radius: 8px;
+        border: 2px solid rgba(52, 152, 219, 0.3);
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--text-color);
+        font-family: inherit;
+        font-size: 1em;
+        resize: vertical;
+        transition: border-color 0.3s;
+    }
+    
+    .test-response-area textarea:focus {
+        outline: none;
+        border-color: #3498db;
+        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+    }
+    
+    /* Стили для оценки заданий */
+    .assignment-points {
+        display: inline-block;
+        background: #3498db;
+        color: white;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 0.9em;
+        font-weight: bold;
+        margin-left: 10px;
+    }
+    
+    .max-points {
+        color: #7f8c8d;
+        font-size: 0.9em;
+        margin-left: 5px;
+    }
+    
+    /* Стили для временного ограничения */
+    .time-limit {
+        display: inline-block;
+        background: rgba(231, 76, 60, 0.1);
+        color: #e74c3c;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 0.9em;
+        margin-left: 15px;
+        border: 1px solid rgba(231, 76, 60, 0.3);
+    }
+    
+    /* Стили для итогового экзамена */
+    .exam-section {
+        margin: 40px 0;
+        padding: 30px;
+        background: var(--card-bg);
+        border-radius: 15px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .exam-section-title {
+        font-size: 1.5em;
+        color: #9b59b6;
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 3px solid rgba(155, 89, 182, 0.3);
+    }
+    
+    .exam-task {
+        background: rgba(155, 89, 182, 0.05);
+        padding: 25px;
+        border-radius: 10px;
+        margin: 25px 0;
+        border-left: 5px solid #9b59b6;
+    }
+    
+    .exam-task h4 {
+        color: #9b59b6;
+        font-size: 1.2em;
+        margin-top: 0;
+        margin-bottom: 20px;
+    }
+    
+    /* Стили для шкалы оценок */
+    .grading-scale {
+        background: rgba(52, 152, 219, 0.1);
         padding: 20px;
         border-radius: 10px;
         margin: 20px 0;
     }
     
-    .additional-task h5 {
-        color: #95a5a6;
+    .grading-scale h4 {
+        color: #3498db;
         margin-top: 0;
+        margin-bottom: 15px;
     }
     
-    /* Кнопки */
-    .btn-primary, .btn-secondary {
+    .grade-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .grade-item:last-child {
+        border-bottom: none;
+    }
+    
+    .grade-letter {
+        font-weight: bold;
+        color: #3498db;
+        min-width: 40px;
+    }
+    
+    .grade-range {
+        color: #e0e0e0;
+    }
+    
+    .grade-description {
+        color: #95a5a6;
+        font-style: italic;
+    }
+    
+    /* Анимации для таблиц */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    table {
+        animation: fadeIn 0.5s ease-out;
+    }
+    
+    /* Стили для прогресса выполнения теста */
+    .test-progress {
+        display: flex;
+        justify-content: space-between;
+        margin: 20px 0;
+        padding: 15px;
+        background: rgba(52, 152, 219, 0.1);
+        border-radius: 10px;
+    }
+    
+    .progress-item {
+        text-align: center;
+        flex: 1;
+    }
+    
+    .progress-number {
+        display: block;
+        font-size: 1.8em;
+        font-weight: bold;
+        color: #3498db;
+    }
+    
+    .progress-label {
+        font-size: 0.9em;
+        color: #95a5a6;
+    }
+    
+    /* Стили для кнопок в тестах */
+    .test-navigation {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .test-btn {
         padding: 12px 25px;
         border-radius: 8px;
         font-weight: bold;
@@ -4801,137 +4244,27 @@ const tableStyles = `
         transition: all 0.3s;
         border: none;
         font-size: 1em;
-        margin-top: 15px;
-        display: inline-block;
     }
     
-    .btn-primary {
-        background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    .test-btn-primary {
+        background: #3498db;
         color: white;
     }
     
-    .btn-primary:hover {
-        background: linear-gradient(135deg, #2980b9 0%, #1f618d 100%);
+    .test-btn-primary:hover {
+        background: #2980b9;
         transform: translateY(-2px);
         box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
     }
     
-    .btn-secondary {
+    .test-btn-secondary {
         background: rgba(255, 255, 255, 0.1);
         color: var(--text-color);
-        border: 1px solid rgba(255, 255, 255, 0.2);
     }
     
-    .btn-secondary:hover {
+    .test-btn-secondary:hover {
         background: rgba(255, 255, 255, 0.2);
         transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-    
-    /* Поля ввода */
-    textarea {
-        width: 100%;
-        min-height: 120px;
-        padding: 15px;
-        border-radius: 8px;
-        border: 2px solid rgba(255, 255, 255, 0.1);
-        background: rgba(255, 255, 255, 0.05);
-        color: var(--text-color);
-        font-family: inherit;
-        font-size: 1em;
-        resize: vertical;
-        transition: border-color 0.3s;
-        margin: 10px 0;
-    }
-    
-    textarea:focus {
-        outline: none;
-        border-color: #3498db;
-        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
-    }
-    
-    /* Обратная связь */
-    .feedback {
-        margin-top: 20px;
-        padding: 15px;
-        border-radius: 8px;
-        display: none;
-    }
-    
-    .feedback.success {
-        background: rgba(46, 204, 113, 0.1);
-        border-left: 4px solid #2ecc71;
-        color: #2ecc71;
-    }
-    
-    .feedback.error {
-        background: rgba(231, 76, 60, 0.1);
-        border-left: 4px solid #e74c3c;
-        color: #e74c3c;
-    }
-    
-    /* Адаптивность */
-    @media (max-width: 768px) {
-        .responsive-image {
-            width: 80% !important;
-            max-width: 80% !important;
-        }
-        
-        table {
-            font-size: 0.85em;
-        }
-        
-        .comparison-table th, 
-        .comparison-table td {
-            padding: 10px 8px;
-        }
-        
-        .quiz, .assignment {
-            padding: 15px;
-        }
-        
-        .option {
-            padding: 12px;
-        }
-        
-        .quote-box {
-            padding: 20px;
-        }
-        
-        .quote {
-            font-size: 1.1em;
-        }
-    }
-    
-    /* Анимации */
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-    
-    .theory-block > * {
-        animation: fadeIn 0.5s ease-out;
-    }
-    
-    /* Заголовки */
-    h3 {
-        color: #3498db;
-        margin-top: 30px;
-        padding-bottom: 10px;
-        border-bottom: 2px solid rgba(52, 152, 219, 0.2);
-    }
-    
-    .practical-tip {
-        background: rgba(241, 196, 15, 0.1);
-        border-left: 4px solid #f1c40f;
-        padding: 20px;
-        margin: 20px 0;
-        border-radius: 0 10px 10px 0;
-    }
-    
-    .practical-tip h4 {
-        color: #f1c40f;
-        margin-top: 0;
     }
 </style>
 `;
@@ -4939,4 +4272,4 @@ const tableStyles = `
 // Добавляем стили в документ
 document.head.insertAdjacentHTML('beforeend', tableStyles);
 
-console.log("✅ Стили для всех элементов добавлены");
+console.log("✅ Стили для таблиц и контрольных работ добавлены");
