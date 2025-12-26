@@ -17,8 +17,8 @@ body {
     font-size: 16px;
     line-height: 1.6;
     transition: background-color 0.3s ease, color 0.3s ease;
-    background-color: #121212 !important;
-    color: #f5f5f5 !important;
+    background-color: #ffffff !important;
+    color: #000000 !important;
 }
 
 /* =============================================
@@ -27,7 +27,7 @@ body {
 h1, h2, h3, h4, h5, h6 {
     font-family: 'Montserrat', sans-serif;
     font-weight: 600;
-    color: #f5f5f5 !important;
+    color: #000000 !important;
 }
 
 p, span, li, a:not(.sidebar a) {
@@ -50,26 +50,26 @@ p, span, li, a:not(.sidebar a) {
     --info-color: #3498db;
     
     /* Фоны */
-    --body-bg: #121212;
-    --card-bg: #1e1e1e;
-    --sidebar-bg: #0f1419;
-    --header-bg: #1e1e1e;
-    --input-bg: #2d2d2d;
-    --modal-bg: #252525;
+    --body-bg: #b1c48e;
+    --card-bg: #b6b6b6;
+    --sidebar-bg: #929292;
+    --header-bg: #ffffff;
+    --input-bg: #c4a7a7;
+    --modal-bg: #93b5b9;
     --dropdown-bg: #ffffff;
-    --footer-bg: #1e1e1e;
-    --table-bg: #252525;
+    --footer-bg: #93b5b9;
+    --table-bg: #93b5b9;
     
     /* Текст */
-    --text-color: #f5f5f5;
-    --text-secondary: #cccccc;
-    --text-muted: #aaaaaa;
-    --text-light: #888888;
-    --sidebar-text: #ffffff;
-    --header-text: #ffffff;
-    --text-on-primary: #ffffff;
-    --text-on-dark: #ffffff;
-    --table-text: #f5f5f5;
+    --text-color: #000000;
+    --text-secondary: #000000;
+    --text-muted: #000000;
+    --text-light: #000000;
+    --sidebar-text: #000000;
+    --header-text: #000000;
+    --text-on-primary: #000000;
+    --text-on-dark: #000000;
+    --table-text: #000000;
     --dropdown-text: #333333;
     
     /* Границы */
