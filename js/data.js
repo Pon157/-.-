@@ -13,21 +13,6 @@ function checkAssignment(submoduleId) {
     
     // ID элементов
     const answerId = 'answer' + submoduleId.replace('.', '_');
-    const feedbackId = 'feedback' + submoduleId.replacfunction checkAssignment(submoduleId) {
-    console.log("=== НАЧАЛО ПРОВЕРКИ ===");
-    
-    // Находим текущий модуль и подмодуль
-    const moduleId = userProgress.currentModule;
-    const module = courseData.modules.find(m => m.id === moduleId);
-    const submodule = module.submodules.find(s => s.id === submoduleId);
-    
-    if (!module || !submodule) {
-        console.error("Модуль или подмодуль не найдены");
-        return;
-    }
-    
-    // ID элементов
-    const answerId = 'answer' + submoduleId.replace('.', '_');
     const feedbackId = 'feedback' + submoduleId.replace('.', '_');
     
     const answerElement = document.getElementById(answerId);
@@ -42,676 +27,87 @@ function checkAssignment(submoduleId) {
         return;
     }
     
-    // Проверка задания - теперь ищем в tabs.practice
-    if (submodule.tabs.theory && submodule.tabs.theory.content) {
-        // Проверяем, есть ли проверочная функция для этого подмодуля
-        const checkFunction = getCheckFunctionForSubmodule(submoduleId);
-        if (checkFunction) {
-            const result = checkFunction(answer);
-            showFeedback(feedbackElement, result.message, result.correct);
+    // Проверка задания
+    if (submodule.tabs.practice && submodule.tabs.practice.check) {
+        const result = submodule.tabs.practice.check(answer);
+        showFeedback(feedbackElement, result.message, result.correct);
+        
+        // После успешной проверки можно очистить черновик
+        if (result.correct && isAuthenticated && currentUserId) {
+            // Очищаем черновик после успешной проверки
+            const key = `${submoduleId}_main`;
+            answerDraftsCache.delete(key);
             
-            // После успешной проверки можно очистить черновик
-            if (result.correct && isAuthenticated && currentUserId) {
-                // Очищаем черновик после успешной проверки
-                const key = `${submoduleId}_main`;
-                answerDraftsCache.delete(key);
-                
-                // Удаляем из базы данных
-                supabase
-                    .from('answer_drafts')
-                    .delete()
-                    .eq('user_id', currentUserId)
-                    .eq('submodule_id', submoduleId)
-                    .eq('answer_type', 'main');
-            }
-        } else {
-            showFeedback(feedbackElement, "❌ Проверочная функция не найдена для этого задания.", false);
+            // Удаляем из базы данных
+            supabase
+                .from('answer_drafts')
+                .delete()
+                .eq('user_id', currentUserId)
+                .eq('submodule_id', submoduleId)
+                .eq('answer_type', 'main');
         }
-    } else {
-        showFeedback(feedbackElement, "❌ У подмодуля нет задания для проверки.", false);
-    }
-}
-
-// Вспомогательная функция для получения проверочной функции
-function getCheckFunctionForSubmodule(submoduleId) {
-    const moduleId = userProgress.currentModule;
-    const module = courseData.modules.find(m => m.id === moduleId);
-    const submodule = module.submodules.find(s => s.id === submoduleId);
-    
-    if (!module || !submodule) return null;
-    
-    // Возвращаем проверочную функцию для конкретного подмодуля
-    switch(submoduleId) {
-        case "1.1":
-            return function(answer) {
-                const keywordsEmpathy = ["понимаю", "представляю", "должно быть", "чувствую", "разделяю", "поддержку"];
-                const keywordsPity = ["жалко", "жалеешь", "бедный", "несчастный", "сожалею", "повезло бы"];
-                
-                let hasEmpathy = false;
-                let hasPity = false;
-                
-                keywordsEmpathy.forEach(word => {
-                    if (answer.toLowerCase().includes(word)) hasEmpathy = true;
-                });
-                
-                keywordsPity.forEach(word => {
-                    if (answer.toLowerCase().includes(word)) hasPity = true;
-                });
-                
-                if (hasEmpathy && hasPity) {
-                    return {correct: true, message: "✅ Отлично! Вы четко разделили эмпатию («понимаю тебя») и жалость («жалко»)."};
-                } else if (hasEmpathy) {
-                    return {correct: true, message: "✅ Хорошо! Вы привели пример эмпатии. Попробуйте также добавить пример жалости для контраста."};
-                } else {
-                    return {correct: false, message: "❌ Попробуйте еще. Ищите разницу: жалость — это чувство сверху, эмпатия — разделение чувств на равных."};
-                }
-            };
-            
-        case "1.2":
-            return function(answer) {
-                const types = ["когнитив", "эмоциональ", "сострада"];
-                let foundTypes = 0;
-                
-                types.forEach(type => {
-                    if (answer.toLowerCase().includes(type)) foundTypes++;
-                });
-                
-                if (foundTypes >= 2) {
-                    return {correct: true, message: "✅ Хорошая работа! Вы правильно определили виды эмпатии."};
-                } else {
-                    return {correct: false, message: "❌ Попробуйте включить в ответ упоминания когнитивной, эмоциональной и сострадательной эмпатии."};
-                }
-            };
-            
-        case "1.3":
-            return function(answer) {
-                const reflectionWords = ["устал", "прессинг", "не понимает", "не способен", "тяжело", "сложно"];
-                let reflectionCount = 0;
-                
-                reflectionWords.forEach(word => {
-                    if (answer.toLowerCase().includes(word)) reflectionCount++;
-                });
-                
-                if (reflectionCount >= 2 && !answer.toLowerCase().includes("не переживай") && !answer.toLowerCase().includes("все будет хорошо")) {
-                    return {correct: true, message: "✅ Отличный эмпатический ответ! Вы отразили чувства собеседника, не переходя в обесценивание."};
-                } else if (reflectionCount >= 1) {
-                    return {correct: true, message: "✅ Хорошо! Вы начали отражать чувства. Попробуйте также использовать слова, которые передают понимание эмоционального состояния."};
-                } else {
-                    return {correct: false, message: "❌ Попробуйте использовать «отражение» — повторите ключевые эмоциональные слова из жалобы, чтобы показать, что вы действительно слышите чувства."};
-                }
-            };
-            
-        case "2.1":
-            return function(answer) {
-                const keywords = ["субъектив", "восприятие", "след", "последствия", "внутри", "переживание"];
-                let keywordCount = 0;
-                
-                keywords.forEach(word => {
-                    if (answer.toLowerCase().includes(word)) keywordCount++;
-                });
-                
-                if (keywordCount >= 2) {
-                    return {correct: true, message: "✅ Отлично! Вы правильно поняли, что травма — это внутренний след события, а не само событие."};
-                } else {
-                    return {correct: false, message: "❌ Попробуйте подчеркнуть, что травма — это то, как человек пережил событие внутри себя, а не само событие."};
-                }
-            };
-            
-        case "2.2":
-            return function(answer) {
-                const helpIndicators = ["слезы нормальны", "право чувствовать", "твой темп", "здесь с тобой", "принимаю твои чувства"];
-                let helpCount = 0;
-                
-                helpIndicators.forEach(phrase => {
-                    if (answer.toLowerCase().includes(phrase)) helpCount++;
-                });
-                
-                if (helpCount >= 2) {
-                    return {correct: true, message: "✅ Отлично! Вы успешно преобразовали токсичные фразы в поддерживающие."};
-                } else if (helpCount >= 1) {
-                    return {correct: true, message: "✅ Хорошо! Вы на правильном пути. Попробуйте сделать фразы еще более валидирующими чувства."};
-                } else {
-                    return {correct: false, message: "❌ Попробуйте убрать элементы обесценивания («не плачь», «хватит») и добавить признание права на чувства."};
-                }
-            };
-            
-        case "2.3":
-            return function(answer) {
-                const openPhrases = ["хочешь поговорить", "как ты себя чувствуешь", "что тебе нужно", "чем я могу помочь", "хочешь ли ты", "если захочешь"];
-                const pressurePhrases = ["ты должен", "тебе нужно", "я сделаю за тебя", "просто сядь в машину", "преодолей страх"];
-                
-                let openCount = 0;
-                let pressureCount = 0;
-                
-                openPhrases.forEach(phrase => {
-                    if (answer.toLowerCase().includes(phrase)) openCount++;
-                });
-                
-                pressurePhrases.forEach(phrase => {
-                    if (answer.toLowerCase().includes(phrase)) pressureCount++;
-                });
-                
-                if (openCount >= 2 && pressureCount === 0) {
-                    return {correct: true, message: "✅ Идеально! Вы создали безопасное пространство с открытыми вопросами и без давления."};
-                } else if (openCount >= 1) {
-                    return {correct: true, message: "✅ Хорошо, но попробуйте добавить больше открытых предложений ('хочешь...', 'если захочешь...')."};
-                } else {
-                    return {correct: false, message: "❌ В диалоге чувствуется давление. Используйте больше открытых вопросов и предложений, дающих выбор."};
-                }
-            };
-            
-        case "3.1":
-            return function(answer) {
-                const reflectionWords = ["критикует", "придраться", "стрессе", "начальник", "правильно"];
-                let reflectionCount = 0;
-                
-                reflectionWords.forEach(word => {
-                    if (answer.toLowerCase().includes(word)) reflectionCount++;
-                });
-                
-                if (reflectionCount >= 3 && !answer.toLowerCase().includes("советую") && !answer.toLowerCase().includes("надо бы")) {
-                    return {correct: true, message: "✅ Отлично! Вы точно отразили ключевые слова и чувства собеседника без советов."};
-                } else if (reflectionCount >= 2) {
-                    return {correct: true, message: "✅ Хорошо, но попробуйте отразить больше ключевых слов из жалобы."};
-                } else {
-                    return {correct: false, message: "❌ Ответ не отражает жалобу. Попробуйте повторить ключевые слова: 'критикует', 'придраться', 'стресс'."};
-                }
-            };
-            
-        case "3.2":
-            return function(answer) {
-                const questionIndicators = ["что", "как", "расскажи", "опиши", "какой", "какая"];
-                let questionCount = 0;
-                
-                questionIndicators.forEach(word => {
-                    if (answer.toLowerCase().includes(word)) questionCount++;
-                });
-                
-                if (questionCount >= 2) {
-                    return {correct: true, message: "✅ Отлично! Вы правильно преобразовали закрытые вопросы в открытые."};
-                } else if (questionCount >= 1) {
-                    return {correct: true, message: "✅ Хорошо, но можно сделать больше вопросов открытыми. Используйте 'Что ты чувствуешь?' вместо 'Тебе плохо?'."};
-                } else {
-                    return {correct: false, message: "❌ Вопросы все еще закрытые. Попробуйте начать с 'Что', 'Как', 'Расскажи'."};
-                }
-            };
-            
-        case "3.3":
-            return function(answer) {
-                const nonverbalSignals = ["кив", "взгляд", "поза", "наклон", "выражение лица", "пауза", "молчание", "открытая поза"];
-                let signalCount = 0;
-                
-                nonverbalSignals.forEach(signal => {
-                    if (answer.toLowerCase().includes(signal)) signalCount++;
-                });
-                
-                if (signalCount >= 3) {
-                    return {correct: true, message: "✅ Отлично! Вы хорошо описали ключевые невербальные сигналы активного слушания."};
-                } else if (signalCount >= 2) {
-                    return {correct: true, message: "✅ Хорошо, но попробуйте добавить больше конкретных сигналов: кивки, открытая поза, соответствующий взгляд."};
-                } else {
-                    return {correct: false, message: "❌ Попробуйте описать конкретные невербальные действия: кивки головой, наклон тела к собеседнику, соответствующий взгляд."};
-                }
-            };
-            
-        case "4.1":
-            return function(answer) {
-                const helpKeywords = ["помощь", "выбор", "самостоятельность", "вместе", "поддержка"];
-                const rescueKeywords = ["спасение", "замен", "контроль", "сам сделаю", "должен слушать"];
-                
-                let helpCount = 0;
-                let rescueCount = 0;
-                
-                helpKeywords.forEach(word => {
-                    if (answer.toLowerCase().includes(word)) helpCount++;
-                });
-                
-                rescueKeywords.forEach(word => {
-                    if (answer.toLowerCase().includes(word)) rescueCount++;
-                });
-                
-                if (helpCount >= 2 || rescueCount >= 2) {
-                    return {correct: true, message: "✅ Верно! Вы различаете помощь и спасение. Помощь дает выбор, спасение — лишает его."};
-                } else {
-                    return {correct: false, message: "❌ Попробуйте четче разделить: помощь = поддержка самостоятельности, спасение = лишение выбора."};
-                }
-            };
-            
-        case "4.2":
-            return function(answer) {
-                const helpIndicators = ["хочешь", "может быть", "предлагаю", "давай подумаем", "если хочешь", "как ты считаешь"];
-                const rescueIndicators = ["я сделаю", "ты должен", "надо", "обязательно", "лучше знаю"];
-                
-                let helpCount = 0;
-                let rescueCount = 0;
-                
-                helpIndicators.forEach(phrase => {
-                    if (answer.toLowerCase().includes(phrase)) helpCount++;
-                });
-                
-                rescueIndicators.forEach(phrase => {
-                    if (answer.toLowerCase().includes(phrase)) rescueCount++;
-                });
-                
-                if (helpCount >= 2 && rescueCount === 0) {
-                    return {correct: true, message: "✅ Прекрасно! Вы правильно переформулировали спасение в помощь, сохраняя выбор за человеком."};
-                } else if (helpCount >= 1) {
-                    return {correct: true, message: "✅ Хорошо, но есть еще место для улучшения. Используйте больше вопросительных форм и предложений выбора."};
-                } else {
-                    return {correct: false, message: "❌ Ответ все еще содержит элементы спасения. Попробуйте начать с 'Хочешь...' или 'Может быть...'."};
-                }
-            };
-            
-        case "4.3":
-            return function(answer) {
-                const boundaryWords = ["не могу", "границ", "откажусь", "нет", "извини", "но", "ресурс", "выгора"];
-                let boundaryCount = 0;
-                
-                boundaryWords.forEach(word => {
-                    if (answer.toLowerCase().includes(word)) boundaryCount++;
-                });
-                
-                if (boundaryCount >= 3 && !answer.toLowerCase().includes("я должен")) {
-                    return {correct: true, message: "✅ Отлично! Вы четко установили границы, заботясь о своих ресурсах."};
-                } else if (boundaryCount >= 2) {
-                    return {correct: true, message: "✅ Хорошо, но можно сделать формулировку более уверенной. Используйте 'я не могу' вместо 'мне неудобно'."};
-                } else {
-                    return {correct: false, message: "❌ Попробуйте четче обозначить свою позицию: 'Я не могу брать эту работу', 'Мои ресурсы ограничены'."};
-                }
-            };
-            
-        case "5.1":
-            return function(answer) {
-                const burnoutSigns = ["усталость", "раздражительность", "сон", "болезнь", "цинизм", "эффективность", "истощение"];
-                let signCount = 0;
-                
-                burnoutSigns.forEach(sign => {
-                    if (answer.toLowerCase().includes(sign)) signCount++;
-                });
-                
-                if (signCount >= 3) {
-                    return {correct: true, message: "✅ Отлично! Вы хорошо определили ключевые признаки выгорания."};
-                } else if (signCount >= 2) {
-                    return {correct: true, message: "✅ Хорошо, но попробуйте добавить больше признаков: хроническая усталость, проблемы со сном, цинизм."};
-                } else {
-                    return {correct: false, message: "❌ Попробуйте описать конкретные признаки: постоянная усталость, раздражительность, снижение эффективности работы."};
-                }
-            };
-            
-        case "5.2":
-            return function(answer) {
-                const recoveryMethods = ["сон", "прогулка", "спорт", "медитация", "дневник", "хобби", "отдых", "общение", "терапия", "массаж"];
-                let methodCount = 0;
-                
-                recoveryMethods.forEach(method => {
-                    if (answer.toLowerCase().includes(method)) methodCount++;
-                });
-                
-                if (methodCount >= 3 && answer.length > 50) {
-                    return {correct: true, message: "✅ Отличный план! Вы включили разнообразные методы восстановления."};
-                } else if (methodCount >= 1) {
-                    return {correct: true, message: "✅ Хорошее начало. Попробуйте добавить больше конкретных действий с указанием регулярности."};
-                } else {
-                    return {correct: false, message: "❌ План слишком общий. Попробуйте указать конкретные действия: 'ежедневная 20-минутная прогулка', '8 часов сна'."};
-                }
-            };
-            
-        case "5.3":
-            return function(answer) {
-                const boundaryWords = ["не могу", "границ", "откажусь", "нет", "извини", "но", "ресурс", "выгора"];
-                let boundaryCount = 0;
-                
-                boundaryWords.forEach(word => {
-                    if (answer.toLowerCase().includes(word)) boundaryCount++;
-                });
-                
-                if (boundaryCount >= 3 && !answer.toLowerCase().includes("я должен")) {
-                    return {correct: true, message: "✅ Отлично! Вы четко установили границы, заботясь о своих ресурсах."};
-                } else if (boundaryCount >= 2) {
-                    return {correct: true, message: "✅ Хорошо, но можно сделать формулировку более уверенной. Используйте 'я не могу' вместо 'мне неудобно'."};
-                } else {
-                    return {correct: false, message: "❌ Попробуйте четче обозначить свою позицию: 'Я не могу взять эту работу, потому что...'."};
-                }
-            };
-            
-        default:
-            return null;
     }
 }
 
 function checkQuiz(submoduleId, questionId, selectedAnswers) {
-    console.log("=== ПРОВЕРКА ТЕСТА ===", submoduleId, questionId, selectedAnswers);
+    console.log("=== ПРОВЕРКА ТЕСТА ===");
     
     const moduleId = userProgress.currentModule;
     const module = courseData.modules.find(m => m.id === moduleId);
     const submodule = module.submodules.find(s => s.id === submoduleId);
     
-    if (!module || !submodule) {
-        console.error("Модуль или подмодуль не найдены");
-        return;
-    }
+    if (!module || !submodule) return;
     
     const feedbackId = 'quiz_feedback_' + submoduleId.replace('.', '_') + '_' + questionId;
     const feedbackElement = document.getElementById(feedbackId);
     
-    if (!feedbackElement) {
-        console.error("Элемент фидбека не найден:", feedbackId);
-        return;
-    }
+    if (!feedbackElement) return;
     
-    // Находим вопрос по ID
-    let question = null;
-    let correct = false;
-    let explanation = "";
-    
-    // Определяем вопросы для каждого подмодуля
-    switch(submoduleId) {
-        case "1.1":
-            if (questionId === "q1") {
-                question = {
-                    type: "single-choice",
-                    correct: 1,
-                    explanation: "Правильный ответ — «Понимаю, как это обидно, когда тебя не ценят». Это пример эмпатии, потому что показывает понимание чувств с позиции равенства. Первый вариант — жалость (позиция сверху), третий — обесценивание."
-                };
-            } else if (questionId === "q2") {
-                question = {
-                    type: "multiple-choice",
-                    correct: [1, 2],
-                    explanation: "Для эмпатии не нужно пережить точно такую же ситуацию — достаточно найти схожую эмоцию в своем опыте. Также важно признать право человека на его чувства. Давать советы без запроса — это не эмпатия."
-                };
-            }
-            break;
-            
-        case "1.2":
-            if (questionId === "q1") {
-                question = {
-                    type: "single-choice",
-                    correct: 1,
-                    explanation: "Правильный ответ — эмоциональная эмпатия. Это когда вы физически ощущаете эмоции другого человека. Когнитивная — это понимание, сострадательная — понимание плюс желание помочь."
-                };
-            } else if (questionId === "q2") {
-                question = {
-                    type: "single-choice",
-                    correct: 2,
-                    explanation: "Сострадательная эмпатия — это баланс понимания, чувствования и конструктивного желания помочь. Только эмоциональная ведет к выгоранию, только когнитивная — к холодности."
-                };
-            }
-            break;
-            
-        case "1.3":
-            if (questionId === "q1") {
-                question = {
-                    type: "single-choice",
-                    correct: 1,
-                    explanation: "Конгруэнтность — это когда слова соответствуют тону голоса, выражению лица и языку тела. Неконгруэнтное общение воспринимается как неискреннее."
-                };
-            } else if (questionId === "q2") {
-                question = {
-                    type: "multiple-choice",
-                    correct: [1, 2],
-                    explanation: "Наклон тела к собеседнику и кивки показывают внимание и понимание. Скрещенные руки и постукивание пальцами показывают закрытость или нетерпение."
-                };
-            }
-            break;
-            
-        case "2.1":
-            if (questionId === "q1") {
-                question = {
-                    type: "single-choice",
-                    correct: 1,
-                    explanation: "Ко-регуляция — это процесс, когда нервная система одного человека (обычно более спокойного) помогает успокоиться нервной системе другого."
-                };
-            } else if (questionId === "q2") {
-                question = {
-                    type: "single-choice",
-                    correct: 1,
-                    explanation: "Триггер — это любой стимул (звук, запах, ситуация), который запускает воспоминание о травмирующем событии и соответствующую эмоциональную реакцию."
-                };
-            }
-            break;
-            
-        case "2.2":
-            if (questionId === "q1") {
-                question = {
-                    type: "single-choice",
-                    correct: 1,
-                    explanation: "Токсичная позитивность — это требование быть позитивным всегда, даже когда это неуместно. Она отрицает право человека на сложные эмоции."
-                };
-            } else if (questionId === "q2") {
-                question = {
-                    type: "multiple-choice",
-                    correct: [0, 1, 3],
-                    explanation: "«Все будет хорошо», «Другим еще хуже» и «Смотри на позитив» — примеры токсичной позитивности или обесценивания. «Это нормально чувствовать грусть» — валидация чувств."
-                };
-            }
-            break;
-            
-        case "2.3":
-            if (questionId === "q1") {
-                question = {
-                    type: "single-choice",
-                    correct: 1,
-                    explanation: "Безопасное пространство предполагает, что человек чувствует контроль над ситуацией. Когда у него есть выбор, снижается тревога и включаются внутренние ресурсы."
-                };
-            } else if (questionId === "q2") {
-                question = {
-                    type: "multiple-choice",
-                    correct: [1, 2],
-                    explanation: "Давать выбор и контроль, а также поддерживать конфиденциальность создают безопасность. Перебивание и настаивание на разговоре разрушают ее."
-                };
-            }
-            break;
-            
-        case "3.1":
-            if (questionId === "q1") {
-                question = {
-                    type: "single-choice",
-                    correct: 1,
-                    explanation: "Техника отражения (рефлексивное слушание) — это возвращение собеседнику сути его слов, возможно, в других формулировках. Показывает: «Я тебя слышу и понимаю»."
-                };
-            } else if (questionId === "q2") {
-                question = {
-                    type: "multiple-choice",
-                    correct: [1, 2],
-                    explanation: "«Похоже, ты очень расстроен» и «Если я правильно понял, ты злишься» — примеры отражения. «Ты не должен так чувствовать» — оценка, «Просто забудь» — обесценивание."
-                };
-            }
-            break;
-            
-        case "3.2":
-            if (questionId === "q1") {
-                question = {
-                    type: "single-choice",
-                    correct: 1,
-                    explanation: "Открытые вопросы начинаются с «что», «как», «расскажи», «опиши» и не предполагают ответа «да/нет». Они приглашают к развернутому ответу."
-                };
-            } else if (questionId === "q2") {
-                question = {
-                    type: "single-choice",
-                    correct: 1,
-                    explanation: "«Почему» часто воспринимается как требование оправдаться: «Почему ты это сделал?» = «Объясни свое плохое поведение». Лучше: «Что привело к такому решению?»"
-                };
-            }
-            break;
-            
-        case "3.3":
-            if (questionId === "q1") {
-                question = {
-                    type: "single-choice",
-                    correct: 1, // Неверно (false в данных, но 1 индекс для "Неверно")
-                    explanation: "Паузы, наоборот, помогают. Они дают время подумать, снижают темп до комфортного, позволяют эмоциям «осесть». Часто самое важное говорится после паузы."
-                };
-            } else if (questionId === "q2") {
-                question = {
-                    type: "multiple-choice",
-                    correct: [0, 2],
-                    explanation: "Кивки головой и наклон тела к собеседнику показывают активное слушание. Скрещенные руки и проверка телефона показывают закрытость или отсутствие внимания."
-                };
-            }
-            break;
-            
-        case "4.1":
-            if (questionId === "q1") {
-                question = {
-                    type: "single-choice",
-                    correct: 1,
-                    explanation: "Помощь предполагает выбор («хочешь»), спасение — директивность («я сделаю», «ты должен»). Помощь дает удочку, спасение — рыбу."
-                };
-            } else if (questionId === "q2") {
-                question = {
-                    type: "multiple-choice",
-                    correct: [1, 2, 3],
-                    explanation: "Участники треугольника Карпмана: Спасатель (делает за других), Жертва (беспомощный), Преследователь (обвинитель). Помощник — это не роль в треугольнике."
-                };
-            }
-            break;
-            
-        case "4.2":
-            if (questionId === "q1") {
-                question = {
-                    type: "single-choice",
-                    correct: 1,
-                    explanation: "Вопрос «Чем я могу быть полезен?» позволяет человеку самому определить, какая помощь ему нужна. Это уважает его автономию и предотвращает непрошеную помощь."
-                };
-            } else if (questionId === "q2") {
-                question = {
-                    type: "multiple-choice",
-                    correct: [1, 2],
-                    explanation: "«Хочешь, я помогу?» и «Чем я могу быть полезен?» — экологичные формулировки. «Я сделаю это за тебя» и «Ты должен принять мою помощь» — спасение."
-                };
-            }
-            break;
-            
-        case "4.3":
-            if (questionId === "q1") {
-                question = {
-                    type: "single-choice",
-                    correct: 1,
-                    explanation: "Зона ближайшего развития (Выготский) — это то, что человек может сделать С ПОМОЩЬЮ, но не может самостоятельно. Идеальное место для помощи — не слишком просто, не слишком сложно."
-                };
-            } else if (questionId === "q2") {
-                question = {
-                    type: "single-choice",
-                    correct: 1,
-                    explanation: "Уважение к отказу — это уважение к автономии человека. Он лучше знает, что ему нужно. Иногда отказ — это проявление силы («Я справлюсь сам»), а не слабости."
-                };
-            }
-            break;
-            
-        case "5.1":
-            if (questionId === "q1") {
-                question = {
-                    type: "single-choice",
-                    correct: 0,
-                    explanation: "Энтузиазм — это признак «медового месяца» работы, а не выгорания. Выгорание начинается, когда энтузиазм сменяется истощением, цинизмом и снижением эффективности."
-                };
-            } else if (questionId === "q2") {
-                question = {
-                    type: "single-choice",
-                    correct: 1,
-                    explanation: "Вторичная травма (vicarious trauma) — это когда человек, выслушивая травматические истории других, начинает испытывать симптомы, похожие на ПТСР. Это профессиональный риск помогающих специалистов."
-                };
-            }
-            break;
-            
-        case "5.2":
-            if (questionId === "q1") {
-                question = {
-                    type: "single-choice",
-                    correct: 1,
-                    explanation: "Сеть пассивного режима (Default Mode Network) активируется, когда мы не фокусируемся на внешних задачах. В этом состоянии мозг обрабатывает эмоции, творит, восстанавливается."
-                };
-            } else if (questionId === "q2") {
-                question = {
-                    type: "multiple-choice",
-                    correct: [0, 1, 3],
-                    explanation: "Физическая активность, глубокое дыхание и творчество помогают завершить цикл стресса. Скроллинг соцсетей перегружает мозг информацией и не дает восстановиться."
-                };
-            }
-            break;
-            
-        case "5.3":
-            if (questionId === "q1") {
-                question = {
-                    type: "single-choice",
-                    correct: 1,
-                    explanation: "«Нет» — это инструмент защиты своих ресурсов (времени, энергии, эмоций). Без умения говорить «нет» невозможно долго помогать другим."
-                };
-            } else if (questionId === "q2") {
-                question = {
-                    type: "multiple-choice",
-                    correct: [1, 2],
-                    explanation: "Границы делают эмпатию возможной, предотвращая выгорание. Устанавливать границы — это нормально и необходимо. Границы — это не эгоизм, а забота о себе и отношениях."
-                };
-            }
-            break;
-            
-        default:
-            console.error("Неизвестный подмодуль:", submoduleId);
+    // Находим вопрос в практике
+    if (submodule.tabs.practice && submodule.tabs.practice.quizQuestions) {
+        const question = submodule.tabs.practice.quizQuestions.find(q => q.id === questionId);
+        
+        if (!question) {
             showFeedback(feedbackElement, "❌ Вопрос не найден", false);
             return;
-    }
-    
-    if (!question) {
-        console.error("Вопрос не найден для:", submoduleId, questionId);
-        showFeedback(feedbackElement, "❌ Вопрос не найден", false);
-        return;
-    }
-    
-    // Проверяем ответ
-    if (question.type === 'single-choice') {
-        correct = parseInt(selectedAnswers[0]) === question.correct;
-        explanation = question.explanation;
-    } else if (question.type === 'multiple-choice') {
-        // Преобразуем выбранные значения в числа
-        const selectedNumbers = selectedAnswers.map(id => parseInt(id));
-        const correctNumbers = question.correct;
+        }
         
-        // Проверяем, что выбраны все правильные и только они
-        const allCorrectSelected = correctNumbers.every(num => selectedNumbers.includes(num));
-        const noIncorrectSelected = selectedNumbers.every(num => correctNumbers.includes(num));
-        const correctCount = selectedNumbers.length === correctNumbers.length;
+        let correct = false;
+        let message = "";
         
-        correct = allCorrectSelected && noIncorrectSelected && correctCount;
-        explanation = question.explanation;
+        if (question.type === 'single-choice') {
+            // Один правильный ответ
+            correct = parseInt(selectedAnswers[0]) === question.correct;
+            message = correct ? 
+                "✅ Верно! " + question.explanation :
+                "❌ Неверно. " + question.explanation;
+                
+        } else if (question.type === 'multiple-choice') {
+            // Несколько правильных ответов
+            const correctSet = new Set(question.correct);
+            const selectedSet = new Set(selectedAnswers.map(id => parseInt(id)));
+            
+            // Проверяем, что выбраны все правильные и только они
+            const allCorrect = selectedAnswers.length === question.correct.length;
+            const allSelectedCorrect = selectedAnswers.every(id => 
+                question.correct.includes(parseInt(id))
+            );
+            
+            correct = allCorrect && allSelectedCorrect;
+            message = correct ? 
+                "✅ Все верно! " + question.explanation :
+                "❌ Не все ответы правильные. " + question.explanation;
+        }
+        
+        showFeedback(feedbackElement, message, correct);
+        
+        // После успешной проверки можно отметить как выполненное
+        if (correct && isAuthenticated && currentUserId) {
+            // Помечаем вопрос как пройденный
+            const quizKey = `${submoduleId}_quiz_${questionId}`;
+            localStorage.setItem(quizKey, 'completed');
+        }
     }
-    
-    const message = correct ? 
-        "✅ Верно! " + explanation :
-        "❌ Неверно. " + explanation;
-    
-    showFeedback(feedbackElement, message, correct);
-    
-    // После успешной проверки можно отметить как выполненное
-    if (correct && isAuthenticated && currentUserId) {
-        const quizKey = `${submoduleId}_quiz_${questionId}`;
-        localStorage.setItem(quizKey, 'completed');
-    }
-    
-    console.log("Результат проверки:", { correct, message });
-}
-
-// Вспомогательная функция для показа фидбека
-function showFeedback(element, message, isCorrect) {
-    element.innerHTML = `
-        <div class="quiz-feedback ${isCorrect ? 'correct' : 'incorrect'}">
-            ${message}
-        </div>
-    `;
-    element.style.display = 'block';
-}
-
-// Функция для проверки множественного выбора (вызывается из onchange)
-function checkQuizMultiple(submoduleId, questionId, checkbox) {
-    console.log("checkQuizMultiple вызвана:", submoduleId, questionId, checkbox.name);
-    
-    // Находим все выбранные чекбоксы с этим именем
-    const checkboxes = document.querySelectorAll(`input[name="${checkbox.name}"]:checked`);
-    const selectedValues = Array.from(checkboxes).map(cb => cb.value);
-    
-    console.log("Выбранные значения:", selectedValues);
-    
-    checkQuiz(submoduleId, questionId, selectedValues);
 }
 
 function showFeedback(element, message, isCorrect) {
